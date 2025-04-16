@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signInWithEmail, signUpWithEmail, resetPassword } from '@/lib/auth';
+import { signInWithEmail, signUpWithEmail, resetPassword, checkUserExists } from '@/lib/auth';
 import { APP_NAME } from '@/lib/constants';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -27,10 +27,18 @@ export default function AuthForm() {
 
     try {
       if (isForgotPassword) {
+        const userExists = await checkUserExists(email);
+        if (!userExists) {
+          throw new Error('No account exists with this email address');
+        }
         await resetPassword(email);
         alert('Please check your email for password reset instructions');
         setIsForgotPassword(false);
       } else if (isSignUp) {
+        const userExists = await checkUserExists(email);
+        if (userExists) {
+          throw new Error('An account already exists with this email address');
+        }
         await signUpWithEmail(email, password);
         alert('Please check your email to verify your account');
       } else {

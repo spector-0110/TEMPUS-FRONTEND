@@ -100,3 +100,33 @@ export async function getCurrentUser() {
     return null;
   }
 }
+
+/**
+ * Check if user exists
+ */
+export async function checkUserExists(email) {
+  try {
+    const { data, error } = await supabase.auth.signInWithOtp({
+      email: email,
+      options: {
+        shouldCreateUser: false // Only send OTP if user exists
+      }
+    });
+    
+    // If there's no error, user exists
+    // If error code is 400, user doesn't exist
+    // Any other error means we couldn't determine
+    if (error) {
+      if (error.status === 400) {
+        return false;
+      }
+      throw error;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error checking user existence:', error.message);
+    // If we can't check, assume user might exist to be safe
+    return null;
+  }
+}
