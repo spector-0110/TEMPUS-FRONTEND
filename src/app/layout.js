@@ -2,6 +2,7 @@ import '../styles/globals.css';
 import { AuthProvider } from '@/context/AuthProvider';
 import { ThemeProvider } from '@/context/ThemeProvider';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { LogoutButton } from '@/components/ui/LogoutButton';
 
 export const metadata = {
   title: 'Swasthify - Hospital Management System',
@@ -18,6 +19,7 @@ export default function RootLayout({ children }) {
               {children}
             </main>
             <ThemeToggle />
+            <LogoutButton />
           </AuthProvider>
         </ThemeProvider>
       </body>
