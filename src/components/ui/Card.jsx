@@ -5,20 +5,21 @@ import { cn } from '@/lib/utils';
 
 const Card = forwardRef(({ className, variant = 'default', ...props }, ref) => {
   const variants = {
-    default: 'bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700',
-    glass: 'bg-white/10 dark:bg-dark-800/30 backdrop-blur-lg border border-white/20 dark:border-dark-700/50',
-    premium: `bg-gradient-to-b from-white to-gray-50 dark:from-dark-800 dark:to-dark-900
-              shadow-premium dark:shadow-premium-dark border border-gray-100 dark:border-dark-700
-              hover:shadow-lg dark:hover:shadow-lg`,
-    gradient: `bg-gradient-to-br from-primary-500/10 to-accent-500/10 dark:from-primary-900/20 dark:to-accent-900/20
-               border border-primary-100 dark:border-primary-800`,
+    default: 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md',
+    glass: 'bg-white/10 dark:bg-gray-800/30 backdrop-blur-lg border border-white/20 dark:border-gray-700/50 shadow-lg',
+    premium: `bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900
+              shadow-xl dark:shadow-2xl border border-gray-100 dark:border-gray-700
+              hover:shadow-2xl dark:hover:shadow-3xl transition-all duration-300`,
+    gradient: `bg-gradient-to-br from-primary-500/10 via-accent-500/10 to-secondary-500/10 
+               dark:from-primary-400/20 dark:via-accent-400/20 dark:to-secondary-400/20
+               border border-primary-100 dark:border-primary-800 shadow-lg hover:shadow-xl`
   };
 
   return (
     <div
       ref={ref}
       className={cn(
-        "rounded-xl shadow-sm transition-all duration-200",
+        'rounded-lg p-6 transition-all duration-200 card-hover',
         variants[variant],
         className
       )}
@@ -26,7 +27,7 @@ const Card = forwardRef(({ className, variant = 'default', ...props }, ref) => {
     />
   );
 });
-Card.displayName = "Card";
+Card.displayName = 'Card';
 
 const CardHeader = forwardRef(({ className, ...props }, ref) => (
   <div
