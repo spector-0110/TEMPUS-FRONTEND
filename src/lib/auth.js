@@ -11,7 +11,7 @@ export async function signInWithEmail(email, password) {
     });
     
     if (error) throw error;
-    
+    console.log(data);
     return data;
   } catch (error) {
     console.error('Error signing in:', error.message);

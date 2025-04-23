@@ -5,7 +5,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { LogoutButton } from '@/components/ui/LogoutButton';
 
 export const metadata = {
-  title: 'Swasthify - Hospital Management System',
+  title: 'Tempus - Hospital Management System',
   description: 'Modern healthcare management platform',
 };
 

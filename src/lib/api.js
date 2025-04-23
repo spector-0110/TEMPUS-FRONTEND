@@ -11,7 +11,7 @@ export async function fetchHospitalFormFields() {
     const session = await supabase.auth.getSession();
     const { data: token } = session;
     
-    const response = await fetch(`${BASE_URL}/form-fields`, {
+    const response = await fetch(`${BASE_URL}/hospitals/form-config`, {
       headers: {
         'Authorization': `Bearer ${token?.session?.access_token || ''}`,
         'Content-Type': 'application/json'
@@ -34,7 +34,7 @@ export async function fetchHospitalFormFields() {
  */
 export async function fetchSubscriptionPlans() {
   try {
-    const response = await fetch(`${BASE_URL}/subscription-plans`);
+    const response = await fetch(`${BASE_URL}/subscriptions/plans`);
     
     if (!response.ok) {
       throw new Error('Failed to fetch subscription plans');
