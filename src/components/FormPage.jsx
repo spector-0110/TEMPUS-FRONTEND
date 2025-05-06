@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthProvider';
-import { fetchHospitalFormFields } from '@/lib/api';
+import { fetchHospitalFormFields,submitHospitalDetails } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 
 export default function FormPage() {
   const [formFields, setFormFields] = useState([]);
+  const [formSections, setFormSections] = useState([]);
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -19,28 +20,27 @@ export default function FormPage() {
   const { user } = useAuth();
   const router = useRouter();
 
-  // Group form fields into steps for better user experience
-  const formSteps = [
-    { title: 'Basic Information', key: 'basic' },
-    { title: 'Healthcare Details', key: 'healthcare' },
-    { title: 'Additional Information', key: 'additional' }
-  ];
-
   useEffect(() => {
     const getFormFields = async () => {
       try {
         setLoading(true);
         const data = await fetchHospitalFormFields();
-        // Transform sections into flat array of fields with section info
-        const fields = data.sections?.reduce((acc, section) => {
-          return acc.concat(
-            section.fields.map(field => ({
-              ...field,
-              step: section.id // Use section id as step
-            }))
-          );
-        }, []) || [];
-        setFormFields(fields);
+        
+        if (data.sections && data.sections.length > 0) {
+          setFormSections(data.sections);
+          
+          // Transform sections into flat array of fields with section info
+          const fields = data.sections.reduce((acc, section) => {
+            return acc.concat(
+              section.fields.map(field => ({
+                ...field,
+                step: section.id
+              }))
+            );
+          }, []);
+          
+          setFormFields(fields);
+        }
       } catch (err) {
         setError('Failed to load form fields. Please try again.');
         console.error(err);
@@ -61,37 +61,107 @@ export default function FormPage() {
     }));
   };
 
+  const handleFileChange = (fieldId, file) => {
+    setFormData(prev => ({
+      ...prev,
+      [fieldId]: file
+    }));
+  };
+
+  const validateField = (field, value) => {
+    if (field.required && (value === undefined || value === null || value === '')) {
+      return `${field.label} is required`;
+    }
+
+    if (!value && !field.required) {
+      return null;
+    }
+
+    const validation = field.validation;
+    if (!validation) return null;
+
+    if (validation.minLength && String(value).length < validation.minLength) {
+      return `${field.label} must be at least ${validation.minLength} characters`;
+    }
+
+    if (validation.maxLength && String(value).length > validation.maxLength) {
+      return `${field.label} must be no more than ${validation.maxLength} characters`;
+    }
+
+    if (validation.pattern) {
+      const pattern = new RegExp(validation.pattern);
+      if (!pattern.test(String(value))) {
+        return validation.message || `Invalid format for ${field.label}`;
+      }
+    }
+
+    if (field.type === 'file' && value) {
+      if (validation.maxSize && value.size > validation.maxSize) {
+        return `File size must be less than ${validation.maxSize / 1024 / 1024}MB`;
+      }
+      
+      if (validation.acceptedTypes && !validation.acceptedTypes.includes(value.type)) {
+        return `File type must be ${validation.acceptedTypes.join(', ')}`;
+      }
+    }
+
+    if (field.type === 'date' && validation.max && new Date(value) > new Date(validation.max)) {
+      return validation.message || `${field.label} cannot be later than ${validation.max}`;
+    }
+
+    return null;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Store form data in session storage for the subscription page
-    sessionStorage.setItem('formData', JSON.stringify(formData));
+    // Validate all fields before submitting
+    const errors = formFields.map(field => validateField(field, formData[field.id])).filter(Boolean);
     
-    // Navigate to subscription page
-    router.push('/subscription');
+    if (errors.length > 0) {
+      setError(errors[0]);
+      return;
+    }
+    
+    // Store form data in session storage for the subscription page
+   // sessionStorage.setItem('formData', JSON.stringify(formData));
+
+
+    submitHospitalDetails(formData);
+
+    
+    router.push('/dashboard');
   };
 
   const nextStep = () => {
-    setCurrentStep(prev => Math.min(prev + 1, formSteps.length - 1));
+    if (currentStep < formSections.length - 1) {
+      setCurrentStep(prev => prev + 1);
+    }
   };
 
   const prevStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 0));
+    if (currentStep > 0) {
+      setCurrentStep(prev => prev - 1);
+    }
   };
 
   const isCurrentStepValid = () => {
+    if (!formSections[currentStep]) return false;
+    
     const currentStepFields = formFields.filter(
-      field => field.step === formSteps[currentStep].key && field.required
+      field => field.step === formSections[currentStep].id && field.required
     );
     
-    return currentStepFields.every(field => 
-      formData[field.id] !== undefined && formData[field.id] !== ''
-    );
+    return currentStepFields.every(field => {
+      const value = formData[field.id];
+      return !validateField(field, value);
+    });
   };
 
   // Get fields for current step
   const getCurrentStepFields = () => {
-    return formFields.filter(field => field.step === formSteps[currentStep].key);
+    if (!formSections[currentStep]) return [];
+    return formFields.filter(field => field.step === formSections[currentStep].id);
   };
 
   if (loading) {
@@ -138,7 +208,7 @@ export default function FormPage() {
         {/* Progress steps */}
         <div className="px-8 py-4 bg-gray-50 border-b border-gray-100">
           <div className="flex items-center w-full">
-            {formSteps.map((step, index) => (
+            {formSections.map((section, index) => (
               <div key={index} className="flex items-center relative w-full">
                 {/* Step connector */}
                 {index > 0 && (
@@ -171,7 +241,7 @@ export default function FormPage() {
                     )}
                   </div>
                   <p className="mt-2 text-xs font-medium text-gray-500">
-                    {step.title}
+                    {section.title}
                   </p>
                 </div>
               </div>
@@ -187,7 +257,7 @@ export default function FormPage() {
           <form onSubmit={handleSubmit}>
             <CardContent className="pt-6">
               <h3 className="text-lg font-medium text-gray-900 mb-4">
-                {formSteps[currentStep].title}
+                {formSections[currentStep]?.title || "Form"}
               </h3>
               
               <div className="space-y-5">
@@ -199,6 +269,8 @@ export default function FormPage() {
                     required: field.required,
                     description: field.description,
                   };
+                  
+                  const validationError = validateField(field, formData[field.id]);
 
                   // Render appropriate field based on type
                   switch (field.type) {
@@ -209,7 +281,9 @@ export default function FormPage() {
                             value={formData[field.id] || ''}
                             onChange={(e) => handleInputChange(field.id, e.target.value)}
                             placeholder={field.placeholder || ''}
+                            className={validationError ? "border-error-300" : ""}
                           />
+                          {validationError && <p className="mt-1 text-sm text-error-500">{validationError}</p>}
                         </FormField>
                       );
                       
@@ -224,9 +298,10 @@ export default function FormPage() {
                             className={cn(
                               "w-full px-3 py-2 bg-white border rounded-md text-gray-900 text-sm transition-colors duration-200",
                               "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                              "border-gray-300 focus:border-primary-500"
+                              validationError ? "border-error-300" : "border-gray-300 focus:border-primary-500"
                             )}
                           />
+                          {validationError && <p className="mt-1 text-sm text-error-500">{validationError}</p>}
                         </FormField>
                       );
                       
@@ -239,7 +314,7 @@ export default function FormPage() {
                             className={cn(
                               "w-full px-3 py-2 bg-white border rounded-md text-gray-900 text-sm transition-colors duration-200",
                               "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                              "border-gray-300 focus:border-primary-500"
+                              validationError ? "border-error-300" : "border-gray-300 focus:border-primary-500"
                             )}
                           >
                             <option value="">Select an option</option>
@@ -249,6 +324,7 @@ export default function FormPage() {
                               </option>
                             ))}
                           </select>
+                          {validationError && <p className="mt-1 text-sm text-error-500">{validationError}</p>}
                         </FormField>
                       );
                       
@@ -273,6 +349,7 @@ export default function FormPage() {
                               </div>
                             ))}
                           </div>
+                          {validationError && <p className="mt-1 text-sm text-error-500">{validationError}</p>}
                         </FormField>
                       );
                       
@@ -291,6 +368,98 @@ export default function FormPage() {
                               {field.checkboxLabel || field.label}
                             </label>
                           </div>
+                          {validationError && <p className="mt-1 text-sm text-error-500">{validationError}</p>}
+                        </FormField>
+                      );
+                      
+                    case 'tel':
+                      return (
+                        <FormField {...fieldProps}>
+                          <Input
+                            type="tel"
+                            value={formData[field.id] || ''}
+                            onChange={(e) => handleInputChange(field.id, e.target.value)}
+                            placeholder={field.placeholder || ''}
+                            className={validationError ? "border-error-300" : ""}
+                          />
+                          {validationError && <p className="mt-1 text-sm text-error-500">{validationError}</p>}
+                        </FormField>
+                      );
+                      
+                    case 'url':
+                      return (
+                        <FormField {...fieldProps}>
+                          <Input
+                            type="url"
+                            value={formData[field.id] || ''}
+                            onChange={(e) => handleInputChange(field.id, e.target.value)}
+                            placeholder={field.placeholder || 'https://example.com'}
+                            className={validationError ? "border-error-300" : ""}
+                          />
+                          {validationError && <p className="mt-1 text-sm text-error-500">{validationError}</p>}
+                        </FormField>
+                      );
+                      
+                    case 'file':
+                      return (
+                        <FormField {...fieldProps}>
+                          <div className="mt-1">
+                            <input
+                              id={field.id}
+                              type="file"
+                              onChange={(e) => handleFileChange(field.id, e.target.files[0])}
+                              accept={field.validation?.acceptedTypes?.join(',')}
+                              className={cn(
+                                "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4",
+                                "file:rounded-md file:border-0 file:text-sm file:font-semibold",
+                                "file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100",
+                                validationError ? "border border-error-300 rounded-md" : ""
+                              )}
+                            />
+                            {validationError && <p className="mt-1 text-sm text-error-500">{validationError}</p>}
+                            {formData[field.id] && (
+                              <p className="mt-1 text-sm text-gray-500">
+                                Selected file: {formData[field.id].name}
+                              </p>
+                            )}
+                          </div>
+                        </FormField>
+                      );
+                      
+                    case 'color':
+                      return (
+                        <FormField {...fieldProps}>
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="color"
+                              id={field.id}
+                              value={formData[field.id] || field.defaultValue || '#000000'}
+                              onChange={(e) => handleInputChange(field.id, e.target.value)}
+                              className="h-10 w-10 rounded cursor-pointer"
+                            />
+                            <Input
+                              type="text"
+                              value={formData[field.id] || field.defaultValue || '#000000'}
+                              onChange={(e) => handleInputChange(field.id, e.target.value)}
+                              placeholder="#000000"
+                              className="w-32"
+                            />
+                          </div>
+                          {validationError && <p className="mt-1 text-sm text-error-500">{validationError}</p>}
+                        </FormField>
+                      );
+                      
+                    case 'date':
+                      return (
+                        <FormField {...fieldProps}>
+                          <Input
+                            type="date"
+                            value={formData[field.id] || ''}
+                            onChange={(e) => handleInputChange(field.id, e.target.value)}
+                            max={field.validation?.max}
+                            className={validationError ? "border-error-300" : ""}
+                          />
+                          {validationError && <p className="mt-1 text-sm text-error-500">{validationError}</p>}
                         </FormField>
                       );
                       
@@ -311,7 +480,7 @@ export default function FormPage() {
                 Previous
               </Button>
               
-              {currentStep < formSteps.length - 1 ? (
+              {currentStep < formSections.length - 1 ? (
                 <Button
                   type="button"
                   onClick={nextStep}
@@ -320,8 +489,9 @@ export default function FormPage() {
                   Next
                 </Button>
               ) : (
-                <Button type="submit">
-                  Continue to Subscription
+                <Button type="submit" disabled={!isCurrentStepValid()}>
+
+                  Create Hospital Account
                 </Button>
               )}
             </CardFooter>

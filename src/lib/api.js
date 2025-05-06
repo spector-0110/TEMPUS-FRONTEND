@@ -52,7 +52,7 @@ export async function fetchHospitalDetails() {
       if (response.status === 404) {
         throw new Error('Hospital details not found. Please complete your registration.');
       }
-      throw new Error('Failed to fetch hospital details');
+      throw new Error('Hospital details not found');
     }
     
     return await response.json();
