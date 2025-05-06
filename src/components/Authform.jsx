@@ -59,31 +59,28 @@ export default function AuthForm() {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-lg mx-auto"> {/* Increased max-width */}
       <CardHeader>
-        <CardTitle className="text-2xl font-medium text-center">
-          {isForgotPassword 
-            ? 'Reset your password'
-            : isSignUp 
-              ? 'Create your account' 
-              : 'Sign in to your account'}
+        <CardTitle className="text-3xl font-medium text-center"> {/* Increased text size */}
+          Tempus
         </CardTitle>
         {error && (
-          <div className="mt-3 px-4 py-3 bg-error-50 text-error-700 text-sm rounded-md border border-error-100">
+          <div className="mt-4 px-5 py-4 bg-error-50 text-error-700 text-base rounded-md border border-error-100"> {/* Increased padding and text size */}
             {error}
           </div>
         )}
       </CardHeader>
 
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <FormField label="Email address" required>
+      <CardContent className="p-6"> {/* Added padding */}
+        <form onSubmit={handleSubmit} className="space-y-8"> {/* Increased spacing */}
+          <FormField label="Email address" required className="text-base"> 
             <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="Enter your email"
+              className="h-12 text-base"
             />
           </FormField>
 
@@ -92,8 +89,9 @@ export default function AuthForm() {
               label="Password" 
               required
               description={isSignUp ? "Must be at least 6 characters" : ""}
+              className="text-base" 
             >
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex-grow relative">
                     <Input
@@ -103,26 +101,27 @@ export default function AuthForm() {
                       required
                       minLength={6}
                       placeholder={isSignUp ? "Create a password" : "Enter your password"}
+                      className="h-12 text-base"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />} 
                     </button>
                   </div>
-                  {!isSignUp && (
+                </div>
+                {!isSignUp && (
                     <a 
                       href="#" 
                       onClick={toggleForgotPassword}
-                      className="text-xs font-medium text-primary-600 hover:text-primary-500 ml-2"
+                      className="text-sm font-small text-primary-600 hover:text-primary-500 ml-3"
                     >
                       Forgot?
                     </a>
                   )}
-                </div>
               </div>
             </FormField>
           )}
@@ -130,7 +129,7 @@ export default function AuthForm() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full mt-2"
+            className="w-full mt-4 h-12 text-base"
           >
             {loading 
               ? 'Processing...' 
@@ -143,14 +142,14 @@ export default function AuthForm() {
         </form>
 
         {!isForgotPassword && (
-          <div className="mt-8 text-center">
+          <div className="mt-10 text-center"> 
             <Button
               onClick={() => {
                 setIsSignUp(!isSignUp);
                 setError('');
               }}
               variant="link"
-              className="font-medium"
+              className="font-medium text-base" 
             >
               {isSignUp 
                 ? 'Already have an account? Sign in' 
@@ -160,11 +159,11 @@ export default function AuthForm() {
         )}
 
         {isForgotPassword && (
-          <div className="mt-8 text-center">
+          <div className="mt-10 text-center"> 
             <Button
               onClick={toggleForgotPassword}
               variant="link"
-              className="font-medium"
+              className="font-medium text-base" 
             >
               Back to sign in
             </Button>
@@ -172,8 +171,8 @@ export default function AuthForm() {
         )}
       </CardContent>
       
-      <CardFooter className="text-center">
-        <p className="text-xs text-gray-500 w-full">
+      <CardFooter className="text-center p-6"> {/* Added padding */}
+        <p className="text-sm text-gray-500 w-full"> {/* Increased text size */}
           By continuing, you agree to {APP_NAME}'s <a href="#" className="text-primary-600 hover:underline">Terms of Service</a> and <a href="#" className="text-primary-600 hover:underline">Privacy Policy</a>.
         </p>
       </CardFooter>

@@ -33,7 +33,7 @@ export function AuthProvider({ children }) {
               // Use a timeout to ensure state is updated before navigation
               setTimeout(() => {
                 router.push('/');
-              }, 100);
+              }, 1000);
               return;
             }
             

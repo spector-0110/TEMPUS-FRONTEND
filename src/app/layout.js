@@ -1,8 +1,9 @@
 import '../styles/globals.css';
 import { AuthProvider } from '@/context/AuthProvider';
-import { ThemeProvider } from '@/context/ThemeProvider';
-import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import ThemeProvider from '@/context/ThemeProvider';
+import { HospitalProvider } from '@/context/HospitalProvider';
 import { LogoutButton } from '@/components/ui/LogoutButton';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 export const metadata = {
   title: 'Tempus - Hospital Management System',
@@ -12,14 +13,23 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
-        <ThemeProvider>
-          <AuthProvider>
-            <main className="min-h-[calc(100vh-64px)]">
-              {children}
-            </main>
+      <body className="bg-background text-foreground">
+        <ThemeProvider
+           attribute="class"
+           defaultTheme="system"
+           enableSystem
+           disableTransitionOnChange
+        >
+          <div className="fixed bottom-4 right-4 z-50">
             <ThemeToggle />
-            <LogoutButton />
+          </div>
+          <AuthProvider>
+            <HospitalProvider>
+              <main className="min-h-[calc(100vh-64px)]">
+                {children}
+              </main>
+              <LogoutButton />
+            </HospitalProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

@@ -27,8 +27,9 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 flex flex-col md:flex-row">
+        
         {/* Left column - content */}
-        <div className="flex-1 bg-primary-50 flex flex-col justify-center px-4 py-12 sm:px-6 lg:px-8 lg:flex-none">
+        <div className="w-full md:w-2/5 bg-primary-50 flex flex-col justify-center px-4 py-12 sm:px-6 lg:px-8">
           <div className="mx-auto w-full max-w-md">
             <div>
               <h1 className="text-3xl font-medium text-gray-900 tracking-tight">
@@ -37,7 +38,7 @@ export default function Home() {
               <p className="mt-3 text-base text-gray-500">
                 {APP_NAME} streamlines your healthcare operations with powerful queue management, patient tracking, and administrative tools.
               </p>
-              
+
               <div className="mt-8">
                 <div className="space-y-4">
                   {trustIndicators.map((indicator, index) => (
@@ -47,14 +48,12 @@ export default function Home() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                       </div>
-                      <p className="ml-3 text-base text-gray-500">
-                        {indicator}
-                      </p>
+                      <p className="ml-3 text-base text-gray-500">{indicator}</p>
                     </div>
                   ))}
                 </div>
               </div>
- 
+
               <div className="mt-12">
                 <div className="bg-white py-4 px-4 rounded-md shadow-sm border border-gray-100">
                   <div className="flex items-center space-x-3">
@@ -67,14 +66,16 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+
             </div>
           </div>
         </div>
-        
+
         {/* Right column - auth form */}
-        <div className="flex-1 flex flex-col justify-center px-4 py-12 sm:px-6 lg:px-8">
+        <div className="w-full md:w-3/5 flex flex-col justify-center px-4 py-12 sm:px-6 lg:px-8">
           <AuthForm />
         </div>
+
       </div>
     </div>
   );

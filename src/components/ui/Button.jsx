@@ -3,7 +3,7 @@
 import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
-const Button = forwardRef(({ className, variant = 'default', size = 'default', ...props }, ref) => {
+const Button = forwardRef(({ className, variant = 'ghost', size = 'default', ...props }, ref) => {
   const variants = {
     default: 'bg-primary-500 text-white hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-700',
     secondary: 'bg-secondary-500 text-white hover:bg-secondary-600 dark:bg-secondary-600 dark:hover:bg-secondary-700',

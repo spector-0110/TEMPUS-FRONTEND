@@ -31,7 +31,16 @@ export default function FormPage() {
       try {
         setLoading(true);
         const data = await fetchHospitalFormFields();
-        setFormFields(data.fields || []);
+        // Transform sections into flat array of fields with section info
+        const fields = data.sections?.reduce((acc, section) => {
+          return acc.concat(
+            section.fields.map(field => ({
+              ...field,
+              step: section.id // Use section id as step
+            }))
+          );
+        }, []) || [];
+        setFormFields(fields);
       } catch (err) {
         setError('Failed to load form fields. Please try again.');
         console.error(err);

@@ -2,8 +2,9 @@
 
 import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
+import { HeartPulse } from "lucide-react"; 
 
-const Card = forwardRef(({ className, variant = 'default', ...props }, ref) => {
+const Card = forwardRef(({ className, variant = 'glass', ...props }, ref) => {
   const variants = {
     default: 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md',
     glass: 'bg-white/10 dark:bg-gray-800/30 backdrop-blur-lg border border-white/20 dark:border-gray-700/50 shadow-lg',
@@ -19,7 +20,7 @@ const Card = forwardRef(({ className, variant = 'default', ...props }, ref) => {
     <div
       ref={ref}
       className={cn(
-        'rounded-lg p-6 transition-all duration-200 card-hover',
+        'rounded-lg p-2 transition-all duration-200 card-hover',
         variants[variant],
         className
       )}
@@ -38,16 +39,22 @@ const CardHeader = forwardRef(({ className, ...props }, ref) => (
 ));
 CardHeader.displayName = "CardHeader";
 
-const CardTitle = forwardRef(({ className, ...props }, ref) => (
-  <h3
+
+const CardTitle = forwardRef(({ className, children, ...props }, ref) => (
+  <h1
     ref={ref}
     className={cn(
-      "text-2xl font-semibold leading-tight tracking-tight text-gray-900 dark:text-white",
+      "text-4xl md:text-5xl font-extrabold tracking-tight text-center text-primary-700 dark:text-primary-300 flex items-center justify-center space-x-3",
       className
     )}
     {...props}
-  />
+  >
+    <HeartPulse className="w-10 h-10 text-primary-500" />
+    <span>{children}</span>
+  </h1>
 ));
+
+
 CardTitle.displayName = "CardTitle";
 
 const CardDescription = forwardRef(({ className, ...props }, ref) => (

@@ -10,7 +10,7 @@ const FormField = forwardRef(({
   error, 
   description, 
   required, 
-  variant = 'default',
+  variant = 'premium',
   children, 
   ...props 
 }, ref) => {

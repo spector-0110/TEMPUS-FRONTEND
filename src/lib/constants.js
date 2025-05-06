@@ -1,7 +1,7 @@
 // Design tokens for consistent UI across the application
 export const colors = {
   primary: {
-    50: '#f0f9ff',
+    50: '#ffffff',
     100: '#e0f2fe',
     200: '#bae6fd',
     300: '#7dd3fc',
@@ -66,5 +66,5 @@ export const shadows = {
 };
 
 // Application-specific constants
-export const APP_NAME = 'Swasthify';
+export const APP_NAME = 'Tempus';
 export const APP_DESCRIPTION = 'Modern healthcare management platform';
