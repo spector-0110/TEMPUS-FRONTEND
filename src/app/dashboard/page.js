@@ -40,7 +40,7 @@ export default function DashboardPage() {
             {/* Dashboard content would go here */}
             <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <p className="text-gray-600 dark:text-gray-300">
-                Your hospital management dashboard will appear here after completing registration.
+                Your hospital management dashboard will appear here .
               </p>
             </div>
           </div>

@@ -19,6 +19,7 @@ export default function FormPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const { user } = useAuth();
   const router = useRouter();
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const getFormFields = async () => {
@@ -28,6 +29,7 @@ export default function FormPage() {
         
         if (data.sections && data.sections.length > 0) {
           setFormSections(data.sections);
+          console.log('Form sections:', data.sections);
           
           // Transform sections into flat array of fields with section info
           const fields = data.sections.reduce((acc, section) => {
@@ -112,7 +114,7 @@ export default function FormPage() {
     return null;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Validate all fields before submitting
@@ -122,15 +124,22 @@ export default function FormPage() {
       setError(errors[0]);
       return;
     }
+  
+    try {
+      setSubmitting(true);
+      setError('');
     
-    // Store form data in session storage for the subscription page
-   // sessionStorage.setItem('formData', JSON.stringify(formData));
+      const response=await submitHospitalDetails(formData);
 
+      // Only redirect after successful submission
+      window.location.href = '/dashboard';   
 
-    submitHospitalDetails(formData);
-
-    
-    router.push('/dashboard');
+    } catch (err) {
+      setError(err.message || 'Failed to submit form. Please try again.');
+      console.error('Form submission error:', err);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const nextStep = () => {
@@ -262,8 +271,8 @@ export default function FormPage() {
               
               <div className="space-y-5">
                 {currentFields.map((field) => {
-                  // Common field props
-                  const fieldProps = {
+                  // Separate key from other field props
+                  const { key, ...fieldProps } = {
                     key: field.id,
                     label: field.label,
                     required: field.required,
@@ -276,7 +285,7 @@ export default function FormPage() {
                   switch (field.type) {
                     case 'text':
                       return (
-                        <FormField {...fieldProps}>
+                        <FormField key={key} {...fieldProps}>
                           <Input
                             value={formData[field.id] || ''}
                             onChange={(e) => handleInputChange(field.id, e.target.value)}
@@ -289,7 +298,7 @@ export default function FormPage() {
                       
                     case 'textarea':
                       return (
-                        <FormField {...fieldProps}>
+                        <FormField key={key} {...fieldProps}>
                           <textarea
                             value={formData[field.id] || ''}
                             onChange={(e) => handleInputChange(field.id, e.target.value)}
@@ -307,7 +316,7 @@ export default function FormPage() {
                       
                     case 'select':
                       return (
-                        <FormField {...fieldProps}>
+                        <FormField key={key} {...fieldProps}>
                           <select
                             value={formData[field.id] || ''}
                             onChange={(e) => handleInputChange(field.id, e.target.value)}
@@ -330,7 +339,7 @@ export default function FormPage() {
                       
                     case 'radio':
                       return (
-                        <FormField {...fieldProps}>
+                        <FormField key={key} {...fieldProps}>
                           <div className="space-y-2 pt-1">
                             {field.options?.map((option) => (
                               <div key={option.value} className="flex items-center">
@@ -355,7 +364,7 @@ export default function FormPage() {
                       
                     case 'checkbox':
                       return (
-                        <FormField {...fieldProps}>
+                        <FormField key={key} {...fieldProps}>
                           <div className="flex items-center pt-1">
                             <input
                               id={field.id}
@@ -374,7 +383,7 @@ export default function FormPage() {
                       
                     case 'tel':
                       return (
-                        <FormField {...fieldProps}>
+                        <FormField key={key} {...fieldProps}>
                           <Input
                             type="tel"
                             value={formData[field.id] || ''}
@@ -388,7 +397,7 @@ export default function FormPage() {
                       
                     case 'url':
                       return (
-                        <FormField {...fieldProps}>
+                        <FormField key={key} {...fieldProps}>
                           <Input
                             type="url"
                             value={formData[field.id] || ''}
@@ -402,7 +411,7 @@ export default function FormPage() {
                       
                     case 'file':
                       return (
-                        <FormField {...fieldProps}>
+                        <FormField key={key} {...fieldProps}>
                           <div className="mt-1">
                             <input
                               id={field.id}
@@ -428,7 +437,7 @@ export default function FormPage() {
                       
                     case 'color':
                       return (
-                        <FormField {...fieldProps}>
+                        <FormField key={key} {...fieldProps}>
                           <div className="flex items-center gap-3">
                             <input
                               type="color"
@@ -451,7 +460,7 @@ export default function FormPage() {
                       
                     case 'date':
                       return (
-                        <FormField {...fieldProps}>
+                        <FormField key={key} {...fieldProps}>
                           <Input
                             type="date"
                             value={formData[field.id] || ''}
@@ -489,9 +498,18 @@ export default function FormPage() {
                   Next
                 </Button>
               ) : (
-                <Button type="submit" disabled={!isCurrentStepValid()}>
-
-                  Create Hospital Account
+                <Button 
+                  type="submit" 
+                  disabled={!isCurrentStepValid() || submitting}
+                >
+                  {submitting ? (
+                    <>
+                      <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent mr-2" />
+                      Creating Hospital Account...
+                    </>
+                  ) : (
+                    'Create Hospital Account'
+                  )}
                 </Button>
               )}
             </CardFooter>
