@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { submitHospitalDetails } from '@/lib/api';
-import defaultHospitalFormConfig from '@/lib/config/hospitalFormConfig';
+import { Spinner } from '@/components/ui/Spinner';
+import { submitHospitalDetails, fetchHospitalFormFields } from '@/lib/api';
 
 const FORM_STORAGE_KEY = 'hospitalFormData';
 
@@ -17,6 +17,26 @@ export default function HospitalRegistrationForm() {
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formConfig, setFormConfig] = useState({ sections: [] });
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch form configuration on mount
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        setIsLoading(true);
+        const config = await fetchHospitalFormFields();
+        setFormConfig(config);
+      } catch (error) {
+        toast.error('Failed to load form configuration');
+        console.error('Error loading form configuration:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchConfig();
+  }, []);
 
   // Restore form data from localStorage on mount
   useEffect(() => {
@@ -32,7 +52,9 @@ export default function HospitalRegistrationForm() {
 
   // Save form data to localStorage on change
   useEffect(() => {
-    localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(formData));
+    if (Object.keys(formData).length > 0) {
+      localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(formData));
+    }
   }, [formData]);
 
   const validateField = useCallback((field, value) => {
@@ -59,7 +81,7 @@ export default function HospitalRegistrationForm() {
     const newErrors = {};
     let hasError = false;
 
-    defaultHospitalFormConfig.sections.forEach(section => {
+    formConfig.sections.forEach(section => {
       section.fields.forEach(field => {
         const value = formData[field.id] || '';
         const error = validateField(field, value);
@@ -72,7 +94,7 @@ export default function HospitalRegistrationForm() {
 
     setErrors(newErrors);
     return !hasError;
-  }, [formData, validateField]);
+  }, [formData, validateField, formConfig]);
 
   const handleChange = (field, value) => {
     const transformedValue = field.validation?.transform
@@ -120,37 +142,43 @@ export default function HospitalRegistrationForm() {
       <h1 className="text-3xl font-bold mb-8 text-center">Hospital Registration</h1>
 
       <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-8">
-        {defaultHospitalFormConfig.sections.map(section => (
-          <Card key={section.id} className="p-6">
-            <h2 className="text-xl font-semibold mb-4">{section.title}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {section.fields.map(field => (
-                <div key={field.id} className="space-y-2">
-                  <Label htmlFor={field.id}>
-                    {field.label}
-                    {field.required && <span className="text-red-500 ml-1">*</span>}
-                  </Label>
-                  <Input
-                    id={field.id}
-                    type={field.type}
-                    value={formData[field.id] || ''}
-                    onChange={(e) => handleChange(field, e.target.value)}
-                    className={errors[field.id] ? 'border-red-500' : ''}
-                    max={field.validation?.max}
-                  />
-                  {errors[field.id] && (
-                    <p className="text-sm text-red-500">{errors[field.id]}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </Card>
-        ))}
+        {isLoading ? (
+          <div className="flex justify-center items-center min-h-[200px]">
+            <Spinner />
+          </div>
+        ) : (
+          formConfig.sections.map(section => (
+            <Card key={section.id} className="p-6">
+              <h2 className="text-xl font-semibold mb-4">{section.title}</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {section.fields.map(field => (
+                  <div key={field.id} className="space-y-2">
+                    <Label htmlFor={field.id}>
+                      {field.label}
+                      {field.required && <span className="text-red-500 ml-1">*</span>}
+                    </Label>
+                    <Input
+                      id={field.id}
+                      type={field.type}
+                      value={formData[field.id] || ''}
+                      onChange={(e) => handleChange(field, e.target.value)}
+                      className={errors[field.id] ? 'border-red-500' : ''}
+                      max={field.validation?.max}
+                    />
+                    {errors[field.id] && (
+                      <p className="text-sm text-red-500">{errors[field.id]}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Card>
+          ))
+        )}
 
         <div className="flex justify-end mt-6">
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isLoading}
             className="w-full md:w-auto"
           >
             {isSubmitting ? 'Submitting...' : 'Submit Registration'}
