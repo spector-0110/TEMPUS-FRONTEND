@@ -3,7 +3,7 @@ import { AuthProvider } from '@/context/AuthProvider';
 import ThemeProvider from '@/context/ThemeProvider';
 import { HospitalProvider } from '@/context/HospitalProvider';
 import { LogoutButton } from '@/components/ui/LogoutButton';
-import { ThemeToggle } from '@/components/ui/ThemeToggle';
+// import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 export const metadata = {
   title: 'Tempus - Hospital Management System',
@@ -21,7 +21,7 @@ export default function RootLayout({ children }) {
            disableTransitionOnChange
         >
           <div className="fixed bottom-4 right-4 z-50">
-            <ThemeToggle />
+            {/* <ThemeToggle /> */}
           </div>
           <AuthProvider>
             <HospitalProvider>

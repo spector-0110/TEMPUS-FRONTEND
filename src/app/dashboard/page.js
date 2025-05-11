@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthProvider';
 import { useHospital } from '@/context/HospitalProvider';
-import FormPage from '@/components/FormPage';
+import OnboardingForm from '@/components/forms/onboarding-form';
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth();
@@ -30,7 +30,7 @@ export default function DashboardPage() {
     <main className="min-h-screen p-4">
       
       {!isProfileComplete ? (
-        <FormPage />
+        <OnboardingForm />
       ) : (
         <div className="max-w-7xl mx-auto">
           <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-6">

@@ -1,6 +1,37 @@
 import supabase from './supabase';
 
 /**
+ * Sign in with Google
+ */
+export async function signInWithGoogle() {
+  try {
+
+    const origin = typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL;
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${origin}/dashboard`,
+        
+      }
+    });
+    
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error signing in with Google:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Sign up with Google
+ */
+export async function signUpWithGoogle() {
+  // For OAuth providers like Google, signIn and signUp are the same operation
+  return signInWithGoogle();
+}
+
+/**
  * Sign in with email and password
  */
 export async function signInWithEmail(email, password) {
@@ -43,8 +74,11 @@ export async function signUpWithEmail(email, password) {
  */
 export async function resetPassword(email) {
   try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
+    // Get origin safely
+    const origin = typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL;
+    
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${origin}/auth/reset-password`,
     });
     
     if (error) throw error;
@@ -128,5 +162,22 @@ export async function checkUserExists(email) {
     console.error('Error checking user existence:', error.message);
     // If we can't check, assume user might exist to be safe
     return null;
+  }
+}
+
+/**
+ * Update user's password
+ */
+export async function updatePassword(newPassword) {
+  try {
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword
+    });
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error updating password:', error.message);
+    throw error;
   }
 }
