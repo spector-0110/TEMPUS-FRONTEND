@@ -13,33 +13,34 @@ export function HospitalProvider({ children }) {
   const [error, setError] = useState(null);
   const [isProfileComplete, setIsProfileComplete] = useState(false);
   
+  // Extracted common fetch logic into a reusable function
+  const fetchAndUpdateDetails = async () => {
+    setLoading(true);
+    try {
+      const details = await fetchHospitalDetails();
+      setHospitalDetails(details);
+      setIsProfileComplete(true);
+      setError(null);
+    } catch (err) {
+      console.log('Hospital details fetch error:', err);
+      setHospitalDetails(null);
+      setError(err);
+      setIsProfileComplete(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   useEffect(() => {
-    const fetchDetails = async () => {
-      if (!user) {
-        setHospitalDetails(null);
-        setLoading(false);
-        setIsProfileComplete(false);
-        return;
-      }
-      
-      try {
-        setLoading(true);
-        const details = await fetchHospitalDetails();
-        setHospitalDetails(details);
-        setIsProfileComplete(true);
-        setError(null);
-      } catch (err) {
-        console.log('Hospital details fetch error:', err);
-        setHospitalDetails(null);
-        setError(err);
-        setIsProfileComplete(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    if (!user) {
+      setHospitalDetails(null);
+      setLoading(false);
+      setIsProfileComplete(false);
+      return;
+    }
+    
     if (!authLoading) {
-      fetchDetails();
+      fetchAndUpdateDetails();
     }
   }, [user, authLoading]);
   
@@ -55,24 +56,7 @@ export function HospitalProvider({ children }) {
     error,
     isProfileComplete,
     updateHospitalDetails,
-    refresh: () => {
-      setLoading(true);
-      // Using the same function that runs on mount
-      fetchHospitalDetails()
-        .then((details) => {
-          setHospitalDetails(details);
-          setIsProfileComplete(true);
-          setError(null);
-        })
-        .catch((err) => {
-          setError(err);
-          setHospitalDetails(null);
-          setIsProfileComplete(false);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
+    refresh: fetchAndUpdateDetails // Using the same function directly
   };
   
   return (

@@ -25,7 +25,7 @@ export function LoginForm({className, onSignUpClick, onForgetPasswordClick, ...p
 
         try {
             await signInWithEmail(email, password);
-            router.push("/dashboard");
+            router.push("/onboarding");
         } catch (err) {
             setError("Invalid email or password");
         } finally {

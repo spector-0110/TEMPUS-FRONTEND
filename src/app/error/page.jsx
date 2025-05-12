@@ -3,9 +3,21 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
+import { checkServerStatus } from '@/lib/api';
 
 export default function ServerErrorPage() {
   const router = useRouter();
+
+  const handleRetry = async () => {
+    try {
+      await checkServerStatus();
+      // If server check succeeds, redirect to dashboard
+      router.replace('/dashboard');
+    } catch (error) {
+      // If server is still down, refresh the page to show error again
+      router.refresh();
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -22,18 +34,18 @@ export default function ServerErrorPage() {
             Please try again in a few moments.
           </p>
           <Button 
-            onClick={() => router.refresh()}
+            onClick={handleRetry}
             className="w-full"
           >
             Retry Connection
           </Button>
-          <Button 
+          {/* <Button 
             variant="outline"
-            onClick={() => router.push('/')}
+            onClick={() => router.push('/dashboard')}
             className="w-full"
           >
             Return to Home
-          </Button>
+          </Button> */}
         </div>
       </Card>
     </div>

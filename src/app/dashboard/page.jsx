@@ -1,44 +1,31 @@
-'use client';
+import { AppSidebar } from "@/components/ui/app-sidebar"
+import { ChartAreaInteractive } from "@/components/ui/chart-area-interactive"
+import { DataTable } from "@/components/ui/data-table"
+import { SectionCards } from "@/components/ui/section-cards"
+import { SiteHeader } from "@/components/ui/site-header"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthProvider';
-import { useHospital } from '@/context/HospitalProvider';
-import DashBoardComponent from './DashBoardComponent';
-import { Spinner } from '@/components/ui/Spinner';
-import HospitalRegistrationForm from '@/components/forms/hospital-registration-form';
+import data from "./data.json"
 
-export default function DashboardPage() {
-  const { user, loading: authLoading } = useAuth();
-  const { isProfileComplete, loading: hospitalLoading } = useHospital();
-  
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/');
-    }
-  }, [user, authLoading, router]);
-
-  if (authLoading || hospitalLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-          <Spinner />
-      </div>
-    );
-  }
-
+export default function DashBoardComponent() {
   return (
-    <main className="min-h-screen p-4">
-      
-      {!isProfileComplete ? (
-        <HospitalRegistrationForm />
-      ) : (
-        <DashBoardComponent />
-      )
-      }
-    </main>
+    
+    <SidebarProvider>
+      <AppSidebar variant="inset" />
+      <SidebarInset>
+        <SiteHeader />
+        <div className="flex flex-1 flex-col">
+          <div className="@container/main flex flex-1 flex-col gap-2">
+            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+              <SectionCards />
+              <div className="px-4 lg:px-6">
+                <ChartAreaInteractive />
+              </div>
+              <DataTable data={data} />
+            </div>
+          </div>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
-
-

@@ -19,6 +19,7 @@ import {
   UsersIcon,
 } from "lucide-react"
 
+import {useHospital} from "@/context/HospitalProvider"
 import { NavDocuments } from "@/components/ui/nav-documents"
 import { NavMain } from "@/components/ui/nav-main"
 import { NavSecondary } from "@/components/ui/nav-secondary"
@@ -33,11 +34,22 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-const data = {
+export function AppSidebar({
+  ...props
+}) {
+
+
+
+  const { hospitalDetails, loading } = useHospital();
+
+  console.log("hospitalDetails", hospitalDetails);
+
+  const data = {
+
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+      name: hospitalDetails?.name || "Hospital Admin",
+      email: hospitalDetails?.adminEmail || "admin@example.com",
+      avatar: hospitalDetails?.logo || "/tempusLogo1.png",
   },
   navMain: [
     {
@@ -46,7 +58,7 @@ const data = {
       icon: LayoutDashboardIcon,
     },
     {
-      title: "Lifecycle",
+      title: "Appointemnts",
       url: "#",
       icon: ListIcon,
     },
@@ -56,70 +68,14 @@ const data = {
       icon: BarChartIcon,
     },
     {
-      title: "Projects",
-      url: "#",
-      icon: FolderIcon,
-    },
-    {
-      title: "Team",
+      title: "doctors",
       url: "#",
       icon: UsersIcon,
     },
   ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: CameraIcon,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: FileTextIcon,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: FileCodeIcon,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-  ],
+  
   navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: SettingsIcon,
-    },
+
     {
       title: "Get Help",
       url: "#",
@@ -131,37 +87,40 @@ const data = {
       icon: SearchIcon,
     },
   ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: DatabaseIcon,
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: ClipboardListIcon,
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: FileIcon,
-    },
-  ],
-}
+  
+  // documents: [
+  //   {
+  //     name: "Data Library",
+  //     url: "#",
+  //     icon: DatabaseIcon,
+  //   },
+  //   {
+  //     name: "Reports",
+  //     url: "#",
+  //     icon: ClipboardListIcon,
+  //   },
+  //   {
+  //     name: "Word Assistant",
+  //     url: "#",
+  //     icon: FileIcon,
+  //   },
+  // ],
 
-export function AppSidebar({
-  ...props
-}) {
+  }
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
-              <a href="#">
-                <ArrowUpCircleIcon className="h-5 w-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+              <a href="/dashboard">
+                <img
+                  src="/tempusLogo1.png"
+                  alt="Tempus Logo"
+                  className="h-6 w-6 mr-2"
+                />
+                {/* <ArrowUpCircleIcon className="h-5 w-5" /> */}
+                <span className="text-base font-semibold">Tempus</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -169,7 +128,7 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
+        {/* <NavDocuments items={data.documents} /> */}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
