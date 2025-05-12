@@ -8,17 +8,28 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/Spinner';
+import { useHospital } from '@/context/HospitalProvider';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { submitHospitalDetails, fetchHospitalFormFields } from '@/lib/api';
 
 const FORM_STORAGE_KEY = 'hospitalFormData';
 
 export default function HospitalRegistrationForm() {
   const router = useRouter();
+  const { refreshHospitalData } = useHospital();
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formConfig, setFormConfig] = useState({ sections: [] });
   const [isLoading, setIsLoading] = useState(true);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   // Fetch form configuration on mount
   useEffect(() => {
@@ -127,9 +138,10 @@ export default function HospitalRegistrationForm() {
     setIsSubmitting(true);
     try {
       await submitHospitalDetails(formData);
-      toast.success('Hospital details submitted successfully');
       localStorage.removeItem(FORM_STORAGE_KEY);
-      router.push('/dashboard');
+      await refreshHospitalData(); // Refresh hospital data to update isProfileComplete
+      toast.success('Hospital details submitted successfully');
+      // No need for navigation dialog since we're already on dashboard
     } catch (error) {
       toast.error(error?.message || 'Submission failed, please try again.');
     } finally {
@@ -185,6 +197,22 @@ export default function HospitalRegistrationForm() {
           </Button>
         </div>
       </form>
+
+      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Registration Successful!</DialogTitle>
+            <DialogDescription>
+              Your hospital has been successfully registered. You can now access your dashboard to manage your hospital details.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => router.push('/dashboard')}>
+              Go to Dashboard
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
