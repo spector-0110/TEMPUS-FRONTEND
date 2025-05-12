@@ -11,7 +11,6 @@ export async function signInWithGoogle() {
       provider: 'google',
       options: {
         redirectTo: `${origin}/dashboard`,
-        
       }
     });
     

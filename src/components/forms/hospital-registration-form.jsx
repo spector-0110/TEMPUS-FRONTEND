@@ -27,6 +27,7 @@ export default function HospitalRegistrationForm() {
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [formConfig, setFormConfig] = useState({ sections: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
@@ -127,7 +128,7 @@ export default function HospitalRegistrationForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (isSubmitting) return;
+    if (isSubmitting || isButtonDisabled) return;
 
     const isValid = validateForm();
     if (!isValid) {
@@ -136,16 +137,21 @@ export default function HospitalRegistrationForm() {
     }
 
     setIsSubmitting(true);
+    setIsButtonDisabled(true);
+
     try {
       await submitHospitalDetails(formData);
       localStorage.removeItem(FORM_STORAGE_KEY);
-      await refreshHospitalData(); // Refresh hospital data to update isProfileComplete
+      await refreshHospitalData();
       toast.success('Hospital details submitted successfully');
-      // No need for navigation dialog since we're already on dashboard
     } catch (error) {
       toast.error(error?.message || 'Submission failed, please try again.');
     } finally {
       setIsSubmitting(false);
+      // Set a 3-second timeout before enabling the button again
+      setTimeout(() => {
+        setIsButtonDisabled(false);
+      }, 10000);
     }
   };
 
@@ -190,10 +196,10 @@ export default function HospitalRegistrationForm() {
         <div className="flex justify-end mt-6">
           <Button
             type="submit"
-            disabled={isSubmitting || isLoading}
+            disabled={isSubmitting || isLoading || isButtonDisabled}
             className="w-full md:w-auto"
           >
-            {isSubmitting ? 'Submitting...' : 'Submit Registration'}
+            {isSubmitting ? 'Submitting...' : isButtonDisabled ? 'Please wait...' : 'Submit Registration'}
           </Button>
         </div>
       </form>
