@@ -45,6 +45,10 @@ export default function OnboardingPage() {
     );
   }
 
+  if (isProfileComplete) {
+    return null;
+  }
+
   return (
     <main className="min-h-screen p-4">
         <HospitalRegistrationForm />

@@ -18,7 +18,7 @@ import {
   SettingsIcon,
   UsersIcon,
 } from "lucide-react"
-
+import Link from "next/link"
 import {useHospital} from "@/context/HospitalProvider"
 import { NavDocuments } from "@/components/ui/nav-documents"
 import { NavMain } from "@/components/ui/nav-main"
@@ -38,8 +38,6 @@ export function AppSidebar({
   ...props
 }) {
 
-
-
   const { hospitalDetails, loading } = useHospital();
 
   console.log("hospitalDetails", hospitalDetails);
@@ -54,36 +52,35 @@ export function AppSidebar({
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/dashboard",
       icon: LayoutDashboardIcon,
     },
     {
-      title: "Appointemnts",
-      url: "#",
+      title: "Appointments",
+      url: "/dashboard/appointments",
       icon: ListIcon,
     },
     {
       title: "Analytics",
-      url: "#",
+      url: "/dashboard/analytics",
       icon: BarChartIcon,
     },
     {
-      title: "doctors",
-      url: "#",
+      title: "Doctors",
+      url: "/dashboard/doctors",
       icon: UsersIcon,
     },
   ],
   
   navSecondary: [
-
     {
       title: "Get Help",
-      url: "#",
+      url: "/dashboard/help",
       icon: HelpCircleIcon,
     },
     {
       title: "Search",
-      url: "#",
+      url: "/dashboard/search",
       icon: SearchIcon,
     },
   ],
@@ -120,7 +117,7 @@ export function AppSidebar({
                   className="h-6 w-6 mr-2"
                 />
                 {/* <ArrowUpCircleIcon className="h-5 w-5" /> */}
-                <span className="text-base font-semibold">Tempus</span>
+                <span className="text-base font-semibold">{data.user.name}</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
