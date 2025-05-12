@@ -16,15 +16,15 @@ export default function OnboardingPage() {
   
   const router = useRouter();
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/');
-    }
+  // useEffect(() => {
+  //   if (!authLoading && !user) {
+  //     router.push('/');
+  //   }
     
-    if (!authLoading && !hospitalLoading && isProfileComplete) {
-      router.push('/dashboard');
-    }
-  }, [user, authLoading, hospitalLoading, isProfileComplete, router]);
+  //   if (!authLoading && !hospitalLoading && isProfileComplete) {
+  //     router.push('/dashboard');
+  //   }
+  // }, [user, authLoading, hospitalLoading, isProfileComplete, router]);
 
   useEffect(() => {
     const checkServer = async () => {

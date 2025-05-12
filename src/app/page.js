@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthProvider';
+import { useHospital } from '@/context/HospitalProvider';
 import { APP_NAME, APP_DESCRIPTION } from '@/lib/constants';
 import { GalleryVerticalEnd } from "lucide-react"
 import { LoginForm } from "@/components/forms/login-form"
@@ -11,14 +12,19 @@ import { ForgetPasswordForm } from "@/components/forms/forget-password-form"
 
 export default function Home() {
   const { user, loading } = useAuth();
+  const { isProfileComplete, loading: hospitalLoading } = useHospital();
   const router = useRouter();
   const [formState, setFormState] = useState('login');
 
   useEffect(() => {
-    if (user && !loading) {
-      router.push('/onboarding');
+    if (user && !loading && !hospitalLoading) {
+      if (isProfileComplete) {
+        router.push('/dashboard');
+      } else {
+        router.push('/onboarding');
+      }
     }
-  }, [user, loading, router]);
+  }, [user, loading, hospitalLoading, isProfileComplete, router]);
 
   const renderForm = () => {
     switch (formState) {
