@@ -77,8 +77,8 @@ export function AuthProvider({ children }) {
         // Then clear local state
         setUser(null);
         
-        // Navigate to home page
-        router.push('/');
+        // // Navigate to home page
+        // router.push('/');
         
         return true;
       } catch (error) {
