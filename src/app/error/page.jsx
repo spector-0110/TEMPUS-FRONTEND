@@ -14,7 +14,7 @@ export default function ErrorPage() {
     try {
       await checkServerStatus();
       // If server check succeeds, redirect to dashboard
-      window.location.href = '/dashboard';
+      window.location.href = '/onboarding';
 
     } catch (error) {
       // If server is still down, refresh the page to show error again

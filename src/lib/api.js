@@ -46,6 +46,9 @@ async function fetchWithTimeout(url, options = {}) {
   }
 }
 
+/**
+ * Checks if the backend server is running
+ */
 export async function checkServerStatus() {
   try {
     const response = await fetchWithTimeout(`${BASE_URL}`);
@@ -133,6 +136,98 @@ export async function submitHospitalDetails(formData) {
       message: error.message,
       error
     });
+    throw error;
+  }
+}
+
+/**
+ * Get OTP for hospital details update
+ */
+export async function getOTPforHospitalDetailsUpdate(formData) {
+  try {
+    const session = await supabase.auth.getSession();
+    const { data: token } = session;
+    
+    if (!token?.session?.access_token) {
+      throw new Error('Authentication required. Please login again.');
+    }
+    
+    const response = await fetchWithTimeout(`${BASE_URL}/hospitals/request-edit-verification`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token.session.access_token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    });
+    
+    return handleApiResponse(response, 'Failed to submit hospital details');
+  } catch (error) {
+    console.error('Error submitting form data:', {
+      message: error.message,
+      error
+    });
+    throw error;
+  }
+}
+
+/**
+ * Verify OTP for hospital details update
+ */
+export async function verifyOTPforHospitalDeatailsUpdate(formData) {
+  try {
+    const session = await supabase.auth.getSession();
+    const { data: token } = session;
+    
+    if (!token?.session?.access_token) {
+      throw new Error('Authentication required. Please login again.');
+    }
+    
+    const response = await fetchWithTimeout(`${BASE_URL}/hospitals/verify-edit-otp`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token.session.access_token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    });
+    
+    return handleApiResponse(response, 'Failed to submit hospital details');
+  } catch (error) {
+    console.error('Error submitting form data:', {
+      message: error.message,
+      error
+    });
+    throw error;
+  }
+}
+
+/**
+ * Updates hospital details - used by edit form
+ */
+export async function updateHospitalDetailsAPI(updateData) {
+  try {
+    const session = await supabase.auth.getSession();
+    const { data: token } = session;
+    
+    if (!token?.session?.access_token) {
+      throw new Error('Authentication required. Please login again.');
+    }
+
+    console.log('Update Data:', updateData);
+    
+    const response = await fetchWithTimeout(`${BASE_URL}/hospitals/update`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token.session.access_token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updateData)
+    });
+    
+    return handleApiResponse(response, 'Failed to update hospital details');
+  } catch (error) {
+    console.error('Error updating hospital details:', error);
     throw error;
   }
 }
