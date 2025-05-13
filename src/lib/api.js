@@ -2,9 +2,64 @@ import supabase from './supabase';
 import { ServerConnectionError } from './errors';
 
 // Constants for API configuration
-const API_TIMEOUT = 8000; // 5 seconds timeout
+const API_TIMEOUT = 5000; // 5 seconds timeout
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 const INDIA_POST_API = 'https://api.postalpincode.in/pincode';
+
+/**
+ * Robust function to get the access token from Supabase session
+ * This will first try localStorage for faster access and fallback to Supabase API
+ */
+async function getAuthToken() {
+  console.log('getAuthToken - Starting token retrieval');
+  let accessToken = null;
+  
+  try {
+    // First try to get from localStorage directly if available in browser context
+    if (typeof window !== 'undefined' && window.localStorage) {
+      console.log('getAuthToken - Trying localStorage approach');
+      const supabaseKey = Object.keys(localStorage).find(key => key.startsWith('sb-'));
+      
+      if (supabaseKey) {
+        try {
+          const storedAuth = JSON.parse(localStorage.getItem(supabaseKey));
+          if (storedAuth && storedAuth.access_token) {
+            console.log('getAuthToken - Found token in localStorage');
+            accessToken = storedAuth.access_token;
+          }
+        } catch (e) {
+          console.error('getAuthToken - Error parsing localStorage auth:', e);
+        }
+      }
+    }
+    
+    // If localStorage approach didn't work, try the Supabase API with timeout
+    if (!accessToken) {
+      console.log('getAuthToken - Falling back to supabase.auth.getSession()');
+      const sessionPromise = supabase.auth.getSession();
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Supabase session retrieval timed out after 5s')), 5000)
+      );
+      
+      const session = await Promise.race([sessionPromise, timeoutPromise]);
+      console.log('getAuthToken - Session promise resolved');
+      
+      const token = session?.data;
+      accessToken = token?.session?.access_token;
+    }
+    
+    if (!accessToken) {
+      console.error('getAuthToken - No valid access token found');
+      throw new Error('Authentication required. Please login again.');
+    }
+    
+    console.log('getAuthToken - Successfully retrieved access token');
+    return accessToken;
+  } catch (error) {
+    console.error('getAuthToken - Failed to retrieve auth token:', error);
+    throw new Error(`Authentication error: ${error.message}`);
+  }
+}
 
 /**
  * Common error handler for API responses
@@ -28,20 +83,48 @@ async function handleApiResponse(response, errorMessage = 'Request failed') {
  */
 async function fetchWithTimeout(url, options = {}) {
   const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), API_TIMEOUT);
+  const id = setTimeout(() => {
+    controller.abort();
+  }, API_TIMEOUT);
   
   try {
+    const startTime = Date.now();
+    
+    // Combine user signal with our timeout signal if provided
+    let signal = controller.signal;
+    if (options.signal) {
+      // We need to create a new AbortController that aborts if either signal aborts
+      const userController = { signal: options.signal };
+      signal = AbortSignal.any([controller.signal, userController.signal]);
+    }
+    
     const response = await fetch(url, {
       ...options,
-      signal: controller.signal
+      signal
     });
+    
+    // const endTime = Date.now();
+    // const responseTime = endTime - startTime;
+    // console.log(`fetchWithTimeout [${requestId}] - Response received in ${responseTime}ms with status: ${response.status}`);
+    
+    // if (responseTime > API_TIMEOUT * 0.8) {
+    //   // Log warning for slow responses that are close to timeout
+    //   console.warn(`fetchWithTimeout [${requestId}] - Response was slow (${responseTime}ms), close to timeout threshold`);
+    // }
+    
     clearTimeout(id);
     return response;
   } catch (error) {
-    clearTimeout(id);
+    clearTimeout(id);    
+    // Provide more detailed error information
     if (error.name === 'AbortError') {
-      throw new ServerConnectionError('Request timed out');
+      throw new ServerConnectionError(`Request to ${url} timed out after ${API_TIMEOUT}ms`);
+    } else if (error.message === 'Failed to fetch') {
+      throw new ServerConnectionError(`Network error: Unable to connect to ${url}. Please check your connection.`);
+    } else if (error.message?.includes('NetworkError')) {
+      throw new ServerConnectionError(`Network error while connecting to ${url}: ${error.message}`);
     }
+    
     throw error;
   }
 }
@@ -70,12 +153,11 @@ export async function checkServerStatus() {
  */
 export async function fetchHospitalFormFields() {
   try {
-    const session = await supabase.auth.getSession();
-    const { data: token } = session;
+    const accessToken = await getAuthToken();
     
     const response = await fetchWithTimeout(`${BASE_URL}/hospitals/form-config`, {
       headers: {
-        'Authorization': `Bearer ${token?.session?.access_token || ''}`,
+        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       }
     });
@@ -92,12 +174,11 @@ export async function fetchHospitalFormFields() {
  */
 export async function fetchHospitalDetails() {
   try {
-    const session = await supabase.auth.getSession();
-    const { data: token } = session;
+    const accessToken = await getAuthToken();
 
     const response = await fetchWithTimeout(`${BASE_URL}/hospitals/details`, {
       headers: {
-        'Authorization': `Bearer ${token?.session?.access_token || ''}`,
+        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       }
     });
@@ -114,17 +195,12 @@ export async function fetchHospitalDetails() {
  */
 export async function submitHospitalDetails(formData) {
   try {
-    const session = await supabase.auth.getSession();
-    const { data: token } = session;
-    
-    if (!token?.session?.access_token) {
-      throw new Error('Authentication required. Please login again.');
-    }
+    const accessToken = await getAuthToken();
     
     const response = await fetchWithTimeout(`${BASE_URL}/hospitals/initial-details`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token.session.access_token}`,
+        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(formData)
@@ -145,17 +221,12 @@ export async function submitHospitalDetails(formData) {
  */
 export async function getOTPforHospitalDetailsUpdate(formData) {
   try {
-    const session = await supabase.auth.getSession();
-    const { data: token } = session;
-    
-    if (!token?.session?.access_token) {
-      throw new Error('Authentication required. Please login again.');
-    }
+    const accessToken = await getAuthToken();
     
     const response = await fetchWithTimeout(`${BASE_URL}/hospitals/request-edit-verification`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token.session.access_token}`,
+        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(formData)
@@ -176,17 +247,12 @@ export async function getOTPforHospitalDetailsUpdate(formData) {
  */
 export async function verifyOTPforHospitalDeatailsUpdate(formData) {
   try {
-    const session = await supabase.auth.getSession();
-    const { data: token } = session;
-    
-    if (!token?.session?.access_token) {
-      throw new Error('Authentication required. Please login again.');
-    }
+    const accessToken = await getAuthToken();
     
     const response = await fetchWithTimeout(`${BASE_URL}/hospitals/verify-edit-otp`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token.session.access_token}`,
+        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(formData)
@@ -207,27 +273,24 @@ export async function verifyOTPforHospitalDeatailsUpdate(formData) {
  */
 export async function updateHospitalDetailsAPI(updateData) {
   try {
-    const session = await supabase.auth.getSession();
-    const { data: token } = session;
-    
-    if (!token?.session?.access_token) {
-      throw new Error('Authentication required. Please login again.');
-    }
 
-    console.log('Update Data:', updateData);
-    
+    const accessToken = await getAuthToken();
     const response = await fetchWithTimeout(`${BASE_URL}/hospitals/update`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token.session.access_token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(updateData)
-    });
-    
-    return handleApiResponse(response, 'Failed to update hospital details');
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData),
+        // Ensure we're not caching responses
+        cache: 'no-store'
+      });
+
+    const result = await handleApiResponse(response, 'Failed to update hospital details');
+
+    return result;
   } catch (error) {
-    console.error('Error updating hospital details:', error);
+    console.error('updateHospitalDetailsAPI - Error updating hospital details:', error);
     throw error;
   }
 }
