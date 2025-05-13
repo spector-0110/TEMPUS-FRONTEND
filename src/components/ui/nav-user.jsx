@@ -7,7 +7,9 @@ import {
   MoreVerticalIcon,
   UserCircleIcon,
 } from "lucide-react"
+
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/context/AuthProvider"
 
 import {
   Avatar,
@@ -33,10 +35,15 @@ import {
 export function NavUser({
   user
 }) {
+  
+  const { signOut } = useAuth();
+
   const { isMobile } = useSidebar()
   const router = useRouter()
 
+
   return (
+    
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
@@ -86,13 +93,13 @@ export function NavUser({
                 <CreditCardIcon />
                 Billing
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push("/dashboard/notifications")}>
+              <DropdownMenuItem >
                 <BellIcon />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={signOut}>
               <LogOutIcon />
               Log out
             </DropdownMenuItem>

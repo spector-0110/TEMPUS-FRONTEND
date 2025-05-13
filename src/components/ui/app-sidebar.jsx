@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import {
-  ArrowUpCircleIcon,
   BarChartIcon,
   CameraIcon,
   ClipboardListIcon,
@@ -18,7 +17,6 @@ import {
   SettingsIcon,
   UsersIcon,
 } from "lucide-react"
-import Link from "next/link"
 import {useHospital} from "@/context/HospitalProvider"
 import { NavDocuments } from "@/components/ui/nav-documents"
 import { NavMain } from "@/components/ui/nav-main"
@@ -116,7 +114,6 @@ export function AppSidebar({
                   alt="Tempus Logo"
                   className="h-6 w-6 mr-2"
                 />
-                {/* <ArrowUpCircleIcon className="h-5 w-5" /> */}
                 <span className="text-base font-semibold">{data.user.name}</span>
               </a>
             </SidebarMenuButton>
