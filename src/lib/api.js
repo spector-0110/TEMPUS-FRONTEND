@@ -322,6 +322,59 @@ export async function getHospitalDashboard(updateData) {
   }
 }
 
+/**
+ * update doctor details
+ */
+export async function updateDoctorDetails(updateData) {
+  try {
+
+    const accessToken = await getAuthToken();
+    const response = await fetchWithTimeout(`${BASE_URL}/doctors/update-doctor`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData),
+        // Ensure we're not caching responses
+        cache: 'no-store'
+      });
+
+    const result = await handleApiResponse(response, 'Failed to update doctor details');
+
+    return result;
+  } catch (error) {
+    console.error('updateDoctorDetails- Error updating doctor details:', error);
+    throw error;
+  }
+}
+
+/**
+ * update doctor schedule
+ */
+export async function updateDoctorSchedule(updateData) {
+  try {
+
+    const accessToken = await getAuthToken();
+    const response = await fetchWithTimeout(`${BASE_URL}/doctors/schedules`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData),
+        // Ensure we're not caching responses
+        cache: 'no-store'
+      });
+
+    const result = await handleApiResponse(response, 'Failed to update doctor schedule details');
+
+    return result;
+  } catch (error) {
+    console.error('updateDoctorSchedule- Error updating doctor schedule:', error);
+    throw error;
+  }
+}
 
 
 export async function fetchLocationsByState() {
