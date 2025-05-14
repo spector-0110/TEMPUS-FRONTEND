@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Plus, Minus, Save, Check } from 'lucide-react';
+import { validateDoctorUpdate, validateAllSchedulesData, validateNewDoctor } from '@/lib/validation/doctor-validation';
+
 
 /**
  * Component for editing a doctor's schedule with time ranges for each day
@@ -108,10 +110,20 @@ const ScheduleEditor = ({ doctorId, initialSchedules, onSave, onCancel }) => {
 
   // Handle save action
   const handleSave = () => {
+    // Ensure all numeric fields are actually numbers, not strings
+    const processedSchedules = schedules.map(schedule => ({
+      ...schedule,
+      dayOfWeek: Number(schedule.dayOfWeek),
+      avgConsultationTime: parseInt(schedule.avgConsultationTime, 10),
+      timeRanges: schedule.timeRanges.map(range => ({
+        start: range.start,
+        end: range.end
+      }))
+    }));
     // Construct the data object to be sent
     const scheduleData = {
       doctor_id: doctorId,
-      schedules: schedules
+      schedules: processedSchedules
     };
     
     onSave(scheduleData);

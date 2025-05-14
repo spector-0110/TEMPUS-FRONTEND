@@ -16,8 +16,8 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
     phone: '',
     specialization: '',
     qualification: '',
-    experience: '',
-    age: '',
+    experience: null, // Initialize as null instead of empty string
+    age: null, // Initialize as null instead of empty string
     status: 'active'
   });
   
@@ -30,8 +30,10 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
         phone: doctor.phone || '',
         specialization: doctor.specialization || '',
         qualification: doctor.qualification || '',
-        experience: doctor.experience || '',
-        age: doctor.age || '',
+        experience: typeof doctor.experience === 'number' ? doctor.experience : 
+                   doctor.experience ? parseInt(doctor.experience, 10) : null,
+        age: typeof doctor.age === 'number' ? doctor.age : 
+             doctor.age ? parseInt(doctor.age, 10) : null,
         status: doctor.status || 'active'
       });
     }
@@ -39,15 +41,42 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
   
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setDoctorData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // Convert numeric fields to actual numbers
+    if (name === 'experience' || name === 'age') {
+      const parsedValue = value === '' ? '' : parseInt(value, 10);
+      setDoctorData(prev => ({
+        ...prev,
+        [name]: parsedValue
+      }));
+    } else {
+      setDoctorData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
   
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(doctorData);
+    
+    // Ensure numeric fields are properly typed before submitting
+    // Remove id field from doctorData before creating formattedData
+    const { id, ...doctorDataWithoutId } = doctorData;
+    const formattedData = {
+      ...doctorData,
+      doctor_id: id, // Add doctor_id from the existing id
+      experience: doctorData.experience === '' ? null : 
+           typeof doctorData.experience === 'number' ? doctorData.experience : 
+           parseInt(doctorData.experience, 10),
+      age: doctorData.age === '' ? null : 
+         typeof doctorData.age === 'number' ? doctorData.age : 
+         parseInt(doctorData.age, 10)
+    };
+  
+    console.log('Submitting doctor data:', formattedData);
+    
+    onSave(formattedData);
   };
   
   return (

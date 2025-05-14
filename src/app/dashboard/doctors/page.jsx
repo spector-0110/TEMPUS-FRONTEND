@@ -9,7 +9,8 @@ import { User } from 'lucide-react';
 import DoctorCard from '@/components/doctors/DoctorCard';
 import DoctorDetailsEditor from '@/components/doctors/DoctorDetailsEditor';
 import StatusMessage from '@/components/ui/StatusMessage';
-import {updateDoctorDetails , updateDoctorSchedule} from '@/lib/api'; 
+import { updateDoctorDetails, updateDoctorSchedule } from '@/lib/api'; 
+import { validateUpdateDoctorData, validateAllSchedulesData, validateCreateDoctorData } from '@/lib/validation/doctor-validation';
 
 /**
  * Main DoctorsPage component
@@ -32,77 +33,180 @@ const DoctorsPage = () => {
   
   const handleUpdateDoctorDetails = async (doctorData) => {
     try {
-      // Here you would call the API to update the doctor details
-
-      console.log('Updating doctor details:', doctorData);
+      // Validate the doctor data
+      const validationResult = validateUpdateDoctorData(doctorData);
+      
+      if (!validationResult.isValid) {
+        throwError(validationResult);
+      }
+      
+      // Call the API to update the doctor details
+      await updateDoctorDetails(validationResult.data);
       
       setActionStatus({
         type: 'success',
         message: `Doctor details updated successfully for ${doctorData.name}`
       });
       
-      // In a real implementation, refresh data from server
-      // await backgroundRefresh();
+      // Refresh data from server
+      await backgroundRefresh();
       
       // Hide status after 3 seconds
       setTimeout(() => {
         setActionStatus({ type: '', message: '' });
-      }, 3000);
+      }, 5000);
     } catch (error) {
-      console.error('Error updating doctor details:', error);
+      console.error('Error updating doctor details:', {
+        error: error instanceof Error ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        } : error,
+        doctorData
+      });
+      
       setActionStatus({
         type: 'error',
-        message: 'Failed to update doctor details. Please try again.'
+        message: `Failed to update doctor details: ${error.message || 'Unknown error'}`
       });
       
       setTimeout(() => {
         setActionStatus({ type: '', message: '' });
-      }, 3000);
+      }, 5000);
     }
   };
   
   const handleUpdateSchedule = async (scheduleData) => {
     try {
-      // Here you would call the API to update the schedule
-      console.log('Updating doctor schedule:', scheduleData);
+      
+      // Validate the schedule data
+      const validationResult = validateAllSchedulesData(scheduleData.schedules);
+      
+      if (!validationResult.isValid) {
+        throwError(validationResult);
+        return;
+      }
+      
+      // Call the API to update the schedule
+      await updateDoctorSchedule(scheduleData);
       
       setActionStatus({
         type: 'success',
         message: 'Schedule updated successfully'
       });
       
-      // In a real implementation, refresh data from server
-      // await backgroundRefresh();
+      // Refresh data from server
+      await backgroundRefresh();
       
       // Hide status after 3 seconds
       setTimeout(() => {
         setActionStatus({ type: '', message: '' });
-      }, 3000);
+      }, 5000);
     } catch (error) {
-      console.error('Error updating schedule:', error);
+      console.error('Error updating schedule:', {
+        error: error instanceof Error ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        } : error,
+        scheduleData
+      });
+      
       setActionStatus({
         type: 'error',
-        message: 'Failed to update schedule. Please try again.'
+        message: `Failed to update schedule: ${error.message || 'Unknown error'}`
       });
       
       setTimeout(() => {
         setActionStatus({ type: '', message: '' });
-      }, 3000);
+      }, 5000);
     }
   };
 
-  const handleAddDoctor = (doctorData) => {
-    console.log('Adding new doctor:', doctorData);
-    setShowAddDoctorDialog(false);
-    setActionStatus({
-      type: 'success',
-      message: `Doctor ${doctorData.name} added successfully`
-    });
-    
-    setTimeout(() => {
-      setActionStatus({ type: '', message: '' });
-    }, 3000);
+  const handleAddDoctor = async (doctorData) => {
+    try {
+      // Validate the new doctor data
+      const validationResult = validateCreateDoctorData(doctorData);
+      
+      if (!validationResult.success) {
+        console.error('Validation error in handleAddDoctor:', doctorData, validationResult.error);
+        
+        // Format error message for display
+        const errorMessage = typeof validationResult.error === 'string'
+          ? validationResult.error
+          : Array.isArray(validationResult.error)
+            ? validationResult.error.map(err => err.message).join(', ')
+            : 'Invalid doctor data';
+            
+        setActionStatus({
+          type: 'error',
+          message: `New doctor validation error: ${errorMessage}`
+        });
+        
+        setTimeout(() => {
+          setActionStatus({ type: '', message: '' });
+        }, 5000); // Increased to 5 seconds to give users more time to read errors
+        
+        return;
+      }
+      
+      console.log('Adding new doctor:', validationResult.data);
+      // Here you would call your API to add a new doctor
+      // await addDoctor(validationResult.data);
+      
+      setShowAddDoctorDialog(false);
+      setActionStatus({
+        type: 'success',
+        message: `Doctor ${doctorData.name} added successfully`
+      });
+      
+      // Refresh data from server
+      await backgroundRefresh();
+      
+      setTimeout(() => {
+        setActionStatus({ type: '', message: '' });
+      }, 3000);
+    } catch (error) {
+      console.error('Error adding doctor:', {
+        error: error instanceof Error ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        } : error,
+        doctorData
+      });
+      
+      setActionStatus({
+        type: 'error',
+        message: `Failed to add doctor: ${error.message || 'Unknown error'}`
+      });
+      
+      setTimeout(() => {
+        setActionStatus({ type: '', message: '' });
+      }, 5000);
+    }
   };
+
+  const throwError = (validationResult) => {
+     console.error('Validation error in handleUpdateDoctorDetails:', validationResult.error);
+        
+        const errorMessage = typeof validationResult.error === 'string'
+          ? validationResult.error
+          : Array.isArray(validationResult.error)
+            ? validationResult.error.map(err => err.message).join(', ')
+            : 'Invalid doctor data';
+            
+        setActionStatus({
+          type: 'error',
+          message: `Validation error: ${errorMessage}`
+        });
+        
+        setTimeout(() => {
+          setActionStatus({ type: '', message: '' });
+        }, 10000); // Increased to 5 seconds to give users more time to read errors
+        
+        return;
+  }
 
   return (
     <div className="container mx-auto p-4 space-y-6">
