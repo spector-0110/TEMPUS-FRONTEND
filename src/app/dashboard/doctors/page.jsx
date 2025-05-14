@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useHospital } from '@/context/HospitalProvider';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { Spinner } from '@/components/ui/Spinner';
 import { User } from 'lucide-react';
 import DoctorCard from '@/components/doctors/DoctorCard';

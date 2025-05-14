@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/Spinner';
 import { useHospital } from '@/context/HospitalProvider';

@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/context/AuthProvider';
 import { ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
-import { Button } from './button';
+import { Button } from './Button';
 
 export function LogoutButton() {
   const { signOut, user, loading, isAuthenticated } = useAuth();

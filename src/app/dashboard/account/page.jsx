@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useHospital } from '@/context/HospitalProvider';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Spinner } from '@/components/ui/Spinner';
 import EditHospitalDetailsForm from '@/components/forms/edit-hospital-details-form';

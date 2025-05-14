@@ -5,7 +5,7 @@ import { useAuth } from '@/context/AuthProvider';
 import { useHospital } from '@/context/HospitalProvider';
 import { Spinner } from '@/components/ui/Spinner';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { SearchIcon } from 'lucide-react';
 
 export default function SearchPage() {
