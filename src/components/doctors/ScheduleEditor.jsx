@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
 import { DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Plus, Minus, Save, Check } from 'lucide-react';
 import { validateDoctorUpdate, validateAllSchedulesData, validateNewDoctor } from '@/lib/validation/doctor-validation';

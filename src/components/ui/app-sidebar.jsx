@@ -18,10 +18,10 @@ import {
   UsersIcon,
 } from "lucide-react"
 import {useHospital} from "@/context/HospitalProvider"
-import { NavDocuments } from "@/components/ui/nav-documents"
-import { NavMain } from "@/components/ui/nav-main"
-import { NavSecondary } from "@/components/ui/nav-secondary"
-import { NavUser } from "@/components/ui/nav-user"
+import { NavDocuments } from "@/components/ui/NavDocuments"
+import { NavMain } from "@/components/ui/NavMain"
+import { NavSecondary } from "@/components/ui/NavSecondary"
+import { NavUser } from "@/components/ui/NavUser"
 import {
   Sidebar,
   SidebarContent,

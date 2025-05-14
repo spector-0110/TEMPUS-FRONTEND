@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppSidebar } from "@/components/ui/app-sidebar"
-import { SiteHeader } from "@/components/ui/site-header"
+import { SiteHeader } from "@/components/ui/SiteHeader"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { useAuth } from "@/context/AuthProvider";
 import { Spinner } from "@/components/ui/Spinner";

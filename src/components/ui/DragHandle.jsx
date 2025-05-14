@@ -50,7 +50,7 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/Button"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { Checkbox } from "@/components/ui/checkbox"
+import { Checkbox } from "@/components/ui/Checkbox"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -59,8 +59,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/Input"
+import { Label } from "@/components/ui/Label"
 import {
   Select,
   SelectContent,
@@ -68,7 +68,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
+import { Separator } from "@/components/ui/Separator"
 import {
   Sheet,
   SheetClose,
