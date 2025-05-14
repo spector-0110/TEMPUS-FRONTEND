@@ -295,6 +295,35 @@ export async function updateHospitalDetailsAPI(updateData) {
   }
 }
 
+/**
+ * Get hospital dashboard - used to populate data
+ */
+export async function getHospitalDashboard(updateData) {
+  try {
+
+    const accessToken = await getAuthToken();
+    const response = await fetchWithTimeout(`${BASE_URL}/hospitals/dashboard`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData),
+        // Ensure we're not caching responses
+        cache: 'no-store'
+      });
+
+    const result = await handleApiResponse(response, 'Failed to fetch hospital dashboard details');
+
+    return result;
+  } catch (error) {
+    console.error('getHospitalDashboard- Error fetching hospital dashboard:', error);
+    throw error;
+  }
+}
+
+
+
 export async function fetchLocationsByState() {
   try {
     const response = await fetchWithTimeout('https://cdn-api.co-vin.in/api/v2/admin/location/states');

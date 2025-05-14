@@ -38,8 +38,6 @@ export function AppSidebar({
 
   const { hospitalDetails, loading } = useHospital();
 
-  console.log("hospitalDetails", hospitalDetails);
-
   const data = {
 
   user: {

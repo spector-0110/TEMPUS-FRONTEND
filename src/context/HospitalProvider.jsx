@@ -2,7 +2,7 @@
 
 import { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthProvider';
-import { fetchHospitalDetails, updateHospitalDetailsAPI } from '@/lib/api';
+import { fetchHospitalDetails, updateHospitalDetailsAPI,getHospitalDashboard } from '@/lib/api';
 
 const HospitalContext = createContext({
   hospitalDetails: null,
@@ -10,7 +10,10 @@ const HospitalContext = createContext({
   error: null,
   isProfileComplete: false,
   updateHospitalDetails: () => {},
+  getHospitalDashboardDetails: () => {},
   refresh: () => {},
+  backgroundRefresh: () => {}, // Background refresh without loading state changes
+  debouncedRefresh: () => {}, // Refresh with delayed loading state
 });
 
 export function HospitalProvider({ children }) {
@@ -20,6 +23,7 @@ export function HospitalProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isProfileComplete, setIsProfileComplete] = useState(false);
+  const [hospitalDashboardDetails, setHospitalDashboardDetails] = useState(null);
 
   // Stable, memoized fetch function
   const fetchAndUpdateDetails = useCallback(async () => {
@@ -30,9 +34,12 @@ export function HospitalProvider({ children }) {
 
     setLoading(true);
     try {
-      const details = await fetchHospitalDetails();
-      setHospitalDetails(details);
-      localStorage.setItem('hospitalDetails', JSON.stringify(details));
+      // const details = await fetchHospitalDetails(); // Fetch hospital details
+      const dashboardDetails = await getHospitalDashboard(); // Fetch dashboard details
+      console.log('Fetched hospital details:', dashboardDetails);
+      setHospitalDashboardDetails(dashboardDetails);
+      setHospitalDetails(dashboardDetails.hospitalInfo);
+      localStorage.setItem('hospitalDetails', JSON.stringify(dashboardDetails.hospitalInfo));
       setIsProfileComplete(true);
       setError(null);
     } catch (err) {
@@ -45,22 +52,94 @@ export function HospitalProvider({ children }) {
     }
   }, []);
 
-  // Load from localStorage only once if auth is not loading
-  useEffect(() => {
-    const saved = localStorage.getItem('hospitalDetails');
-    if (saved && !authLoading && user) {
-      setHospitalDetails(JSON.parse(saved));
-      setIsProfileComplete(true);
-      setLoading(false); // Show cached data immediately
+  // Background refresh that doesn't change loading state
+  const backgroundRefresh = useCallback(async () => {
+    if (!navigator.onLine) {
+      console.log("You're offline. Cannot refresh data.");
+      return;
     }
-  }, [authLoading, user]);
 
-  //  Fetch fresh data when user is authenticated
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchAndUpdateDetails();
+    try {
+      const dashboardDetails = await getHospitalDashboard();
+      setHospitalDashboardDetails(dashboardDetails);
+      setHospitalDetails(dashboardDetails.hospitalInfo);
+      localStorage.setItem('hospitalDetails', JSON.stringify(dashboardDetails.hospitalInfo));
+      setIsProfileComplete(true);
+      setError(null);
+    } catch (err) {
+      console.error('Background refresh error:', err);
+      // Don't update UI on error during background refresh
     }
-  }, [authLoading, user, fetchAndUpdateDetails]);
+  }, []);
+
+  // Refresh with delayed loading state to prevent flicker
+  const debouncedRefresh = useCallback(async (minLoadingTime = 300) => {
+    if (!navigator.onLine) {
+      alert("You're offline. Connect to the internet to refresh.");
+      return;
+    }
+
+    let loadingTimer = null;
+    const startTime = Date.now();
+    
+    // Only show loading indicator if fetch takes longer than minLoadingTime
+    loadingTimer = setTimeout(() => {
+      setLoading(true);
+    }, minLoadingTime);
+    
+    try {
+      const dashboardDetails = await getHospitalDashboard();
+      
+      // Calculate total elapsed time
+      const elapsed = Date.now() - startTime;
+      
+      // If we finished faster than minimum loading time, wait before updating UI
+      if (elapsed < minLoadingTime) {
+        await new Promise(resolve => setTimeout(resolve, minLoadingTime - elapsed));
+      }
+      
+      setHospitalDashboardDetails(dashboardDetails);
+      setHospitalDetails(dashboardDetails.hospitalInfo);
+      localStorage.setItem('hospitalDetails', JSON.stringify(dashboardDetails.hospitalInfo));
+      setIsProfileComplete(true);
+      setError(null);
+    } catch (err) {
+      console.error('Hospital details fetch error:', err);
+      setHospitalDetails(null);
+      setError(err);
+      setIsProfileComplete(false);
+    } finally {
+      clearTimeout(loadingTimer);
+      setLoading(false);
+    }
+  }, []);
+
+  // Load from localStorage and then background refresh after sign-in
+  useEffect(() => {
+    // Initial loading from localStorage
+    const saved = localStorage.getItem('hospitalDetails');
+
+    
+    if (!authLoading) {
+      if (user) {
+        if (saved) {
+          // If we have cached data, show it immediately
+          setHospitalDetails(JSON.parse(saved));
+          setIsProfileComplete(true);
+          setLoading(false);
+          
+          // Then refresh in background without showing loading state
+          debouncedRefresh();
+        } else {
+          // No cached data available, we need to show loading state
+          fetchAndUpdateDetails();
+        }
+      } else {
+        // No user, reset states
+        setLoading(false);
+      }
+    }
+  }, [authLoading, user, backgroundRefresh]);
 
   //  Update hospital details in both state and localStorage
   const updateHospitalDetails = async (newDetails) => {
@@ -70,7 +149,6 @@ export function HospitalProvider({ children }) {
         ...hospitalDetails,
         ...newDetails
       };
-      
       setHospitalDetails(updatedDetails);
       localStorage.setItem('hospitalDetails', JSON.stringify(updatedDetails));
       setIsProfileComplete(true);
@@ -86,7 +164,10 @@ export function HospitalProvider({ children }) {
     error,
     isProfileComplete,
     updateHospitalDetails,
+    hospitalDashboardDetails,
     refresh: fetchAndUpdateDetails,
+    backgroundRefresh,
+    debouncedRefresh,
   };
 
   return (
