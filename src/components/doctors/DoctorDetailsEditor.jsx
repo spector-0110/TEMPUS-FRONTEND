@@ -69,12 +69,12 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
     // Remove id field from doctorData before creating formattedData
     const { id, ...doctorDataWithoutId } = doctorData;
     const formattedData = {
-      ...doctorData,
+      ...doctorDataWithoutId,
       doctor_id: id, // Add doctor_id from the existing id
-      experience: doctorData.experience === '' ? null : 
+      experience: doctorData.experience === '' || doctorData.experience === null ? 0 : 
            typeof doctorData.experience === 'number' ? doctorData.experience : 
            parseInt(doctorData.experience, 10),
-      age: doctorData.age === '' ? null : 
+      age: doctorData.age === '' || doctorData.age === null ? 30 : 
          typeof doctorData.age === 'number' ? doctorData.age : 
          parseInt(doctorData.age, 10)
     };
@@ -82,6 +82,7 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
     // If creating a new doctor, exclude the status field
     if (!isEditMode) {
       delete formattedData.status;
+      delete formattedData.doctor_id;
     }
   
     console.log('Submitting doctor data:', formattedData);

@@ -9,6 +9,7 @@ import { User } from 'lucide-react';
 import DoctorCard from '@/components/doctors/DoctorCard';
 import DoctorDetailsEditor from '@/components/doctors/DoctorDetailsEditor';
 import StatusMessage from '@/components/ui/StatusMessage';
+import ErrorDialog from '@/components/ui/ErrorDialog';
 import { updateDoctorDetails, updateDoctorSchedule, createDoctor } from '@/lib/api'; 
 import { validateUpdateDoctorData, validateAllSchedulesData, validateCreateDoctorData } from '@/lib/validation/doctor-validation';
 
@@ -19,6 +20,12 @@ const DoctorsPage = () => {
   const { hospitalDashboardDetails, loading, backgroundRefresh } = useHospital();
   const [showAddDoctorDialog, setShowAddDoctorDialog] = useState(false);
   const [actionStatus, setActionStatus] = useState({ type: '', message: '' });
+  const [errorDialog, setErrorDialog] = useState({ 
+    isOpen: false, 
+    title: '', 
+    message: '', 
+    details: [] 
+  });
 
   if (loading) {
     return (
@@ -66,14 +73,13 @@ const DoctorsPage = () => {
         doctorData
       });
       
-      setActionStatus({
-        type: 'error',
-        message: `Failed to update doctor details: ${error.message || 'Unknown error'}`
+      // Show error in dialog
+      setErrorDialog({
+        isOpen: true,
+        title: 'Doctor Update Error',
+        message: 'Failed to update doctor details',
+        details: [error.message || 'Unknown error occurred']
       });
-      
-      setTimeout(() => {
-        setActionStatus({ type: '', message: '' });
-      }, 5000);
     }
   };
   
@@ -113,36 +119,45 @@ const DoctorsPage = () => {
         scheduleData
       });
       
-      setActionStatus({
-        type: 'error',
-        message: `Failed to update schedule: ${error.message || 'Unknown error'}`
+      // Show error in dialog
+      setErrorDialog({
+        isOpen: true,
+        title: 'Schedule Update Error',
+        message: 'Failed to update doctor schedule',
+        details: [error.message || 'Unknown error occurred']
       });
-      
-      setTimeout(() => {
-        setActionStatus({ type: '', message: '' });
-      }, 5000);
     }
   };
 
   const handleAddDoctor = async (doctorData) => {
     try {
+      // Ensure numeric fields are properly typed
+      console.log('Adding new doctor:', doctorData);
+      const sanitizedData = {
+        ...doctorData,
+        experience: typeof doctorData.experience === 'string' ? 
+          parseInt(doctorData.experience, 10) : doctorData.experience || 0,
+        age: typeof doctorData.age === 'string' ? 
+          parseInt(doctorData.age, 10) : doctorData.age || 30
+      };
+      
       // Validate the new doctor data
-      const validationResult = validateCreateDoctorData(doctorData);
+      const validationResult = validateCreateDoctorData(sanitizedData);
       
       if (!validationResult.isValid) {
         throwError(validationResult);
         return;
       }
       
-      console.log('Adding new doctor:', validationResult.data);
+      console.log('Adding new doctor FWD---------->>>:', validationResult.data);
     
-      await createDoctor(doctorData);
-      console.log('Doctor added successfully:', doctorData);
+      await createDoctor(validationResult.data);
+      console.log('Doctor added successfully:', validationResult.data);
 
       setShowAddDoctorDialog(false);
       setActionStatus({
         type: 'success',
-        message: `Doctor ${doctorData.name} added successfully`
+        message: `Doctor ${validationResult.data.name} added successfully`
       });
       
       // Refresh data from server
@@ -152,18 +167,22 @@ const DoctorsPage = () => {
         setActionStatus({ type: '', message: '' });
       }, 3000);
     } catch (error) {
+      // Safely handle error object that might be null or undefined
+      const errorObj = error || {};
+      const errorMessage = errorObj.message || 'Unknown error';
+      
       console.error('Error adding doctor:', {
         error: error instanceof Error ? {
           name: error.name,
-          message: error.message,
+          message: errorMessage,
           stack: error.stack
-        } : error,
+        } : errorObj,
         doctorData
       });
       
       setActionStatus({
         type: 'error',
-        message: `Failed to add doctor: ${error.message || 'Unknown error'}`
+        message: `Failed to add doctor: ${errorMessage}`
       });
       
       setTimeout(() => {
@@ -173,24 +192,30 @@ const DoctorsPage = () => {
   };
 
   const throwError = (validationResult) => {
-     console.error('Validation error in handleUpdateDoctorDetails:', validationResult.error);
-        
-        const errorMessage = typeof validationResult.error === 'string'
-          ? validationResult.error
-          : Array.isArray(validationResult.error)
-            ? validationResult.error.map(err => err.message).join(', ')
-            : 'Invalid doctor data';
-            
-        setActionStatus({
-          type: 'error',
-          message: `Validation error: ${errorMessage}`
-        });
-        
-        setTimeout(() => {
-          setActionStatus({ type: '', message: '' });
-        }, 10000); // Increased to 5 seconds to give users more time to read errors
-        
-        return;
+    console.error('Validation error :', validationResult.error);
+    
+    // Extract error message and details
+    const mainErrorMessage = typeof validationResult.error === 'string'
+      ? validationResult.error
+      : 'Validation failed';
+      
+    // Create detailed error list for the dialog
+    let errorDetails = [];
+    if (Array.isArray(validationResult.error)) {
+      errorDetails = validationResult.error.map(err => err.message || String(err));
+    } else if (Array.isArray(validationResult.errors)) {
+      errorDetails = validationResult.errors.map(err => `${err.field}: ${err.message}`);
+    }
+    
+    // Show error in dialog
+    setErrorDialog({
+      isOpen: true,
+      title: 'Validation Error',
+      message: mainErrorMessage,
+      details: errorDetails
+    });
+    
+    return;
   }
 
   return (

@@ -22,7 +22,7 @@ export const validateUpdateDoctorData=(data) => {
     });
 
     const statusSchema = z.object({
-      status: z.enum([DOCTOR_STATUS.ACTIVE, DOCTOR_STATUS.INACTIVE]).optional()
+      status: z.enum([DOCTOR_STATUS.ACTIVE, DOCTOR_STATUS.INACTIVE])
     });
 
     const otherInfoSchema = z.object({
@@ -72,15 +72,21 @@ export const validateUpdateDoctorData=(data) => {
 export const validateCreateDoctorData=(data)=> {
     const schema = z.object({
       name: z.string().min(2).max(100),
-      specialization: z.string().min(2).max(100)(),
-      qualification: z.string().min(2).max(100)(),
-      experience: z.number().int().min(0)(),
-      age: z.number().int().min(20).max(100)(),
-      phone: z.string().regex(/^\+?[\d\s-]{8,}$/),
+      specialization: z.string().min(2).max(100),
+      qualification: z.string().min(2).max(100),
+      experience: z.number().int().min(0),
+      age: z.number().int().min(20).max(100),
+      phone: z.string().regex(/^\d{10}$/, {
+        message: 'Phone number must be exactly 10 digits',
+      }),
       email: z.string().email(),
-      photo: z.string().url().optional(),
+      photo: z.union([
+        z.string().url(), 
+        z.string().refine(val => val === '', { 
+          message: 'Photo must be a valid URL or an empty string' 
+        })
+      ]).optional(),
       aadhar: z.string(),
-      status: z.enum([DOCTOR_STATUS.ACTIVE, DOCTOR_STATUS.INACTIVE]).default(DOCTOR_STATUS.ACTIVE)
     });
 
     try {
