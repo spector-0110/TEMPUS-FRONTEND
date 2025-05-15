@@ -2,7 +2,7 @@ import supabase from './supabase';
 import { ServerConnectionError } from './errors';
 
 // Constants for API configuration
-const API_TIMEOUT = 5000; // 5 seconds timeout
+const API_TIMEOUT = 8000; // 5 seconds timeout
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 const INDIA_POST_API = 'https://api.postalpincode.in/pincode';
 
@@ -66,14 +66,26 @@ async function getAuthToken() {
  */
 async function handleApiResponse(response, errorMessage = 'Request failed') {
   if (!response.ok) {
-    let message = errorMessage;
     try {
       const errorData = await response.json();
-      message = errorData.message || errorMessage;
+      // Create a custom error object with all the details from the backend
+      const apiError = new Error(errorData.error || errorMessage);
+      console.error('handleApiResponse - Full error data:', errorData);
+      apiError.status = response.status;
+      apiError.data = errorData; // Store the complete error data from the backend
+      apiError.message = errorData.error || errorMessage;
+
+      console.error('handleApiResponse - Error response:', apiError.message);
+
+      throw apiError;
     } catch (parseError) {
       console.error('Could not parse error response:', parseError);
+      // If we can't parse the response, throw a basic error with the status
+      const basicError = new Error(errorMessage);
+      basicError.status = response.status;
+      basicError.statusText = response.statusText;
+      throw basicError;
     }
-    throw new Error(message);
   }
   return response.json();
 }
@@ -163,8 +175,13 @@ export async function fetchHospitalFormFields() {
     });
     return await handleApiResponse(response, 'Error fetching form fields');
   } catch (error) {
-    console.error('Error fetching form fields:', error);
-    throw error;
+    console.error('Error fetching form fields:', {
+      message: error.message,
+      status: error.status,
+      data: error.data,
+      error
+    });
+    throw error;  // Pass through the detailed error from the backend
   }
 }
 
@@ -345,8 +362,11 @@ export async function createDoctor(updateData) {
 
     return result;
   } catch (error) {
-    console.error('createDoctor- Error creating doctor:', error);
-    throw error;
+    console.error('createDoctor- Error creating doctor:', {
+    
+      error
+    });
+    throw error;  // Pass through the detailed error from the backend
   }
 }
 
@@ -372,8 +392,13 @@ export async function updateDoctorDetails(updateData) {
 
     return result;
   } catch (error) {
-    console.error('updateDoctorDetails- Error updating doctor details:', error);
-    throw error;
+    console.error('updateDoctorDetails- Error updating doctor details:', {
+      message: error.message,
+      status: error.status,
+      data: error.data,
+      error
+    });
+    throw error;  // Pass through the detailed error from the backend
   }
 }
 
@@ -399,8 +424,13 @@ export async function updateDoctorSchedule(updateData) {
 
     return result;
   } catch (error) {
-    console.error('updateDoctorSchedule- Error updating doctor schedule:', error);
-    throw error;
+    console.error('updateDoctorSchedule- Error updating doctor schedule:', {
+      message: error.message,
+      status: error.status,
+      data: error.data,
+      error
+    });
+    throw error;  // Pass through the detailed error from the backend
   }
 }
 

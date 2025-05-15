@@ -24,7 +24,10 @@ const DoctorsPage = () => {
     isOpen: false, 
     title: '', 
     message: '', 
-    details: [] 
+    details: [],
+    errorType: 'general',
+    statusCode: null,
+    errorData: null
   });
 
   if (loading) {
@@ -51,11 +54,6 @@ const DoctorsPage = () => {
       // Call the API to update the doctor details
       await updateDoctorDetails(validationResult.data);
       
-      setActionStatus({
-        type: 'success',
-        message: `Doctor details updated successfully for ${doctorData.name}`
-      });
-      
       // Refresh data from server
       await backgroundRefresh();
       
@@ -64,12 +62,14 @@ const DoctorsPage = () => {
         setActionStatus({ type: '', message: '' });
       }, 5000);
     } catch (error) {
+      const errorObj = error || {};
+      const errorMessage = errorObj.message || 'Unknown error';
       console.error('Error updating doctor details:', {
         error: error instanceof Error ? {
           name: error.name,
           message: error.message,
           stack: error.stack
-        } : error,
+        } : errorObj,
         doctorData
       });
       
@@ -78,7 +78,10 @@ const DoctorsPage = () => {
         isOpen: true,
         title: 'Doctor Update Error',
         message: 'Failed to update doctor details',
-        details: [error.message || 'Unknown error occurred']
+        details: [errorMessage || 'Unknown error occurred'],
+        errorType: 'api',
+        statusCode: error.status || error.statusCode || null,
+        errorData: error.data || error
       });
     }
   };
@@ -96,11 +99,6 @@ const DoctorsPage = () => {
       
       // Call the API to update the schedule
       await updateDoctorSchedule(scheduleData);
-      
-      setActionStatus({
-        type: 'success',
-        message: 'Schedule updated successfully'
-      });
       
       // Refresh data from server
       await backgroundRefresh();
@@ -124,15 +122,17 @@ const DoctorsPage = () => {
         isOpen: true,
         title: 'Schedule Update Error',
         message: 'Failed to update doctor schedule',
-        details: [error.message || 'Unknown error occurred']
+        details: [error.message || 'Unknown error occurred'],
+        errorType: 'api',
+        statusCode: error.status || error.statusCode || null,
+        errorData: error.data || error
       });
     }
   };
 
   const handleAddDoctor = async (doctorData) => {
     try {
-      // Ensure numeric fields are properly typed
-      console.log('Adding new doctor:', doctorData);
+  
       const sanitizedData = {
         ...doctorData,
         experience: typeof doctorData.experience === 'string' ? 
@@ -148,17 +148,10 @@ const DoctorsPage = () => {
         throwError(validationResult);
         return;
       }
-      
-      console.log('Adding new doctor FWD---------->>>:', validationResult.data);
-    
+        
       await createDoctor(validationResult.data);
-      console.log('Doctor added successfully:', validationResult.data);
 
       setShowAddDoctorDialog(false);
-      setActionStatus({
-        type: 'success',
-        message: `Doctor ${validationResult.data.name} added successfully`
-      });
       
       // Refresh data from server
       await backgroundRefresh();
@@ -180,37 +173,77 @@ const DoctorsPage = () => {
         doctorData
       });
       
-      setActionStatus({
-        type: 'error',
-        message: `Failed to add doctor: ${errorMessage}`
+      // Show error in dialog
+      setErrorDialog({
+        isOpen: true,
+        title: 'Doctor Add Error',
+        message: 'Failed to add new doctor ',
+        details: [errorMessage || 'Unknown error occurred'],
+        errorType: 'api',
+        statusCode: error.status || error.statusCode || null,
+        errorData: error.data || error
       });
-      
-      setTimeout(() => {
-        setActionStatus({ type: '', message: '' });
-      }, 5000);
     }
   };
 
   const throwError = (validationResult) => {
-    console.error('Validation error :', validationResult.error);
+    console.error('Validation error:', validationResult);
     
-    // Extract error message and details
-    const mainErrorMessage = typeof validationResult.error === 'string'
-      ? validationResult.error
-      : 'Validation failed';
+    // Check if the validation result follows the expected format from doctor-validation.js
+    if (!validationResult.isValid && Array.isArray(validationResult.errors)) {
+      const formattedErrors = validationResult.errors.map(err => {
+        // Format each validation error with field name and message
+        return `${err.field}: ${err.message}`;
+      });
       
-    // Create detailed error list for the dialog
-    let errorDetails = [];
-    if (Array.isArray(validationResult.error)) {
-      errorDetails = validationResult.error.map(err => err.message || String(err));
-    } else if (Array.isArray(validationResult.errors)) {
-      errorDetails = validationResult.errors.map(err => `${err.field}: ${err.message}`);
+      // Show validation errors in dialog
+      setErrorDialog({
+        isOpen: true,
+        title: 'Validation Error',
+        message: 'Please fix the following validation errors:',
+        errorType: 'validation',
+        details: formattedErrors
+      });
+      return;
     }
     
-    // Show error in dialog
+    // Fallback for unexpected error formats
+    // This handles any other type of error that might be passed
+    let mainErrorMessage = 'Validation failed';
+    let errorDetails = [];
+    
+    if (typeof validationResult === 'string') {
+      mainErrorMessage = validationResult;
+    } else if (validationResult instanceof Error) {
+      mainErrorMessage = validationResult.message || 'Unknown error';
+      if (validationResult.stack) {
+        errorDetails.push(validationResult.stack);
+      }
+    } else if (typeof validationResult === 'object') {
+      // Try to extract meaningful error information
+      if (validationResult.message) {
+        mainErrorMessage = validationResult.message;
+      }
+      
+      // Check for various error formats
+      if (Array.isArray(validationResult.error)) {
+        errorDetails = validationResult.error.map(err => 
+          typeof err === 'object' ? (err.message || JSON.stringify(err)) : String(err)
+        );
+      } else if (validationResult.error && typeof validationResult.error === 'object') {
+        errorDetails = Object.entries(validationResult.error).map(([key, value]) => 
+          `${key}: ${typeof value === 'object' ? JSON.stringify(value) : value}`
+        );
+      } else if (validationResult.data) {
+        errorDetails.push(JSON.stringify(validationResult.data));
+      }
+    }
+    
+    // Show error in dialog with the best information available
     setErrorDialog({
       isOpen: true,
-      title: 'Validation Error',
+      title: 'Error',
+      errorType: 'validation',
       message: mainErrorMessage,
       details: errorDetails
     });
@@ -274,6 +307,20 @@ const DoctorsPage = () => {
             />
           ))}
         </div>
+      )}
+      
+      {/* Error Dialog */}
+      {errorDialog.isOpen && (
+        <ErrorDialog
+          isOpen={errorDialog.isOpen}
+          onClose={() => setErrorDialog(prev => ({ ...prev, isOpen: false }))}
+          title={errorDialog.title}
+          message={errorDialog.message}
+          details={errorDialog.details}
+          errorType={errorDialog.errorType}
+          statusCode={errorDialog.statusCode}
+          errorData={errorDialog.errorData}
+        />
       )}
     </div>
   );
