@@ -7,7 +7,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 const INDIA_POST_API = 'https://api.postalpincode.in/pincode';
 
 /**
- * Robust function to get the access token from Supabase session
+ * function to get the access token from Supabase session
  * This will first try localStorage for faster access and fallback to Supabase API
  */
 async function getAuthToken() {
@@ -318,6 +318,34 @@ export async function getHospitalDashboard(updateData) {
     return result;
   } catch (error) {
     console.error('getHospitalDashboard- Error fetching hospital dashboard:', error);
+    throw error;
+  }
+}
+
+/**
+ * create doctor details
+ */
+
+export async function createDoctor(updateData) {
+
+  try {
+    const accessToken = await getAuthToken();
+    const response = await fetchWithTimeout(`${BASE_URL}/doctors/create-doctor`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData),
+        // Ensure we're not caching responses
+        cache: 'no-store'
+      });
+
+    const result = await handleApiResponse(response, 'Failed to create doctor');
+
+    return result;
+  } catch (error) {
+    console.error('createDoctor- Error creating doctor:', error);
     throw error;
   }
 }

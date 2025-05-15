@@ -9,7 +9,7 @@ import { User } from 'lucide-react';
 import DoctorCard from '@/components/doctors/DoctorCard';
 import DoctorDetailsEditor from '@/components/doctors/DoctorDetailsEditor';
 import StatusMessage from '@/components/ui/StatusMessage';
-import { updateDoctorDetails, updateDoctorSchedule } from '@/lib/api'; 
+import { updateDoctorDetails, updateDoctorSchedule, createDoctor } from '@/lib/api'; 
 import { validateUpdateDoctorData, validateAllSchedulesData, validateCreateDoctorData } from '@/lib/validation/doctor-validation';
 
 /**
@@ -38,6 +38,7 @@ const DoctorsPage = () => {
       
       if (!validationResult.isValid) {
         throwError(validationResult);
+        return;
       }
       
       // Call the API to update the doctor details
@@ -128,32 +129,16 @@ const DoctorsPage = () => {
       // Validate the new doctor data
       const validationResult = validateCreateDoctorData(doctorData);
       
-      if (!validationResult.success) {
-        console.error('Validation error in handleAddDoctor:', doctorData, validationResult.error);
-        
-        // Format error message for display
-        const errorMessage = typeof validationResult.error === 'string'
-          ? validationResult.error
-          : Array.isArray(validationResult.error)
-            ? validationResult.error.map(err => err.message).join(', ')
-            : 'Invalid doctor data';
-            
-        setActionStatus({
-          type: 'error',
-          message: `New doctor validation error: ${errorMessage}`
-        });
-        
-        setTimeout(() => {
-          setActionStatus({ type: '', message: '' });
-        }, 5000); // Increased to 5 seconds to give users more time to read errors
-        
+      if (!validationResult.isValid) {
+        throwError(validationResult);
         return;
       }
       
       console.log('Adding new doctor:', validationResult.data);
-      // Here you would call your API to add a new doctor
-      // await addDoctor(validationResult.data);
-      
+    
+      await createDoctor(doctorData);
+      console.log('Doctor added successfully:', doctorData);
+
       setShowAddDoctorDialog(false);
       setActionStatus({
         type: 'success',

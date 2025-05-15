@@ -18,7 +18,9 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
     qualification: '',
     experience: null, // Initialize as null instead of empty string
     age: null, // Initialize as null instead of empty string
-    status: 'active'
+    status: 'active',
+    photo: '',
+    aadhar: ''
   });
   
   useEffect(() => {
@@ -34,7 +36,9 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
                    doctor.experience ? parseInt(doctor.experience, 10) : null,
         age: typeof doctor.age === 'number' ? doctor.age : 
              doctor.age ? parseInt(doctor.age, 10) : null,
-        status: doctor.status || 'active'
+        status: doctor.status || 'active',
+        photo: doctor.photo || '',
+        aadhar: doctor.aadhar || ''
       });
     }
   }, [doctor]);
@@ -168,6 +172,29 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
             onChange={handleChange}
             placeholder="45"
             required
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="photo">Photo URL</Label>
+          <Input
+            id="photo"
+            name="photo"
+            type="url"
+            value={doctorData.photo}
+            onChange={handleChange}
+            placeholder="https://example.com/doctor-photo.jpg"
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="aadhar">Aadhar Number</Label>
+          <Input
+            id="aadhar"
+            name="aadhar"
+            value={doctorData.aadhar}
+            onChange={handleChange}
+            placeholder="XXXX XXXX XXXX"
           />
         </div>
         
