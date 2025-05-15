@@ -12,7 +12,7 @@ export const validateUpdateDoctorData=(data) => {
       name: z.string().min(2).max(100).optional(),
       specialization: z.string().min(2).max(100).optional(),
       qualification: z.string().min(2).max(100).optional(),
-       experience: z.union([z.number().int().min(0), z.string().regex(/^\d+$/).transform(Number)]).optional(),
+      experience: z.union([z.number().int().min(0), z.string().regex(/^\d+$/).transform(Number)]).optional(),
       age: z.union([z.number().int().min(20).max(100), z.string().regex(/^\d+$/).transform(Number)]).optional(),
     });
 
@@ -79,7 +79,7 @@ export const validateCreateDoctorData=(data)=> {
       phone: z.string().regex(/^\+?[\d\s-]{8,}$/),
       email: z.string().email(),
       photo: z.string().url().optional(),
-      aadhar: z.string().optional(),
+      aadhar: z.string(),
       status: z.enum([DOCTOR_STATUS.ACTIVE, DOCTOR_STATUS.INACTIVE]).default(DOCTOR_STATUS.ACTIVE)
     });
 

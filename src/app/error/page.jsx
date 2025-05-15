@@ -4,8 +4,25 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/card';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { checkServerStatus } from '@/lib/api';
+import { Suspense } from 'react';
 
 export default function ErrorPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="max-w-md w-full p-6 text-center space-y-6">
+          <div className="space-y-2">
+            <h1 className="text-2xl font-bold text-foreground">Loading...</h1>
+          </div>
+        </Card>
+      </div>
+    }>
+      <ErrorContent />
+    </Suspense>
+  );
+}
+
+function ErrorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const errorMessage = searchParams.get('message') || 'Server Unavailable';

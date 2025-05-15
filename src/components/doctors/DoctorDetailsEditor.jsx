@@ -10,17 +10,18 @@ import { DialogFooter } from '@/components/ui/dialog';
  * Component for editing doctor details
  */
 const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
+  const isEditMode = doctor && doctor.id;
   const [doctorData, setDoctorData] = useState({
     name: '',
     email: '',
     phone: '',
     specialization: '',
     qualification: '',
-    experience: null, // Initialize as null instead of empty string
-    age: null, // Initialize as null instead of empty string
-    status: 'active',
+    experience: null, 
+    age: null, 
     photo: '',
-    aadhar: ''
+    aadhar: '',
+    ...(isEditMode ? { status: 'active' } : {}) // Only include status in edit mode
   });
   
   useEffect(() => {
@@ -36,9 +37,9 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
                    doctor.experience ? parseInt(doctor.experience, 10) : null,
         age: typeof doctor.age === 'number' ? doctor.age : 
              doctor.age ? parseInt(doctor.age, 10) : null,
-        status: doctor.status || 'active',
         photo: doctor.photo || '',
-        aadhar: doctor.aadhar || ''
+        aadhar: doctor.aadhar || '',
+        ...(isEditMode ? { status: doctor.status || 'active' } : {})
       });
     }
   }, [doctor]);
@@ -77,6 +78,11 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
          typeof doctorData.age === 'number' ? doctorData.age : 
          parseInt(doctorData.age, 10)
     };
+
+    // If creating a new doctor, exclude the status field
+    if (!isEditMode) {
+      delete formattedData.status;
+    }
   
     console.log('Submitting doctor data:', formattedData);
     
@@ -118,7 +124,7 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
             name="phone"
             value={doctorData.phone}
             onChange={handleChange}
-            placeholder="+91-XXXXXXXXXX"
+            placeholder="XXXXXXXXXX"
             required
           />
         </div>
@@ -198,21 +204,22 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
           />
         </div>
         
-        <div className="space-y-2">
-          <Label htmlFor="status">Status</Label>
-          <select
-            id="status"
-            name="status"
-            value={doctorData.status}
-            onChange={handleChange}
-            className="w-full p-2 rounded-md border border-input bg-background"
-            required
-          >
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-            <option value="on-leave">On Leave</option>
-          </select>
-        </div>
+        {isEditMode && (
+          <div className="space-y-2">
+            <Label htmlFor="status">Status</Label>
+            <select
+              id="status"
+              name="status"
+              value={doctorData.status || 'active'}
+              onChange={handleChange}
+              className="w-full p-2 rounded-md border border-input bg-background"
+              required
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        )}
       </div>
       
       <DialogFooter>
