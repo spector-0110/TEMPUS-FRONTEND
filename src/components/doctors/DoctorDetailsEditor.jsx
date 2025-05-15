@@ -19,7 +19,7 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
     qualification: '',
     experience: null, 
     age: null, 
-    photo: '',
+    photo: 'https://example.com/doctor-photo.jpg', // Default photo URL
     aadhar: '',
     ...(isEditMode ? { status: 'active' } : {}) // Only include status in edit mode
   });
@@ -37,7 +37,7 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
                    doctor.experience ? parseInt(doctor.experience, 10) : null,
         age: typeof doctor.age === 'number' ? doctor.age : 
              doctor.age ? parseInt(doctor.age, 10) : null,
-        photo: doctor.photo || '',
+        photo: doctor.photo || 'https://example.com/doctor-photo.jpg',
         aadhar: doctor.aadhar || '',
         ...(isEditMode ? { status: doctor.status || 'active' } : {})
       });
