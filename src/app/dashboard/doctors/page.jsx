@@ -10,6 +10,7 @@ import DoctorCard from '@/components/doctors/DoctorCard';
 import DoctorDetailsEditor from '@/components/doctors/DoctorDetailsEditor';
 import StatusMessage from '@/components/ui/StatusMessage';
 import ErrorDialog from '@/components/ui/ErrorDialog';
+import SuccessDialog from '@/components/ui/SuccessDialog';
 import { updateDoctorDetails, updateDoctorSchedule, createDoctor } from '@/lib/api'; 
 import { validateUpdateDoctorData, validateAllSchedulesData, validateCreateDoctorData } from '@/lib/validation/doctor-validation';
 
@@ -19,7 +20,6 @@ import { validateUpdateDoctorData, validateAllSchedulesData, validateCreateDocto
 const DoctorsPage = () => {
   const { hospitalDashboardDetails, loading, backgroundRefresh } = useHospital();
   const [showAddDoctorDialog, setShowAddDoctorDialog] = useState(false);
-  const [actionStatus, setActionStatus] = useState({ type: '', message: '' });
   const [errorDialog, setErrorDialog] = useState({ 
     isOpen: false, 
     title: '', 
@@ -28,6 +28,12 @@ const DoctorsPage = () => {
     errorType: 'general',
     statusCode: null,
     errorData: null
+  });
+  const [successDialog, setSuccessDialog] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    details: []
   });
 
   if (loading) {
@@ -57,10 +63,13 @@ const DoctorsPage = () => {
       // Refresh data from server
       await backgroundRefresh();
       
-      // Hide status after 3 seconds
-      setTimeout(() => {
-        setActionStatus({ type: '', message: '' });
-      }, 5000);
+      // Show success dialog
+      setSuccessDialog({
+        isOpen: true,
+        title: 'Doctor Updated',
+        message: 'Doctor details have been successfully updated.',
+        details: []
+      });
     } catch (error) {
       const errorObj = error || {};
       const errorMessage = errorObj.message || 'Unknown error';
@@ -103,10 +112,13 @@ const DoctorsPage = () => {
       // Refresh data from server
       await backgroundRefresh();
       
-      // Hide status after 3 seconds
-      setTimeout(() => {
-        setActionStatus({ type: '', message: '' });
-      }, 5000);
+      // Show success dialog
+      setSuccessDialog({
+        isOpen: true,
+        title: 'Schedule Updated',
+        message: 'Doctor schedule has been successfully updated.',
+        details: []
+      });
     } catch (error) {
       console.error('Error updating schedule:', {
         error: error instanceof Error ? {
@@ -156,9 +168,13 @@ const DoctorsPage = () => {
       // Refresh data from server
       await backgroundRefresh();
       
-      setTimeout(() => {
-        setActionStatus({ type: '', message: '' });
-      }, 3000);
+      // Show success dialog
+      setSuccessDialog({
+        isOpen: true,
+        title: 'Doctor Added',
+        message: 'New doctor has been successfully added to your hospital.',
+        details: [`${validationResult.data.name} has been added to your doctors list.`]
+      });
     } catch (error) {
       // Safely handle error object that might be null or undefined
       const errorObj = error || {};
@@ -278,11 +294,6 @@ const DoctorsPage = () => {
           </DialogContent>
         </Dialog>
       </div>
-      
-      {/* Status message */}
-      {actionStatus.message && (
-        <StatusMessage type={actionStatus.type} message={actionStatus.message} />
-      )}
 
       {doctors.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 border border-dashed rounded-lg">
@@ -320,6 +331,17 @@ const DoctorsPage = () => {
           errorType={errorDialog.errorType}
           statusCode={errorDialog.statusCode}
           errorData={errorDialog.errorData}
+        />
+      )}
+      
+      {/* Success Dialog */}
+      {successDialog.isOpen && (
+        <SuccessDialog
+          isOpen={successDialog.isOpen}
+          onClose={() => setSuccessDialog(prev => ({ ...prev, isOpen: false }))}
+          title={successDialog.title}
+          message={successDialog.message}
+          details={successDialog.details}
         />
       )}
     </div>
