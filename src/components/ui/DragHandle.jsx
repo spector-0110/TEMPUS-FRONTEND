@@ -60,7 +60,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/Input"
-import { Label } from "@/components/ui/Label"
+import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,

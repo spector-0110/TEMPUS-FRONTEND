@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/Label';
+import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/Spinner';
 import { useHospital } from '@/context/HospitalProvider';
 import {

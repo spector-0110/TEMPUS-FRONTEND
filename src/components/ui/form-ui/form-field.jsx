@@ -1,7 +1,7 @@
 'use client';
 
 import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/Label';
+import { Label } from '@/components/ui/label';
 
 export default function FormField({ 
   id, 

@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 import { signInWithEmail, signInWithGoogle } from "@/lib/auth"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
-import { Label } from "@/components/ui/Label"
+import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/Spinner"
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 
