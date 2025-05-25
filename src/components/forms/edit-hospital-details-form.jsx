@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Spinner } from '@/components/ui/Spinner';
+import { Spinner } from '@/components/ui/spinner';
 import { useHospital } from '@/context/HospitalProvider';
 import defaultHospitalFormConfig from '@/lib/config/hospitalFormConfig';
 import ApiErrorAlert from '@/components/ui/api-error-alert';

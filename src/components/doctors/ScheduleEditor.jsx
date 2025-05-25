@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Label } from '../ui/label';
 import { DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Plus, Minus, Save, Check } from 'lucide-react';

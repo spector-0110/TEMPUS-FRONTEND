@@ -2,10 +2,10 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { resetPassword, checkUserExists } from "@/lib/auth"
-import { Button } from "@/components/ui/Button"
-import { Input } from "@/components/ui/Input"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Spinner } from "@/components/ui/Spinner"
+import { Spinner } from "@/components/ui/spinner"
 
 export function ForgetPasswordForm({className, onLoginClick, ...props}) {
     const router = useRouter();

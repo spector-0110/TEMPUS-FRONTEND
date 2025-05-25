@@ -3,10 +3,10 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { signInWithEmail, signInWithGoogle } from "@/lib/auth"
-import { Button } from "@/components/ui/Button"
-import { Input } from "@/components/ui/Input"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Spinner } from "@/components/ui/Spinner"
+import { Spinner } from "@/components/ui/spinner"
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 
 export function LoginForm({className, onSignUpClick, onForgetPasswordClick, ...props}) {

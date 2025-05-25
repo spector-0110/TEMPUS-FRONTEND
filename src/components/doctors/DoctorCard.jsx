@@ -9,7 +9,7 @@ import {
   CardContent, 
   CardFooter 
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { Calendar, User, Clock, Phone, Mail, Award, Briefcase, Edit } from 'lucide-react';
 

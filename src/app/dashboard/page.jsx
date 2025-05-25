@@ -1,6 +1,6 @@
 import { ChartAreaInteractive } from "@/components/ui/chart-area-interactive"
-import { DataTable } from "@/components/ui/DragHandle"
-import { SectionCards } from "@/components/ui/SectionCards"
+import { DataTable } from "@/components/ui/dragHandle"
+import { SectionCards } from "@/components/ui/sectionCards"
 import data from "./data.json";
 
 export default function DashBoardComponent() {

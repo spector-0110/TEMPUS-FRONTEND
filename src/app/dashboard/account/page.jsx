@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { useHospital } from '@/context/HospitalProvider';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Spinner } from '@/components/ui/Spinner';
+import { Spinner } from '@/components/ui/spinner';
 import EditHospitalDetailsForm from '@/components/forms/edit-hospital-details-form';
 import { Calendar, Building2, MapPin, Phone, Globe, FileText, Hash, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

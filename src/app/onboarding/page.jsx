@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthProvider';
 import { useHospital } from '@/context/HospitalProvider';
-import { Spinner } from '@/components/ui/Spinner';
+import { Spinner } from '@/components/ui/spinner';
 import HospitalRegistrationForm from '@/components/forms/hospital-registration-form';
 import { checkServerStatus } from '@/lib/api';
 

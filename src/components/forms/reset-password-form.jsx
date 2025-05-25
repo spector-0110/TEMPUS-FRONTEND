@@ -1,10 +1,10 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/Button"
-import { Input } from "@/components/ui/Input"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Spinner } from "@/components/ui/Spinner"
+import { Spinner } from "@/components/ui/spinner"
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 import supabase from "@/lib/supabase"
 

@@ -3,10 +3,10 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppSidebar } from "@/components/ui/app-sidebar"
-import { SiteHeader } from "@/components/ui/SiteHeader"
+import { SiteHeader } from "@/components/ui/siteHeader"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { useAuth } from "@/context/AuthProvider";
-import { Spinner } from "@/components/ui/Spinner";
+import { Spinner } from "@/components/ui/spinner";
 import { useHospital } from '@/context/HospitalProvider';
 import { checkServerStatus } from '@/lib/api';
 
