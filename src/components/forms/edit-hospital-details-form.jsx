@@ -7,9 +7,9 @@ import { Card } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { useHospital } from '@/context/HospitalProvider';
 import defaultHospitalFormConfig from '@/lib/config/hospitalFormConfig';
-import ApiErrorAlert from '@/components/ui/api-error-alert';
-import FormSection from '@/components/ui/form-ui/form-section';
-import HospitalOtpDialog from '@/components/ui/form-ui/hospital-otp-dialog';
+import { ApiErrorAlert } from '@/components/ui/api-error-alert';
+import { FormSection } from '@/components/ui/form-ui/form-section';
+import { HospitalOtpDialog } from '@/components/ui/form-ui/hospital-otp-dialog';
 import { getOTPforHospitalDetailsUpdate } from '@/lib/api';
 
 // Constants for allowed fields updates

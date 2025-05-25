@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
-export default function ApiErrorAlert({ error, onDismiss }) {
+function ApiErrorAlert({ error, onDismiss }) {
   if (!error) return null;
   
   return (
@@ -33,3 +33,5 @@ export default function ApiErrorAlert({ error, onDismiss }) {
     </Card>
   );
 }
+
+export { ApiErrorAlert };

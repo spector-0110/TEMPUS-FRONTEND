@@ -141,4 +141,4 @@ const ErrorDialog = ({
   );
 };
 
-export default ErrorDialog;
+export { ErrorDialog };

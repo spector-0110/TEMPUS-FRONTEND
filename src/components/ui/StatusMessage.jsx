@@ -20,4 +20,4 @@ const StatusMessage = ({ type, message }) => {
   );
 };
 
-export default StatusMessage;
+export { StatusMessage };

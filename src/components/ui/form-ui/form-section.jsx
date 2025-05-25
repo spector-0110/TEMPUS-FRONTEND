@@ -1,9 +1,9 @@
 'use client';
 
 import { Card } from '@/components/ui/card';
-import FormField from './form-field';
+import { FormField } from './form-field';
 
-export default function FormSection({ title, fields, formData, handleChange, errors, sectionName }) {
+function FormSection({ title, fields, formData, handleChange, errors, sectionName }) {
   return (
     <Card className="p-6">
       <h2 className="text-xl font-semibold mb-4">{title}</h2>
@@ -27,3 +27,5 @@ export default function FormSection({ title, fields, formData, handleChange, err
     </Card>
   );
 }
+
+export { FormSection };

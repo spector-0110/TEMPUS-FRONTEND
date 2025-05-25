@@ -18,7 +18,7 @@ import {
   updateHospitalDetailsAPI 
 } from '@/lib/api';
 
-export default function HospitalOtpDialog({ 
+function HospitalOtpDialog({ 
   isOpen, 
   onClose, 
   pendingUpdateData,
@@ -148,3 +148,5 @@ export default function HospitalOtpDialog({
     </Dialog>
   );
 }
+
+export { HospitalOtpDialog };

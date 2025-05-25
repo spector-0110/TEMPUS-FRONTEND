@@ -3,7 +3,7 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-export default function FormField({ 
+function FormField({ 
   id, 
   label, 
   value, 
@@ -33,3 +33,5 @@ export default function FormField({
     </div>
   );
 }
+
+export { FormField };
