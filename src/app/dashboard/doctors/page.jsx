@@ -1,16 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { useHospital } from '@/context/HospitalProvider';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
+import { useHospital } from '@/context/HospitalProvider.jsx';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog..jsx';
+import { Button } from '@/components/ui/button.jsx';
+import { Spinner } from '@/components/ui/spinner.jsx';
 import { User } from 'lucide-react';
-import DoctorCard from '@/components/doctors/DoctorCard';
-import DoctorDetailsEditor from '@/components/doctors/DoctorDetailsEditor';
-import StatusMessage from '@/components/ui/statusMessage';
-import ErrorDialog from '@/components/ui/errorDialog';
-import SuccessDialog from '@/components/ui/successDialog';
+import DoctorCard from '@/components/doctors/DoctorCard.jsx';
+import DoctorDetailsEditor from '@/components/doctors/DoctorDetailsEditor.jsx';
+import StatusMessage from '@/components/ui/statusMessage.jsx';
+import ErrorDialog from '@/components/ui/errorDialog.jsx';
+import SuccessDialog from '@/components/ui/successDialog.jsx';
 import { updateDoctorDetails, updateDoctorSchedule, createDoctor } from '@/lib/api'; 
 import { validateUpdateDoctorData, validateAllSchedulesData, validateCreateDoctorData } from '@/lib/validation/doctor-validation';
 
