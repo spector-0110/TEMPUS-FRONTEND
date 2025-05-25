@@ -24,8 +24,6 @@
 .DS_Store
 *.pem
 
-/farji
-
 # debug
 npm-debug.log*
 yarn-debug.log*
