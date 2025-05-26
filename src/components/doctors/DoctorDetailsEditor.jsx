@@ -8,8 +8,12 @@ import { DialogFooter } from '@/components/ui/dialog';
 
 /**
  * Component for editing doctor details
+ * @param {Object} doctor - The doctor object to edit (null for create mode)
+ * @param {Function} onSave - Callback function when saving doctor data
+ * @param {Function} onCancel - Callback function when cancelling
+ * @param {boolean} isLoading - External loading state from parent component
  */
-const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
+const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) => {
   const isEditMode = doctor && doctor.id;
   const [doctorData, setDoctorData] = useState({
     name: '',
@@ -19,14 +23,25 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
     qualification: '',
     experience: null, 
     age: null, 
-    photo: 'https://example.com/doctor-photo.jpg', // Default photo URL
+    photo: '/doctor.png', // Default photo URL
     aadhar: '',
     ...(isEditMode ? { status: 'active' } : {}) // Only include status in edit mode
   });
   
+  // Store original data for comparison in edit mode
+  const [originalData, setOriginalData] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Reset submitting state when external loading state changes
+  useEffect(() => {
+    if (!isLoading && isSubmitting) {
+      setIsSubmitting(false);
+    }
+  }, [isLoading, isSubmitting]);
+  
   useEffect(() => {
     if (doctor) {
-      setDoctorData({
+      const formattedDoctor = {
         id: doctor.id,
         name: doctor.name || '',
         email: doctor.email || '',
@@ -37,15 +52,48 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
                    doctor.experience ? parseInt(doctor.experience, 10) : null,
         age: typeof doctor.age === 'number' ? doctor.age : 
              doctor.age ? parseInt(doctor.age, 10) : null,
-        photo: doctor.photo || 'https://example.com/doctor-photo.jpg',
+        photo: doctor.photo || '/doctor.png',
         aadhar: doctor.aadhar || '',
         ...(isEditMode ? { status: doctor.status || 'active' } : {})
-      });
+      };
+      
+      setDoctorData(formattedDoctor);
+      
+      // Store original data for comparison in edit mode
+      if (isEditMode) {
+        setOriginalData(formattedDoctor);
+      }
     }
-  }, [doctor]);
+  }, [doctor, isEditMode]);
+  
+  // Check if data has changed
+  const hasDataChanged = () => {
+    if (!isEditMode || !originalData) return true;
+    
+    const fieldsToCompare = ['name', 'email', 'phone', 'specialization', 'qualification', 'experience', 'age', 'photo', 'aadhar', 'status'];
+    
+    return fieldsToCompare.some(field => {
+      const original = originalData[field];
+      const current = doctorData[field];
+      
+      // Handle null/empty comparisons for numeric fields
+      if (field === 'experience' || field === 'age') {
+        const originalValue = original === null || original === '' ? null : Number(original);
+        const currentValue = current === null || current === '' ? null : Number(current);
+        return originalValue !== currentValue;
+      }
+      
+      return original !== current;
+    });
+  };
   
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Reset submitting state when user makes changes after submission
+    if (isSubmitting) {
+      setIsSubmitting(false);
+    }
     
     // Convert numeric fields to actual numbers
     if (name === 'experience' || name === 'age') {
@@ -64,6 +112,15 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
   
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Prevent submission if no changes in edit mode
+    if (isEditMode && !hasDataChanged()) {
+      console.log('No changes detected, not submitting');
+      return;
+    }
+    
+    // Set submitting state to disable button
+    setIsSubmitting(true);
     
     // Ensure numeric fields are properly typed before submitting
     // Remove id field from doctorData before creating formattedData
@@ -89,6 +146,9 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
     
     onSave(formattedData);
   };
+  
+  // Determine if submit button should be disabled
+  const isSubmitDisabled = isSubmitting || isLoading || (isEditMode && !hasDataChanged());
   
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto p-2">
@@ -223,12 +283,26 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel }) => {
         )}
       </div>
       
+      {/* Show message when no changes detected in edit mode */}
+      {isEditMode && !hasDataChanged() && (
+        <div className="text-sm text-muted-foreground text-center py-2">
+          No changes detected. Make changes to enable save.
+        </div>
+      )}
+      
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="submit">
-          Save Changes
+        <Button 
+          type="submit" 
+          disabled={isSubmitDisabled}
+          className={isSubmitDisabled ? "opacity-50 cursor-not-allowed" : ""}
+        >
+          {(isSubmitting || isLoading)
+            ? (isEditMode ? 'Saving...' : 'Adding...') 
+            : (isEditMode ? 'Save Changes' : 'Add Doctor')
+          }
         </Button>
       </DialogFooter>
     </form>

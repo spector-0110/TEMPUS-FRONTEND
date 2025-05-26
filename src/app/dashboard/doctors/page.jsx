@@ -19,6 +19,7 @@ import { validateUpdateDoctorData, validateAllSchedulesData, validateCreateDocto
 const DoctorsPage = () => {
   const { hospitalDashboardDetails, loading, backgroundRefresh } = useHospital();
   const [showAddDoctorDialog, setShowAddDoctorDialog] = useState(false);
+  const [isAddingDoctor, setIsAddingDoctor] = useState(false);
   const [errorDialog, setErrorDialog] = useState({ 
     isOpen: false, 
     title: '', 
@@ -143,6 +144,7 @@ const DoctorsPage = () => {
 
   const handleAddDoctor = async (doctorData) => {
     try {
+      setIsAddingDoctor(true);
   
       const sanitizedData = {
         ...doctorData,
@@ -198,6 +200,8 @@ const DoctorsPage = () => {
         statusCode: error.status || error.statusCode || null,
         errorData: error.data || error
       });
+    } finally {
+      setIsAddingDoctor(false);
     }
   };
 
@@ -288,7 +292,8 @@ const DoctorsPage = () => {
             </DialogHeader>
             <DoctorDetailsEditor 
               onSave={handleAddDoctor}
-              onCancel={() => setShowAddDoctorDialog(false)} 
+              onCancel={() => setShowAddDoctorDialog(false)}
+              isLoading={isAddingDoctor}
             />
           </DialogContent>
         </Dialog>
