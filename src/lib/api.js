@@ -504,3 +504,111 @@ export async function getCachedLocationByPincode(pincode) {
   locationCache.pincodes[pincode] = data;
   return data;
 }
+
+/**
+ * Create a new appointment (hospital internal)
+ */
+export async function createAppointment(appointmentData) {
+  try {
+    const accessToken = await getAuthToken();
+    const response = await fetchWithTimeout(`${BASE_URL}/appointments`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(appointmentData),
+      cache: 'no-store'
+    });
+
+    const result = await handleApiResponse(response, 'Failed to create appointment');
+    return result;
+  } catch (error) {
+    console.error('createAppointment - Error creating appointment:', {
+      message: error.message,
+      status: error.status,
+      data: error.data,
+      error
+    });
+    throw error;
+  }
+}
+
+/**
+ * Fetch all appointments for hospital with filters
+ */
+export async function fetchAppointments(filters = {}) {
+  try {
+    const accessToken = await getAuthToken();
+    const queryParams = new URLSearchParams();
+    
+    if (filters.date) queryParams.append('date', filters.date);
+    if (filters.status) queryParams.append('status', filters.status);
+    if (filters.doctorId) queryParams.append('doctorId', filters.doctorId);
+    
+    const response = await fetchWithTimeout(`${BASE_URL}/appointments?${queryParams.toString()}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    });
+
+    const result = await handleApiResponse(response, 'Failed to fetch appointments');
+    return result;
+  } catch (error) {
+    console.error('fetchAppointments - Error fetching appointments:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch doctor available slots for internal booking
+ */
+export async function fetchDoctorAvailableSlots(doctorId, date = null) {
+  try {
+    const accessToken = await getAuthToken();
+    const queryParams = new URLSearchParams();
+    if (date) queryParams.append('date', date);
+    
+    const response = await fetchWithTimeout(`${BASE_URL}/doctors/${doctorId}/available-slots?${queryParams.toString()}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      cache: 'no-store'
+    });
+
+    const result = await handleApiResponse(response, 'Failed to fetch doctor available slots');
+    return result.slots || [];
+  } catch (error) {
+    console.error('fetchDoctorAvailableSlots - Error fetching slots:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update appointment status
+ */
+export async function updateAppointmentStatus(appointmentId, status) {
+  try {
+    const accessToken = await getAuthToken();
+    const response = await fetchWithTimeout(`${BASE_URL}/appointments/${appointmentId}/status`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ status }),
+      cache: 'no-store'
+    });
+
+    const result = await handleApiResponse(response, 'Failed to update appointment status');
+    return result;
+  } catch (error) {
+    console.error('updateAppointmentStatus - Error updating status:', error);
+    throw error;
+  }
+}

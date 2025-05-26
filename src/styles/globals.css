@@ -85,3 +85,71 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom Scrollbar Styles */
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+  
+  .scrollbar-thumb-blue-200 {
+    scrollbar-color: rgb(191 219 254) transparent;
+  }
+  
+  .scrollbar-track-gray-100 {
+    scrollbar-color: rgb(191 219 254) rgb(243 244 246);
+  }
+  
+  /* Webkit browsers */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: rgb(243 244 246);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgb(191 219 254);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgb(147 197 253);
+  }
+}
+
+/* Custom Scrollbar Styles */
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+  
+  .scrollbar-thumb-blue-200 {
+    scrollbar-color: rgb(191 219 254) transparent;
+  }
+  
+  .scrollbar-track-gray-100 {
+    scrollbar-color: rgb(191 219 254) rgb(243 244 246);
+  }
+  
+  /* Webkit browsers */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: rgb(243 244 246);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgb(191 219 254);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgb(147 197 253);
+  }
+}

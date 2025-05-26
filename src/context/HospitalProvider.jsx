@@ -6,6 +6,7 @@ import { fetchHospitalDetails, updateHospitalDetailsAPI,getHospitalDashboard } f
 
 const HospitalContext = createContext({
   hospitalDetails: null,
+  hospitalDashboardDetails: null,
   loading: true,
   error: null,
   isProfileComplete: false,
