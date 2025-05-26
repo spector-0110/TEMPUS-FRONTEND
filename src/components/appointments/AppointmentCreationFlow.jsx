@@ -10,13 +10,14 @@ import DoctorSelector from './DoctorSelector';
 import SlotPicker from './SlotPicker';
 import { createAppointment, fetchDoctorAvailableSlots } from '@/lib/api';
 import { validateAppointmentData } from '@/lib/validation/appointment-validation';
-import {useHospital} from '@/context/HospitalProvider';
+import { useHospital } from '@/context/HospitalProvider';
 
 /**
  * Multi-step appointment creation flow
  * Steps: Patient Details → Doctor Selection → Time Slot → Confirmation
  */
 const AppointmentCreationFlow = ({ doctors, onSuccess, onCancel }) => {
+  const { hospitalDetails } = useHospital();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -72,12 +73,92 @@ const AppointmentCreationFlow = ({ doctors, onSuccess, onCancel }) => {
     return Object.keys(errors).length === 0;
   };
 
+  // Generate time slots from doctor's schedule
+  const generateTimeSlotsFromSchedule = (schedules) => {
+    const slots = [];
+    const today = new Date();
+    
+    // Generate slots for the today and tommorow days
+    for (let i = 0; i < 2; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      const dayOfWeek = date.getDay();
+      
+      // Find schedule for this day of week
+      const daySchedule = schedules.find(schedule => 
+        schedule.dayOfWeek === dayOfWeek && schedule.status === 'active'
+      );
+      
+      if (daySchedule && daySchedule.timeRanges && daySchedule.timeRanges.length > 0) {
+        // Generate time slots for each time range
+        daySchedule.timeRanges.forEach(range => {
+          const startTime = range.start;
+          const endTime = range.end;
+          const consultationTime = daySchedule.avgConsultationTime || 10; // Default 30 minutes
+          
+          try {
+            // Parse start and end times
+            const [startHour, startMinute] = startTime.split(':').map(Number);
+            const [endHour, endMinute] = endTime.split(':').map(Number);
+            
+            // Validate time format
+            if (isNaN(startHour) || isNaN(startMinute) || isNaN(endHour) || isNaN(endMinute)) {
+              console.warn(`Invalid time format for doctor schedule: ${startTime} - ${endTime}`);
+              return;
+            }
+            
+            const startDateTime = new Date(date);
+            startDateTime.setHours(startHour, startMinute, 0, 0);
+            
+            const endDateTime = new Date(date);
+            endDateTime.setHours(endHour, endMinute, 0, 0);
+            
+            // Generate slots with consultation time intervals
+            let currentSlot = new Date(startDateTime);
+            
+            while (currentSlot < endDateTime) {
+              // Skip past slots (only allow future appointments)
+              if (currentSlot > new Date()) {
+                slots.push({
+                  id: `${date.toISOString().split('T')[0]}_${currentSlot.toTimeString().slice(0, 5)}`,
+                  date: date.toISOString().split('T')[0],
+                  time: currentSlot.toTimeString().slice(0, 5),
+                  datetime: new Date(currentSlot),
+                  available: true,
+                  scheduleId: daySchedule.id,
+                  dayOfWeek: dayOfWeek,
+                  consultationTime: consultationTime
+                });
+              }
+              
+              // Move to next slot
+              currentSlot = new Date(currentSlot.getTime() + consultationTime * 60000);
+            }
+          } catch (error) {
+            console.error(`Error processing time range ${startTime} - ${endTime}:`, error);
+          }
+        });
+      }
+    }
+    
+    return slots.sort((a, b) => a.datetime - b.datetime);
+  };
+
   // Load available slots when doctor is selected
   const loadAvailableSlots = async (doctorId) => {
     try {
       setIsLoading(true);
-      const slots = doctors.find(doc => doc.id === doctorId)?.schedules || [];
-      setAvailableSlots(slots);
+      const doctor = doctors.find(doc => doc.id === doctorId);
+      
+      if (!doctor || !doctor.schedules) {
+        setAvailableSlots([]);
+        setError('No schedule found for selected doctor');
+        return;
+      }
+      
+      const schedules = doctor.schedules || [];
+      const generatedSlots = generateTimeSlotsFromSchedule(schedules);
+      setAvailableSlots(generatedSlots);
     } catch (err) {
       console.error('Error loading available slots:', err);
       setError('Failed to load available time slots');
@@ -152,21 +233,29 @@ const AppointmentCreationFlow = ({ doctors, onSuccess, onCancel }) => {
       setIsSubmitting(true);
       setError(null);
 
+      // Check if hospitalId is available
+      if (!hospitalDetails?.id) {
+        throw new Error('Hospital information not available. Please refresh the page and try again.');
+      }
+
+      // Create flat data structure expected by backend
       const appointmentData = {
-        patientDetails: {
-          name: patientData.name.trim(),
-          age: parseInt(patientData.age),
-          mobile: patientData.mobile.trim()
-        },
+        hospitalId: hospitalDetails.id,
         doctorId: selectedDoctor.id,
-        appointmentSlot: selectedSlot
+        patientName: patientData.name.trim(),
+        mobile: patientData.mobile.trim(),
+        age: parseInt(patientData.age),
+        appointmentDate: selectedSlot.date,
+        startTime: selectedSlot.time,
+        endTime: null, // Will be calculated by backend based on consultation time
       };
 
       // Validate the complete appointment data
       const validationResult = validateAppointmentData(appointmentData);
       
       if (!validationResult.isValid) {
-        throw new Error(validationResult.errors.join(', '));
+        const errorMessages = validationResult.errors.map(err => err.message || err).join(', ');
+        throw new Error(errorMessages);
       }
 
       const result = await createAppointment(validationResult.data);

@@ -14,6 +14,7 @@ import { Calendar, Plus, Filter, Users, Clock, CheckCircle, XCircle, History } f
 import { ErrorDialog } from '@/components/ui/error-dialog';
 import { SuccessDialog } from '@/components/ui/success-dialog';
 import AppointmentCreationFlow from '@/components/appointments/AppointmentCreationFlow';
+import AppointmentDetailsModal from '@/components/appointments/AppointmentDetailsModal';
 
 /**
  * Main Appointments Page Component
@@ -25,6 +26,8 @@ export default function AppointmentsPage() {
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [isLoadingAppointments, setIsLoadingAppointments] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [activeTimeFilter, setActiveTimeFilter] = useState('today');
   const [activeStatusFilter, setActiveStatusFilter] = useState('all');
   const [selectedDoctor, setSelectedDoctor] = useState('all');
@@ -60,9 +63,114 @@ export default function AppointmentsPage() {
   const loadAppointments = async () => {
     try {
       setIsLoadingAppointments(true);
-      const appointmentsData = hospitalDashboardDetails?.appointments || [];
-      // Ensure appointments is always an array
-      setAppointments(Array.isArray(appointmentsData) ? appointmentsData : []);
+      
+      // Extract appointments from the nested structure
+      const appointmentsFromBackend = hospitalDashboardDetails?.appointments;
+      
+      if (!appointmentsFromBackend) {
+        setAppointments([]);
+        return;
+      }
+      
+      // Combine all appointments from different sources
+      const allAppointments = [
+        ...(appointmentsFromBackend.upcoming?.today || []),
+        ...(appointmentsFromBackend.upcoming?.tomorrow || []),
+        ...(appointmentsFromBackend.history || [])
+      ];
+      
+      // For testing purposes, if no appointments exist, create some mock data
+      // Remove this in production
+      if (allAppointments.length === 0) {
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        const mockAppointments = [
+          {
+            id: 'mock-1',
+            patient: { 
+              name: 'John Doe', 
+              mobile: '9876543210', 
+              email: 'john.doe@email.com',
+              age: 35,
+              gender: 'Male',
+              address: '123 Main Street, Delhi, India'
+            },
+            doctor: { 
+              name: ' Vatsa', 
+              specialization: 'Cardiology',
+              department: 'Cardiology Department'
+            },
+            appointmentDate: today.toISOString(),
+            appointmentTime: '09:00',
+            duration: 30,
+            status: 'scheduled',
+            reason: 'Regular checkup for heart condition',
+            notes: 'Patient has a history of high blood pressure',
+            patientName: 'John Doe',
+            patientMobile: '9876543210',
+            doctorName: 'Dr. Vatsa',
+            datetime: today
+          },
+          {
+            id: 'mock-2',
+            patient: { 
+              name: 'Jane Smith', 
+              mobile: '8765432109', 
+              email: 'jane.smith@email.com',
+              age: 28,
+              gender: 'Female',
+              address: '456 Oak Avenue, Mumbai, India'
+            },
+            doctor: { 
+              name: 'Dr. Vatsa', 
+              specialization: 'Cardiology',
+              department: 'Cardiology Department'
+            },
+            appointmentDate: today.toISOString(),
+            appointmentTime: '10:30',
+            duration: 45,
+            status: 'completed',
+            reason: 'Follow-up consultation',
+            notes: 'Patient is responding well to treatment',
+            patientName: 'Jane Smith',
+            patientMobile: '8765432109',
+            doctorName: 'Dr. Vatsa',
+            datetime: today
+          },
+          {
+            id: 'mock-3',
+            patient: { 
+              name: 'Robert Wilson', 
+              mobile: '7654321098', 
+              email: 'robert.wilson@email.com',
+              age: 45,
+              gender: 'Male',
+              address: '789 Pine Street, Bangalore, India'
+            },
+            doctor: { 
+              name: 'Dr. Vatsa', 
+              specialization: 'Cardiology',
+              department: 'Cardiology Department'
+            },
+            appointmentDate: tomorrow.toISOString(),
+            appointmentTime: '14:00',
+            duration: 30,
+            status: 'confirmed',
+            reason: 'Chest pain evaluation',
+            notes: 'Patient experiencing mild chest discomfort',
+            patientName: 'Robert Wilson',
+            patientMobile: '7654321098',
+            doctorName: 'Dr. Vatsa',
+            datetime: tomorrow
+          }
+        ];
+        setAppointments(mockAppointments);
+      } else {
+        // Ensure appointments is always an array
+        setAppointments(Array.isArray(allAppointments) ? allAppointments : []);
+      }
     } catch (error) {
       console.error('Error loading appointments:', error);
       // Ensure appointments is set to empty array on error
@@ -85,6 +193,7 @@ export default function AppointmentsPage() {
     // Ensure appointments is an array before filtering
     if (!Array.isArray(appointments)) {
       setFilteredAppointments([]);
+      console.log('Appointments data is not an array:');
       return;
     }
     
@@ -114,7 +223,7 @@ export default function AppointmentsPage() {
     if (selectedDoctor !== 'all') {
       filtered = filtered.filter(apt => apt.doctorId === selectedDoctor);
     }
-
+    console.log('Filtered Appointments:', filtered);
     setFilteredAppointments(filtered);
   };
 
@@ -171,6 +280,72 @@ export default function AppointmentsPage() {
     });
   };
 
+  // Appointment action handlers
+  const handleViewDetails = (appointment) => {
+    setSelectedAppointment(appointment);
+    setShowDetailsModal(true);
+  };
+
+  const handleStatusChange = async (appointmentId, newStatus) => {
+    try {
+      // Update appointment status in local state immediately for better UX
+      setAppointments(prevAppointments => 
+        prevAppointments.map(apt => 
+          apt.id === appointmentId 
+            ? { ...apt, status: newStatus }
+            : apt
+        )
+      );
+
+      // Here you would typically make an API call to update the status
+      // await updateAppointmentStatus(appointmentId, newStatus);
+
+      setSuccessDialog({
+        isOpen: true,
+        title: 'Status Updated',
+        message: `Appointment status has been updated to ${newStatus}.`,
+        details: [`Appointment ID: ${appointmentId}`]
+      });
+
+    } catch (error) {
+      console.error('Error updating appointment status:', error);
+      // Revert the local state change on error
+      loadAppointments();
+      
+      setErrorDialog({
+        isOpen: true,
+        title: 'Update Failed',
+        message: 'Failed to update appointment status',
+        details: [error.message || 'Unknown error occurred'],
+        errorType: 'api',
+        statusCode: error.status || null,
+        errorData: error.data || error
+      });
+    }
+  };
+
+  const handleEditAppointment = (appointment) => {
+    // Close details modal and show edit functionality
+    setShowDetailsModal(false);
+    // Here you could implement edit functionality
+    // For now, just show a success message indicating the feature
+    setSuccessDialog({
+      isOpen: true,
+      title: 'Edit Feature',
+      message: 'Edit appointment functionality will be implemented here.',
+      details: [`Appointment ID: ${appointment.id}`]
+    });
+  };
+
+  const handleCancelAppointment = async (appointmentId) => {
+    try {
+      await handleStatusChange(appointmentId, 'cancelled');
+      setShowDetailsModal(false);
+    } catch (error) {
+      console.error('Error cancelling appointment:', error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex h-full w-full items-center justify-center">
@@ -216,7 +391,11 @@ export default function AppointmentsPage() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-muted-foreground">Today's Appointments</p>
                 <p className="text-2xl font-bold">
-                  {Array.isArray(appointments) ? appointments.filter(apt => apt.appointmentDate === new Date().toISOString().split('T')[0]).length : 0}
+                  {(() => {
+                    const appointmentsData = hospitalDashboardDetails?.appointments;
+                    const todaySlots = appointmentsData?.upcoming?.today || [];
+                    return Array.isArray(todaySlots) ? todaySlots.length : 0;
+                  })()}
                 </p>
               </div>
             </div>
@@ -335,8 +514,8 @@ export default function AppointmentsPage() {
           ) : filteredAppointments.length === 0 ? (
             <div className="text-center py-8">
               <Calendar className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No appointments found</h3>
-              <p className="text-gray-500 mb-4">
+              <h3 className="text-lg font-medium text-gray-500 mb-2">No appointments found</h3>
+              <p className="text-gray-200 mb-4">
                 {appointments.length === 0 
                   ? "No appointments have been created yet."
                   : "No appointments match the current filters."
@@ -376,7 +555,11 @@ export default function AppointmentsPage() {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleViewDetails(appointment)}
+                      >
                         View Details
                       </Button>
                     </div>
@@ -407,6 +590,19 @@ export default function AppointmentsPage() {
         title={successDialog.title}
         message={successDialog.message}
         details={successDialog.details}
+      />
+
+      {/* Appointment Details Modal */}
+      <AppointmentDetailsModal
+        appointment={selectedAppointment}
+        isOpen={showDetailsModal}
+        onClose={() => {
+          setShowDetailsModal(false);
+          setSelectedAppointment(null);
+        }}
+        onStatusChange={handleStatusChange}
+        onEdit={handleEditAppointment}
+        onCancel={handleCancelAppointment}
       />
     </div>
   );
