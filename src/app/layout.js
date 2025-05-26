@@ -2,7 +2,7 @@ import '../styles/globals.css';
 import { AuthProvider } from '@/context/AuthProvider';
 import ThemeProvider from '@/context/ThemeProvider';
 import { HospitalProvider } from '@/context/HospitalProvider';
-import { LogoutButton } from '@/components/ui/logoutButton';
+import { LogoutButton } from '@/components/ui/logout-button';
 // import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 export const metadata = {

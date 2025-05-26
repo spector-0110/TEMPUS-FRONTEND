@@ -8,9 +8,8 @@ import { Spinner } from '@/components/ui/spinner';
 import { User } from 'lucide-react';
 import DoctorCard from '@/components/doctors/DoctorCard';
 import DoctorDetailsEditor from '@/components/doctors/DoctorDetailsEditor';
-import { StatusMessage } from '@/components/ui/StatusMessage';
-import { ErrorDialog } from '@/components/ui/ErrorDialog';
-import { SuccessDialog } from '@/components/ui/SuccessDialog';
+import { ErrorDialog } from '@/components/ui/error-dialog';
+import { SuccessDialog } from '@/components/ui/success-dialog';
 import { updateDoctorDetails, updateDoctorSchedule, createDoctor } from '@/lib/api'; 
 import { validateUpdateDoctorData, validateAllSchedulesData, validateCreateDoctorData } from '@/lib/validation/doctor-validation';
 
