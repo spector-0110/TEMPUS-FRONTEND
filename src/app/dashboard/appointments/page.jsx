@@ -15,6 +15,7 @@ import { ErrorDialog } from '@/components/ui/error-dialog';
 import { SuccessDialog } from '@/components/ui/success-dialog';
 import AppointmentCreationFlow from '@/components/appointments/AppointmentCreationFlow';
 import AppointmentDetailsModal from '@/components/appointments/AppointmentDetailsModal';
+import {getTodayAndTomorrowandPastWeekAppointments}  from "@/lib/api"
 
 /**
  * Main Appointments Page Component
@@ -31,7 +32,8 @@ export default function AppointmentsPage() {
   const [activeTimeFilter, setActiveTimeFilter] = useState('today');
   const [activeStatusFilter, setActiveStatusFilter] = useState('all');
   const [selectedDoctor, setSelectedDoctor] = useState('all');
-  const [errorDialog, setErrorDialog] = useState({ 
+  const [appointmentHistory, setAppointmentHistory] = useState([]);
+  const [errorDialog, setErrorDialog] = useState({
     isOpen: false, 
     title: '', 
     message: '', 
@@ -59,118 +61,81 @@ export default function AppointmentsPage() {
   }, [appointments, activeTimeFilter, activeStatusFilter, selectedDoctor]);
 
 
-  // apppointment loading function fetching appointments from hospitalDashboardDetails
+  // appointment loading function fetching appointments from backend
   const loadAppointments = async () => {
     try {
       setIsLoadingAppointments(true);
-      
       // Extract appointments from the nested structure
-      const appointmentsFromBackend = hospitalDashboardDetails?.appointments;
+      const appointmentsFromBackend = await getTodayAndTomorrowandPastWeekAppointments();
+      console.log('Appointments from backend:', appointmentsFromBackend);
       
-      if (!appointmentsFromBackend) {
+      if (!appointmentsFromBackend || !appointmentsFromBackend.data) {
         setAppointments([]);
+        setAppointmentHistory([]);
         return;
       }
+
+      const data = appointmentsFromBackend.data;
       
+      // Helper function to extract time from ISO datetime string
+      const extractTimeFromISO = (isoString) => {
+        if (!isoString) return null;
+        const date = new Date(isoString);
+        return date.toTimeString().slice(0, 5); // Extract HH:MM format
+      };
+
+      // Helper function to format appointment data
+      const formatAppointment = (apt) => ({
+        id: apt.id,
+        hospitalId: apt.hospitalId,
+        doctorId: apt.doctorId,
+        patientName: apt.patientName,
+        mobile: apt.mobile,
+        age: apt.age,
+        appointmentDate: apt.appointmentDate.split('T')[0], // Extract date part (YYYY-MM-DD)
+        appointmentTime: extractTimeFromISO(apt.startTime), // Extract time from startTime ISO string
+        startTime: apt.startTime,
+        endTime: apt.endTime,
+        status: apt.status,
+        notificationStatus: apt.notificationStatus,
+        paymentStatus: apt.paymentStatus,
+        createdAt: apt.createdAt,
+        doctor: apt.doctor,
+        // Legacy format for compatibility
+        patient: {
+          name: apt.patientName,
+          mobile: apt.mobile,
+          age: apt.age
+        },
+        patientMobile: apt.mobile,
+        doctorName: apt.doctor?.name,
+        datetime: new Date(apt.appointmentDate)
+      });
+
       // Combine all appointments from different sources
+      const todayAppointments = (data.today || []).map(formatAppointment);
+      const tomorrowAppointments = (data.tomorrow || []).map(formatAppointment);
+      const historyAppointments = (data.history?.appointments || []).map(formatAppointment);
+
+      // Combine all appointments
       const allAppointments = [
-        ...(appointmentsFromBackend.upcoming?.today || []),
-        ...(appointmentsFromBackend.upcoming?.tomorrow || []),
-        ...(appointmentsFromBackend.history || [])
+        ...todayAppointments,
+        ...tomorrowAppointments,
+        ...historyAppointments
       ];
+
+      // Store history separately for potential future use
+      setAppointmentHistory(historyAppointments);
       
-      // For testing purposes, if no appointments exist, create some mock data
-      // Remove this in production
-      if (allAppointments.length === 0) {
-        const today = new Date();
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        
-        const mockAppointments = [
-          {
-            id: 'mock-1',
-            patient: { 
-              name: 'John Doe', 
-              mobile: '9876543210', 
-              email: 'john.doe@email.com',
-              age: 35,
-              gender: 'Male',
-              address: '123 Main Street, Delhi, India'
-            },
-            doctor: { 
-              name: ' Vatsa', 
-              specialization: 'Cardiology',
-              department: 'Cardiology Department'
-            },
-            appointmentDate: today.toISOString(),
-            appointmentTime: '09:00',
-            duration: 30,
-            status: 'scheduled',
-            reason: 'Regular checkup for heart condition',
-            notes: 'Patient has a history of high blood pressure',
-            patientName: 'John Doe',
-            patientMobile: '9876543210',
-            doctorName: 'Dr. Vatsa',
-            datetime: today
-          },
-          {
-            id: 'mock-2',
-            patient: { 
-              name: 'Jane Smith', 
-              mobile: '8765432109', 
-              email: 'jane.smith@email.com',
-              age: 28,
-              gender: 'Female',
-              address: '456 Oak Avenue, Mumbai, India'
-            },
-            doctor: { 
-              name: 'Dr. Vatsa', 
-              specialization: 'Cardiology',
-              department: 'Cardiology Department'
-            },
-            appointmentDate: today.toISOString(),
-            appointmentTime: '10:30',
-            duration: 45,
-            status: 'completed',
-            reason: 'Follow-up consultation',
-            notes: 'Patient is responding well to treatment',
-            patientName: 'Jane Smith',
-            patientMobile: '8765432109',
-            doctorName: 'Dr. Vatsa',
-            datetime: today
-          },
-          {
-            id: 'mock-3',
-            patient: { 
-              name: 'Robert Wilson', 
-              mobile: '7654321098', 
-              email: 'robert.wilson@email.com',
-              age: 45,
-              gender: 'Male',
-              address: '789 Pine Street, Bangalore, India'
-            },
-            doctor: { 
-              name: 'Dr. Vatsa', 
-              specialization: 'Cardiology',
-              department: 'Cardiology Department'
-            },
-            appointmentDate: tomorrow.toISOString(),
-            appointmentTime: '14:00',
-            duration: 30,
-            status: 'confirmed',
-            reason: 'Chest pain evaluation',
-            notes: 'Patient experiencing mild chest discomfort',
-            patientName: 'Robert Wilson',
-            patientMobile: '7654321098',
-            doctorName: 'Dr. Vatsa',
-            datetime: tomorrow
-          }
-        ];
-        setAppointments(mockAppointments);
-      } else {
-        // Ensure appointments is always an array
-        setAppointments(Array.isArray(allAppointments) ? allAppointments : []);
-      }
+      // Set all appointments
+      setAppointments(allAppointments);
+      console.log('Loaded and formatted appointments:', {
+        today: todayAppointments.length,
+        tomorrow: tomorrowAppointments.length,
+        history: historyAppointments.length,
+        total: allAppointments.length
+      });
+      
     } catch (error) {
       console.error('Error loading appointments:', error);
       // Ensure appointments is set to empty array on error
@@ -209,10 +174,7 @@ export default function AppointmentsPage() {
     } else if (activeTimeFilter === 'tomorrow') {
       const tomorrowStr = tomorrow.toISOString().split('T')[0];
       filtered = filtered.filter(apt => apt.appointmentDate === tomorrowStr);
-    } else if (activeTimeFilter === 'history') {
-      const todayStr = today.toISOString().split('T')[0];
-      filtered = filtered.filter(apt => apt.appointmentDate < todayStr);
-    }
+    } 
 
     // Status-based filtering
     if (activeStatusFilter !== 'all') {
@@ -250,6 +212,7 @@ export default function AppointmentsPage() {
       case 'completed': return 'bg-green-100 text-green-800';
       case 'missed': return 'bg-red-100 text-red-800';
       case 'cancelled': return 'bg-gray-100 text-gray-800';
+      case 'confirmed': return 'bg-purple-100 text-purple-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -260,6 +223,7 @@ export default function AppointmentsPage() {
       case 'completed': return <CheckCircle className="w-4 h-4" />;
       case 'missed': return <XCircle className="w-4 h-4" />;
       case 'cancelled': return <XCircle className="w-4 h-4" />;
+      case 'confirmed': return <CheckCircle className="w-4 h-4" />;
       default: return <Clock className="w-4 h-4" />;
     }
   };
@@ -273,11 +237,29 @@ export default function AppointmentsPage() {
   };
 
   const formatTime = (timeString) => {
-    return new Date(`2000-01-01T${timeString}`).toLocaleTimeString('en-IN', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
+    if (!timeString) return 'N/A';
+    
+    // If it's already in HH:MM format, use it directly
+    if (timeString.includes(':') && timeString.length <= 5) {
+      return new Date(`2000-01-01T${timeString}`).toLocaleTimeString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+    
+    // If it's an ISO string, extract time part
+    try {
+      const date = new Date(timeString);
+      return date.toLocaleTimeString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return timeString;
+    }
   };
 
   // Appointment action handlers
@@ -391,11 +373,12 @@ export default function AppointmentsPage() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-muted-foreground">Today's Appointments</p>
                 <p className="text-2xl font-bold">
-                  {(() => {
-                    const appointmentsData = hospitalDashboardDetails?.appointments;
-                    const todaySlots = appointmentsData?.upcoming?.today || [];
-                    return Array.isArray(todaySlots) ? todaySlots.length : 0;
-                  })()}
+                  {Array.isArray(appointments) ? 
+                    appointments.filter(apt => {
+                      const today = new Date().toISOString().split('T')[0];
+                      return apt.appointmentDate === today;
+                    }).length : 0
+                  }
                 </p>
               </div>
             </div>
@@ -469,11 +452,12 @@ export default function AppointmentsPage() {
             <div className="flex-1">
               <label className="text-sm font-medium mb-2 block">Status</label>
               <Tabs value={activeStatusFilter} onValueChange={setActiveStatusFilter}>
-                <TabsList className="grid w-full grid-cols-4">
+                <TabsList className="grid w-full grid-cols-5">
                   <TabsTrigger value="all">All</TabsTrigger>
                   <TabsTrigger value="booked">Booked</TabsTrigger>
                   <TabsTrigger value="completed">Completed</TabsTrigger>
                   <TabsTrigger value="missed">Missed</TabsTrigger>
+                  <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
@@ -541,7 +525,7 @@ export default function AppointmentsPage() {
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm text-gray-600">
                         <div>
-                          <span className="font-medium">Doctor:</span> Dr. {appointment.doctorName}
+                          <span className="font-medium">Doctor:</span> Dr. {appointment.doctor?.name || appointment.doctorName}
                         </div>
                         <div>
                           <span className="font-medium">Date:</span> {formatDate(appointment.appointmentDate)}
@@ -550,7 +534,7 @@ export default function AppointmentsPage() {
                           <span className="font-medium">Time:</span> {formatTime(appointment.appointmentTime)}
                         </div>
                         <div>
-                          <span className="font-medium">Phone:</span> {appointment.patientMobile}
+                          <span className="font-medium">Phone:</span> {appointment.mobile || appointment.patientMobile}
                         </div>
                       </div>
                     </div>

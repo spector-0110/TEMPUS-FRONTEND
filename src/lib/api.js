@@ -3,7 +3,7 @@ import { ServerConnectionError } from './errors';
 
 // Constants for API configuration
 const API_TIMEOUT = 8000; // 5 seconds timeout
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const BASE_URL =  'http://localhost:8000/api';
 const INDIA_POST_API = 'https://api.postalpincode.in/pincode';
 
 /**
@@ -203,6 +203,49 @@ export async function fetchHospitalDetails() {
     return handleApiResponse(response, 'Failed to fetch hospital details');
   } catch (error) {
     console.error('Error fetching hospital details:', error);
+    throw error;
+  }
+}
+
+
+/**
+ * fetch appointment details of today and tommorow 
+ */
+export async function getTodayAndTomorrowandPastWeekAppointments() {
+  try {
+    const accessToken = await getAuthToken();
+
+    const response = await fetchWithTimeout(`${BASE_URL}/appointments`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    return handleApiResponse(response, 'Failed to fetch appointment details');
+  } catch (error) {
+    console.error('Error fetching appointment details:', error);
+    throw error;
+  }
+}
+
+/**
+ * fetch appointment history details
+ */
+export async function fetchAppointmentHistory() {
+  try {
+    const accessToken = await getAuthToken();
+
+    const response = await fetchWithTimeout(`${BASE_URL}/appointment/history`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    return handleApiResponse(response, 'Failed to fetch appointment history details');
+  } catch (error) {
+    console.error('Error fetching appointment history details:', error);
     throw error;
   }
 }
