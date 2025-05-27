@@ -5,21 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, Clock, User, Phone, Mail, MapPin, Stethoscope, AlertCircle, CheckCircle, XCircle } from "lucide-react";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { Calendar, Clock, User, Phone, Mail, MapPin, Stethoscope, AlertCircle, CheckCircle, XCircle, CreditCard, DollarSign } from "lucide-react";
 import { format } from "date-fns";
+import { useState } from "react";
 
 const statusConfig = {
-  scheduled: { 
-    label: "Scheduled", 
+  booked: { 
+    label: "Booked", 
     variant: "default", 
     icon: Calendar,
     color: "text-blue-600 bg-blue-50 border-blue-200"
-  },
-  confirmed: { 
-    label: "Confirmed", 
-    variant: "secondary", 
-    icon: CheckCircle,
-    color: "text-green-600 bg-green-50 border-green-200"
   },
   completed: { 
     label: "Completed", 
@@ -41,16 +37,99 @@ const statusConfig = {
   }
 };
 
-export default function AppointmentDetailsModal({ appointment, isOpen, onClose, onStatusChange, onEdit, onCancel }) {
+const paymentStatusConfig = {
+  paid: {
+    label: "Paid",
+    variant: "secondary",
+    icon: CheckCircle,
+    color: "text-green-600 bg-green-50 border-green-200"
+  },
+  unpaid: {
+    label: "Unpaid",
+    variant: "outline",
+    icon: CreditCard,
+    color: "text-gray-600 bg-gray-50 border-gray-200"
+  }
+};
+
+export default function AppointmentDetailsModal({ appointment, isOpen, onClose, onStatusChange, onEdit, onCancel, onPaymentStatusChange }) {
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
+  const [confirmationDialog, setConfirmationDialog] = useState({
+    isOpen: false,
+    type: '', // 'status' or 'payment'
+    newValue: '',
+    title: '',
+    description: ''
+  });
+
   if (!appointment) return null;
 
-  const statusInfo = statusConfig[appointment.status] || statusConfig.scheduled;
+  const statusInfo = statusConfig[appointment.status?.toLowerCase()];
   const StatusIcon = statusInfo.icon;
+  const paymentInfo = paymentStatusConfig[appointment.paymentStatus?.toLowerCase()];
+  const PaymentIcon = paymentInfo.icon;
 
-  const handleStatusUpdate = (newStatus) => {
-    if (onStatusChange) {
-      onStatusChange(appointment.id, newStatus);
+  const handleStatusUpdate = async (newStatus) => {
+    if (!onStatusChange) return;
+    
+    const statusInfo = statusConfig[newStatus];
+    setConfirmationDialog({
+      isOpen: true,
+      type: 'status',
+      newValue: newStatus,
+      title: `Confirm Status Update`,
+      description: `Are you sure you want to mark this appointment as "${statusInfo.label}"? This action will update the appointment status.`
+    });
+  };
+
+  const handlePaymentStatusUpdate = async (newPaymentStatus) => {
+    if (!onPaymentStatusChange) return;
+    
+    const paymentInfo = paymentStatusConfig[newPaymentStatus];
+    setConfirmationDialog({
+      isOpen: true,
+      type: 'payment',
+      newValue: newPaymentStatus,
+      title: `Confirm Payment Status Update`,
+      description: `Are you sure you want to mark this appointment payment as "${paymentInfo.label}"? This action will update the payment status.`
+    });
+  };
+
+  const handleConfirmUpdate = async () => {
+    const { type, newValue } = confirmationDialog;
+    
+    setConfirmationDialog(prev => ({ ...prev, isOpen: false }));
+    
+    if (type === 'status') {
+      setIsUpdatingStatus(true);
+      try {
+        await onStatusChange(appointment.id, newValue);
+        // Close the appointment details modal after successful update
+        onClose();
+      } finally {
+        setIsUpdatingStatus(false);
+      }
+    } else if (type === 'payment') {
+      setIsUpdatingPayment(true);
+      try {
+        await onPaymentStatusChange(appointment.id, newValue);
+        // Close the appointment details modal after successful update
+        onClose();
+      } finally {
+        setIsUpdatingPayment(false);
+      }
     }
+  };
+
+  const handleCancelConfirmation = () => {
+    setConfirmationDialog({
+      isOpen: false,
+      type: '',
+      newValue: '',
+      title: '',
+      description: ''
+    });
   };
 
   const formatAppointmentDate = (date) => {
@@ -63,16 +142,29 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
 
   const canUpdateStatus = (currentStatus) => {
     const allowedTransitions = {
-      scheduled: ['confirmed', 'cancelled'],
-      confirmed: ['completed', 'cancelled', 'missed'],
+      booked: ['completed', 'cancelled','missed'],
       completed: [],
-      cancelled: ['scheduled'],
-      missed: ['scheduled']
+      cancelled: [],
+      missed: ['completed', 'cancelled'],
+    };
+    return allowedTransitions[currentStatus] || [];
+  };
+
+  const canUpdatePaymentStatus = (currentPaymentStatus, appointmentStatus) => {
+    // Don't allow payment updates for cancelled or missed appointments
+    if (appointmentStatus === 'cancelled') {
+      return [];
+    }
+    
+    const currentStatus = currentPaymentStatus?.toLowerCase();
+    const allowedTransitions = {
+      unpaid: ['paid'], // for those coming rom website::
     };
     return allowedTransitions[currentStatus] || [];
   };
 
   const allowedStatuses = canUpdateStatus(appointment.status);
+  const allowedPaymentStatuses = canUpdatePaymentStatus(appointment.paymentStatus, appointment.status);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -87,13 +179,21 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
         <div className="space-y-6">
           {/* Status and Actions */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <StatusIcon className="h-5 w-5" />
-              <Badge variant={statusInfo.variant} className={statusInfo.color}>
-                {statusInfo.label}
-              </Badge>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <StatusIcon className="h-5 w-5" />
+                <Badge variant={statusInfo.variant} className={statusInfo.color}>
+                  {statusInfo.label}
+                </Badge>
+              </div>
+              <div className="flex items-center gap-2">
+                <PaymentIcon className="h-5 w-5" />
+                <Badge variant={paymentInfo.variant} className={paymentInfo.color}>
+                  {paymentInfo.label}
+                </Badge>
+              </div>
             </div>
-            <div className="flex gap-2">
+            {/* <div className="flex gap-2">
               {appointment.status !== 'completed' && appointment.status !== 'cancelled' && (
                 <>
                   {onEdit && (
@@ -108,7 +208,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
                   )}
                 </>
               )}
-            </div>
+            </div> */}
           </div>
 
           <Separator />
@@ -235,30 +335,85 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
           )}
 
           {/* Status Update Actions */}
-          {allowedStatuses.length > 0 && (
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Appointment Status Updates */}
+            {allowedStatuses.length > 0 && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-blue-600" />
+                    Update Appointment Status
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {allowedStatuses.map((status) => {
+                      const config = statusConfig[status];
+                      const StatusIcon = config.icon;
+                      return (
+                        <Button
+                          key={status}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleStatusUpdate(status)}
+                          disabled={isUpdatingStatus || isUpdatingPayment}
+                          className="flex items-center gap-2 hover:bg-gray-50 transition-colors"
+                        >
+                          <StatusIcon className="h-4 w-4" />
+                          Mark as {config.label}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                  {isUpdatingStatus && (
+                    <p className="text-sm text-muted-foreground mt-2">Updating appointment status...</p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Payment Status Updates */}
+            {allowedPaymentStatuses.length > 0 && onPaymentStatusChange && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <DollarSign className="h-5 w-5 text-green-600" />
+                    Update Payment Status
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {allowedPaymentStatuses.map((paymentStatus) => {
+                      const config = paymentStatusConfig[paymentStatus];
+                      const PaymentIcon = config.icon;
+                      return (
+                        <Button
+                          key={paymentStatus}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handlePaymentStatusUpdate(paymentStatus)}
+                          disabled={isUpdatingPayment || isUpdatingStatus}
+                          className="flex items-center gap-2 hover:bg-gray-50 transition-colors"
+                        >
+                          <PaymentIcon className="h-4 w-4" />
+                          Mark as {config.label}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                  {isUpdatingPayment && (
+                    <p className="text-sm text-muted-foreground mt-2">Updating payment status...</p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Show message when no updates are available */}
+          {allowedStatuses.length === 0 && allowedPaymentStatuses.length === 0 && (
             <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Update Status</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {allowedStatuses.map((status) => {
-                    const config = statusConfig[status];
-                    const StatusIcon = config.icon;
-                    return (
-                      <Button
-                        key={status}
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleStatusUpdate(status)}
-                        className="flex items-center gap-2"
-                      >
-                        <StatusIcon className="h-4 w-4" />
-                        Mark as {config.label}
-                      </Button>
-                    );
-                  })}
-                </div>
+              <CardContent className="p-6 text-center">
+                <p className="text-muted-foreground">No status updates available for this appointment.</p>
               </CardContent>
             </Card>
           )}
@@ -270,6 +425,21 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
           </Button>
         </div>
       </DialogContent>
+
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={confirmationDialog.isOpen}
+        onClose={handleCancelConfirmation}
+        onConfirm={handleConfirmUpdate}
+        title={confirmationDialog.title}
+        description={confirmationDialog.description}
+        confirmText="Yes, Update"
+        cancelText="Cancel"
+        variant={confirmationDialog.type === 'status' && 
+          (confirmationDialog.newValue === 'cancelled' || confirmationDialog.newValue === 'missed') 
+          ? 'destructive' : 'default'}
+        isLoading={isUpdatingStatus || isUpdatingPayment}
+      />
     </Dialog>
   );
 }

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useHospital } from '@/context/HospitalProvider';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -15,12 +15,9 @@ import { ErrorDialog } from '@/components/ui/error-dialog';
 import { SuccessDialog } from '@/components/ui/success-dialog';
 import AppointmentCreationFlow from '@/components/appointments/AppointmentCreationFlow';
 import AppointmentDetailsModal from '@/components/appointments/AppointmentDetailsModal';
-import {getTodayAndTomorrowandPastWeekAppointments}  from "@/lib/api"
+import {getTodayAndTomorrowandPastWeekAppointments , updateAppointmentStatus, updateAppointmentPaymentStatus}  from "@/lib/api"
 
-/**
- * Main Appointments Page Component
- * Features: Appointment management with filtering and creation flow
- */
+
 export default function AppointmentsPage() {
   const { hospitalDashboardDetails, loading } = useHospital();
   const [appointments, setAppointments] = useState([]);
@@ -33,6 +30,7 @@ export default function AppointmentsPage() {
   const [activeStatusFilter, setActiveStatusFilter] = useState('all');
   const [selectedDoctor, setSelectedDoctor] = useState('all');
   const [appointmentHistory, setAppointmentHistory] = useState([]);
+  const hasLoadedAppointments = useRef(false);
   const [errorDialog, setErrorDialog] = useState({
     isOpen: false, 
     title: '', 
@@ -53,16 +51,28 @@ export default function AppointmentsPage() {
   const doctors = hospitalDashboardDetails?.doctors || [];
 
   useEffect(() => {
-    loadAppointments();
-  }, []);
+    if (!isLoadingAppointments && !hasLoadedAppointments.current) {
+      console.log('Loading appointments for the first time...');
+      hasLoadedAppointments.current = true;
+      loadAppointments();
+    }
+  }, []); // Empty dependency array to run only once
 
   useEffect(() => {
-    filterAppointments();
+    // Only filter if we have appointments data
+    if (appointments.length > 0) {
+      filterAppointments();
+    }
   }, [appointments, activeTimeFilter, activeStatusFilter, selectedDoctor]);
 
 
   // appointment loading function fetching appointments from backend
-  const loadAppointments = async () => {
+  const loadAppointments = useCallback(async () => {
+    // Prevent multiple simultaneous API calls
+    if (isLoadingAppointments) {
+      console.log('Already loading appointments, skipping...');
+      return;
+    }
     try {
       setIsLoadingAppointments(true);
       // Extract appointments from the nested structure
@@ -129,12 +139,6 @@ export default function AppointmentsPage() {
       
       // Set all appointments
       setAppointments(allAppointments);
-      console.log('Loaded and formatted appointments:', {
-        today: todayAppointments.length,
-        tomorrow: tomorrowAppointments.length,
-        history: historyAppointments.length,
-        total: allAppointments.length
-      });
       
     } catch (error) {
       console.error('Error loading appointments:', error);
@@ -152,9 +156,9 @@ export default function AppointmentsPage() {
     } finally {
       setIsLoadingAppointments(false);
     }
-  };
+  }, [isLoadingAppointments]);
 
-  const filterAppointments = () => {
+  const filterAppointments = useCallback(() => {
     // Ensure appointments is an array before filtering
     if (!Array.isArray(appointments)) {
       setFilteredAppointments([]);
@@ -174,7 +178,7 @@ export default function AppointmentsPage() {
     } else if (activeTimeFilter === 'tomorrow') {
       const tomorrowStr = tomorrow.toISOString().split('T')[0];
       filtered = filtered.filter(apt => apt.appointmentDate === tomorrowStr);
-    } 
+    }
 
     // Status-based filtering
     if (activeStatusFilter !== 'all') {
@@ -187,7 +191,7 @@ export default function AppointmentsPage() {
     }
     console.log('Filtered Appointments:', filtered);
     setFilteredAppointments(filtered);
-  };
+  }, [appointments, activeTimeFilter, activeStatusFilter, selectedDoctor]);
 
   const handleAppointmentCreated = (appointmentDetails) => {
     setShowCreateDialog(false);
@@ -203,6 +207,7 @@ export default function AppointmentsPage() {
         `Appointment ID: ${appointmentDetails.appointmentId}`
       ]
     });
+    hasLoadedAppointments.current = false; // Reset to allow reload
     loadAppointments(); // Refresh appointments list
   };
 
@@ -280,7 +285,7 @@ export default function AppointmentsPage() {
       );
 
       // Here you would typically make an API call to update the status
-      // await updateAppointmentStatus(appointmentId, newStatus);
+      const res = await updateAppointmentStatus(appointmentId, newStatus);
 
       setSuccessDialog({
         isOpen: true,
@@ -298,6 +303,44 @@ export default function AppointmentsPage() {
         isOpen: true,
         title: 'Update Failed',
         message: 'Failed to update appointment status',
+        details: [error.message || 'Unknown error occurred'],
+        errorType: 'api',
+        statusCode: error.status || null,
+        errorData: error.data || error
+      });
+    }
+  };
+
+  const handlePaymentStatusChange = async (appointmentId, newPaymentStatus) => {
+    try {
+      // Update payment status in local state immediately for better UX
+      setAppointments(prevAppointments => 
+        prevAppointments.map(apt => 
+          apt.id === appointmentId 
+            ? { ...apt, paymentStatus: newPaymentStatus }
+            : apt
+        )
+      );
+
+      // Call API to update payment status
+      const res = await updateAppointmentPaymentStatus(appointmentId, newPaymentStatus);
+
+      setSuccessDialog({
+        isOpen: true,
+        title: 'Payment Status Updated',
+        message: `Payment status has been updated to ${newPaymentStatus}.`,
+        details: [`Appointment ID: ${appointmentId}`]
+      });
+
+    } catch (error) {
+      console.error('Error updating payment status:', error);
+      // Revert the local state change on error
+      loadAppointments();
+      
+      setErrorDialog({
+        isOpen: true,
+        title: 'Payment Update Failed',
+        message: 'Failed to update payment status',
         details: [error.message || 'Unknown error occurred'],
         errorType: 'api',
         statusCode: error.status || null,
@@ -498,32 +541,31 @@ export default function AppointmentsPage() {
           ) : filteredAppointments.length === 0 ? (
             <div className="text-center py-8">
               <Calendar className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-500 mb-2">No appointments found</h3>
-              <p className="text-gray-200 mb-4">
-                {appointments.length === 0 
-                  ? "No appointments have been created yet."
-                  : "No appointments match the current filters."
-                }
-              </p>
+              <h3 className="text-lg font-medium text-gray-500 mb-4">No appointments found</h3>
               <Button onClick={() => setShowCreateDialog(true)} className="gap-2">
                 <Plus className="h-4 w-4" />
                 Create First Appointment
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {filteredAppointments.map((appointment) => (
-                <div key={appointment.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div
+                  key={appointment.id}
+                  className="border rounded-xl p-5 transition-all hover:bg-neutral-900 hover:shadow-md cursor-pointer"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-semibold text-lg">{appointment.patientName}</h3>
-                        <Badge className={`${getStatusColor(appointment.status)} flex items-center gap-1`}>
+                      <div className="flex flex-wrap items-center gap-3 mb-3">
+                        <h3 className="text-lg font-semibold">
+                          {appointment.patientName}
+                        </h3>
+                        <Badge className={`text-xs font-medium flex items-center gap-1 ${getStatusColor(appointment.status)}`}>
                           {getStatusIcon(appointment.status)}
                           {appointment.status.toUpperCase()}
                         </Badge>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm text-gray-600">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-2 gap-x-4 text-sm">
                         <div>
                           <span className="font-medium">Doctor:</span> Dr. {appointment.doctor?.name || appointment.doctorName}
                         </div>
@@ -538,10 +580,11 @@ export default function AppointmentsPage() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
+                    <div className="flex sm:flex-col gap-2 sm:items-end">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="whitespace-nowrap"
                         onClick={() => handleViewDetails(appointment)}
                       >
                         View Details
@@ -585,6 +628,7 @@ export default function AppointmentsPage() {
           setSelectedAppointment(null);
         }}
         onStatusChange={handleStatusChange}
+        onPaymentStatusChange={handlePaymentStatusChange}
         onEdit={handleEditAppointment}
         onCancel={handleCancelAppointment}
       />

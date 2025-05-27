@@ -230,6 +230,52 @@ export async function getTodayAndTomorrowandPastWeekAppointments() {
 }
 
 /**
+ * Update appointment status
+ */
+export async function updateAppointmentStatus(appointmentId, status) {
+  try {
+    const accessToken = await getAuthToken();
+
+    const response = await fetchWithTimeout(`${BASE_URL}/appointments/${appointmentId}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ status })
+    });
+    
+    return handleApiResponse(response, 'Failed to update appointment status');
+  } catch (error) {
+    console.error('Error updating appointment status:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update appointment status
+ */
+export async function updateAppointmentPaymentStatus(appointmentId, paymentStatus) {
+  try {
+    const accessToken = await getAuthToken();
+
+    const response = await fetchWithTimeout(`${BASE_URL}/appointments/${appointmentId}/payment`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 'paymentStatus': paymentStatus })
+    });
+    
+    return handleApiResponse(response, 'Failed to update appointment payment status');
+  } catch (error) {
+    console.error('Error updating appointment payment status:', error);
+    throw error;
+  }
+}
+
+/**
  * fetch appointment history details
  */
 export async function fetchAppointmentHistory() {
@@ -628,30 +674,6 @@ export async function fetchDoctorAvailableSlots(doctorId, date = null) {
     return result.slots || [];
   } catch (error) {
     console.error('fetchDoctorAvailableSlots - Error fetching slots:', error);
-    throw error;
-  }
-}
-
-/**
- * Update appointment status
- */
-export async function updateAppointmentStatus(appointmentId, status) {
-  try {
-    const accessToken = await getAuthToken();
-    const response = await fetchWithTimeout(`${BASE_URL}/appointments/${appointmentId}/status`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ status }),
-      cache: 'no-store'
-    });
-
-    const result = await handleApiResponse(response, 'Failed to update appointment status');
-    return result;
-  } catch (error) {
-    console.error('updateAppointmentStatus - Error updating status:', error);
     throw error;
   }
 }
