@@ -291,7 +291,6 @@ export default function AppointmentsPage() {
         isOpen: true,
         title: 'Status Updated',
         message: `Appointment status has been updated to ${newStatus}.`,
-        details: [`Appointment ID: ${appointmentId}`]
       });
 
     } catch (error) {
@@ -329,7 +328,6 @@ export default function AppointmentsPage() {
         isOpen: true,
         title: 'Payment Status Updated',
         message: `Payment status has been updated to ${newPaymentStatus}.`,
-        details: [`Appointment ID: ${appointmentId}`]
       });
 
     } catch (error) {
@@ -349,6 +347,7 @@ export default function AppointmentsPage() {
     }
   };
 
+  // Edit appointment handler :will be implemented in future based on requirements
   const handleEditAppointment = (appointment) => {
     // Close details modal and show edit functionality
     setShowDetailsModal(false);
@@ -527,19 +526,19 @@ export default function AppointmentsPage() {
       </Card>
 
       {/* Appointments List */}
-      <Card>
-        <CardHeader>
+      <Card className="flex flex-col h-[60vh]">
+        <CardHeader className="flex-shrink-0">
           <CardTitle>
             Appointments ({filteredAppointments.length})
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1 overflow-hidden p-0">
           {isLoadingAppointments ? (
-            <div className="flex justify-center py-8">
+            <div className="flex justify-center items-center h-full">
               <Spinner size="md" />
             </div>
           ) : filteredAppointments.length === 0 ? (
-            <div className="text-center py-8">
+            <div className="flex flex-col items-center justify-center h-full p-6">
               <Calendar className="mx-auto h-12 w-12 text-gray-400 mb-4" />
               <h3 className="text-lg font-medium text-gray-500 mb-4">No appointments found</h3>
               <Button onClick={() => setShowCreateDialog(true)} className="gap-2">
@@ -548,51 +547,53 @@ export default function AppointmentsPage() {
               </Button>
             </div>
           ) : (
-            <div className="space-y-6">
-              {filteredAppointments.map((appointment) => (
-                <div
-                  key={appointment.id}
-                  className="border rounded-xl p-5 transition-all hover:bg-neutral-900 hover:shadow-md cursor-pointer"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex flex-wrap items-center gap-3 mb-3">
-                        <h3 className="text-lg font-semibold">
-                          {appointment.patientName}
-                        </h3>
-                        <Badge className={`text-xs font-medium flex items-center gap-1 ${getStatusColor(appointment.status)}`}>
-                          {getStatusIcon(appointment.status)}
-                          {appointment.status.toUpperCase()}
-                        </Badge>
+            <div className="h-full overflow-y-auto p-6">
+              <div className="space-y-6 pr-2">
+                {filteredAppointments.map((appointment) => (
+                  <div
+                    key={appointment.id}
+                    className="border rounded-xl p-5 transition-all hover:bg-neutral-900 hover:shadow-md cursor-pointer"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex flex-wrap items-center gap-3 mb-3">
+                          <h3 className="text-lg font-semibold">
+                            {appointment.patientName}
+                          </h3>
+                          <Badge className={`text-xs font-medium flex items-center gap-1 ${getStatusColor(appointment.status)}`}>
+                            {getStatusIcon(appointment.status)}
+                            {appointment.status.toUpperCase()}
+                          </Badge>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-2 gap-x-4 text-sm">
+                          <div>
+                            <span className="font-medium">Doctor:</span> Dr. {appointment.doctor?.name || appointment.doctorName}
+                          </div>
+                          <div>
+                            <span className="font-medium">Date:</span> {formatDate(appointment.appointmentDate)}
+                          </div>
+                          <div>
+                            <span className="font-medium">Time:</span> {formatTime(appointment.appointmentTime)}
+                          </div>
+                          <div>
+                            <span className="font-medium">Phone:</span> {appointment.mobile || appointment.patientMobile}
+                          </div>
+                        </div>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-2 gap-x-4 text-sm">
-                        <div>
-                          <span className="font-medium">Doctor:</span> Dr. {appointment.doctor?.name || appointment.doctorName}
-                        </div>
-                        <div>
-                          <span className="font-medium">Date:</span> {formatDate(appointment.appointmentDate)}
-                        </div>
-                        <div>
-                          <span className="font-medium">Time:</span> {formatTime(appointment.appointmentTime)}
-                        </div>
-                        <div>
-                          <span className="font-medium">Phone:</span> {appointment.mobile || appointment.patientMobile}
-                        </div>
+                      <div className="flex sm:flex-col gap-2 sm:items-end">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="whitespace-nowrap"
+                          onClick={() => handleViewDetails(appointment)}
+                        >
+                          View Details
+                        </Button>
                       </div>
-                    </div>
-                    <div className="flex sm:flex-col gap-2 sm:items-end">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="whitespace-nowrap"
-                        onClick={() => handleViewDetails(appointment)}
-                      >
-                        View Details
-                      </Button>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
         </CardContent>
