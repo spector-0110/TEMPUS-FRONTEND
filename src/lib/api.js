@@ -606,11 +606,9 @@ export async function getCachedLocationByPincode(pincode) {
  */
 export async function createAppointment(appointmentData) {
   try {
-    const accessToken = await getAuthToken();
     const response = await fetchWithTimeout(`${BASE_URL}/appointments`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(appointmentData),
@@ -685,47 +683,3 @@ export async function fetchDoctorAvailableSlots(doctorId, date = null) {
   }
 }
 
-/**
- * Track appointment using public token (no authentication required)
- */
-export async function trackAppointment(token) {
-  try {
-    const response = await fetchWithTimeout(`${BASE_URL}/track/${token}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      cache: 'no-store'
-    });
-
-    const result = await handleApiResponse(response, 'Failed to fetch appointment details');
-    return result;
-  } catch (error) {
-    console.error('trackAppointment - Error tracking appointment:', error);
-    
-    // Enhanced error handling for tracking
-    if (error.status === 404) {
-      const enhancedError = new Error('Appointment not found. The tracking link may have expired or the appointment may not exist.');
-      enhancedError.status = 404;
-      enhancedError.type = 'not-found';
-      throw enhancedError;
-    } else if (error.status === 400) {
-      const enhancedError = new Error('Invalid tracking link. Please check the URL and try again.');
-      enhancedError.status = 400;
-      enhancedError.type = 'invalid-token';
-      throw enhancedError;
-    } else if (error.status === 410) {
-      const enhancedError = new Error('This tracking link has expired. Please contact the hospital for a new link.');
-      enhancedError.status = 410;
-      enhancedError.type = 'expired';
-      throw enhancedError;
-    } else if (error.message?.includes('NetworkError') || error.message?.includes('Failed to fetch')) {
-      const enhancedError = new Error('Unable to connect to the server. Please check your internet connection and try again.');
-      enhancedError.status = 0;
-      enhancedError.type = 'network';
-      throw enhancedError;
-    }
-    
-    throw error;
-  }
-}

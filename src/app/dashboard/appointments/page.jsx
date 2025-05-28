@@ -53,7 +53,6 @@ export default function AppointmentsPage() {
 
   useEffect(() => {
     if (!isLoadingAppointments && !hasLoadedAppointments.current) {
-      console.log('Loading appointments for the first time...');
       hasLoadedAppointments.current = true;
       loadAppointments();
     }
@@ -71,14 +70,12 @@ export default function AppointmentsPage() {
   const loadAppointments = useCallback(async () => {
     // Prevent multiple simultaneous API calls
     if (isLoadingAppointments) {
-      console.log('Already loading appointments, skipping...');
       return;
     }
     try {
       setIsLoadingAppointments(true);
       // Extract appointments from the nested structure
       const appointmentsFromBackend = await getTodayAndTomorrowandPastWeekAppointments();
-      console.log('Appointments from backend:', appointmentsFromBackend);
       
       if (!appointmentsFromBackend || !appointmentsFromBackend.data) {
         setAppointments([]);
@@ -163,7 +160,6 @@ export default function AppointmentsPage() {
     // Ensure appointments is an array before filtering
     if (!Array.isArray(appointments)) {
       setFilteredAppointments([]);
-      console.log('Appointments data is not an array:');
       return;
     }
     
@@ -212,7 +208,6 @@ export default function AppointmentsPage() {
         `Doctor: Dr. ${appointmentDetails.doctorName}`,
         `Date: ${appointmentDetails.appointmentDate}`,
         `Time: ${appointmentDetails.appointmentTime}`,
-        `Appointment ID: ${appointmentDetails.appointmentId}`
       ]
     });
     hasLoadedAppointments.current = false; // Reset to allow reload
@@ -424,7 +419,7 @@ export default function AppointmentsPage() {
           </p>
         </div>
         
-        {/* <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
           <DialogTrigger asChild>
             <Button className="gap-2 w-full sm:w-auto">
               <Plus className="h-4 w-4" />
@@ -438,7 +433,7 @@ export default function AppointmentsPage() {
               onCancel={() => setShowCreateDialog(false)}
             />
           </DialogContent>
-        </Dialog> */}
+        </Dialog>
       </div>
 
       {/* Statistics Cards */}
