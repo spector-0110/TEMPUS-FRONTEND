@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
-import { Calendar, Clock, User, Phone, Mail, MapPin, Stethoscope, AlertCircle, CheckCircle, XCircle, CreditCard, DollarSign } from "lucide-react";
+import { Calendar, Clock, User, Phone, Mail, MapPin, Stethoscope, AlertCircle, CheckCircle, XCircle, CreditCard, Smartphone, IndianRupee } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
 
@@ -52,9 +53,29 @@ const paymentStatusConfig = {
   }
 };
 
+const paymentMethodConfig = {
+  cash: {
+    label: "Cash",
+    icon: IndianRupee,
+    color: "text-green-600"
+  },
+  upi: {
+    label: "UPI",
+    icon: Smartphone,
+    color: "text-blue-600"
+  },
+  card: {
+    label: "Card",
+    icon: CreditCard,
+    color: "text-purple-600"
+  }
+};
+
 export default function AppointmentDetailsModal({ appointment, isOpen, onClose, onStatusChange, onEdit, onCancel, onPaymentStatusChange }) {
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
+  const [showPaymentMethodSelector, setShowPaymentMethodSelector] = useState(false);
   const [confirmationDialog, setConfirmationDialog] = useState({
     isOpen: false,
     type: '', // 'status' or 'payment'
@@ -86,6 +107,13 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
   const handlePaymentStatusUpdate = async (newPaymentStatus) => {
     if (!onPaymentStatusChange) return;
     
+    if (newPaymentStatus === 'paid') {
+      // Show payment method selector for 'paid' status
+      setShowPaymentMethodSelector(true);
+      setSelectedPaymentMethod('');
+      return;
+    }
+    
     const paymentInfo = paymentStatusConfig[newPaymentStatus];
     setConfirmationDialog({
       isOpen: true,
@@ -96,8 +124,28 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
     });
   };
 
+  const handlePaymentMethodConfirm = () => {
+    if (!selectedPaymentMethod) return;
+    
+    const paymentMethodInfo = paymentMethodConfig[selectedPaymentMethod];
+    setShowPaymentMethodSelector(false);
+    setConfirmationDialog({
+      isOpen: true,
+      type: 'payment',
+      newValue: 'paid',
+      paymentMethod: selectedPaymentMethod,
+      title: `Confirm Payment`,
+      description: `Are you sure you want to mark this appointment as paid via ${paymentMethodInfo.label}? This action will update the payment status and method.`
+    });
+  };
+
+  const handleCancelPaymentMethod = () => {
+    setShowPaymentMethodSelector(false);
+    setSelectedPaymentMethod('');
+  };
+
   const handleConfirmUpdate = async () => {
-    const { type, newValue } = confirmationDialog;
+    const { type, newValue, paymentMethod } = confirmationDialog;
     
     setConfirmationDialog(prev => ({ ...prev, isOpen: false }));
     
@@ -113,7 +161,12 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
     } else if (type === 'payment') {
       setIsUpdatingPayment(true);
       try {
-        await onPaymentStatusChange(appointment.id, newValue);
+        // Pass payment method along with status when marking as paid
+        if (newValue === 'paid' && paymentMethod) {
+          await onPaymentStatusChange(appointment.id, newValue, paymentMethod);
+        } else {
+          await onPaymentStatusChange(appointment.id, newValue);
+        }
         // Close the appointment details modal after successful update
         onClose();
       } finally {
@@ -127,6 +180,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
       isOpen: false,
       type: '',
       newValue: '',
+      paymentMethod: '',
       title: '',
       description: ''
     });
@@ -181,13 +235,11 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <StatusIcon className="h-5 w-5" />
                 <Badge variant={statusInfo.variant} className={statusInfo.color}>
                   {statusInfo.label}
                 </Badge>
               </div>
               <div className="flex items-center gap-2">
-                <PaymentIcon className="h-5 w-5" />
                 <Badge variant={paymentInfo.variant} className={paymentInfo.color}>
                   {paymentInfo.label}
                 </Badge>
@@ -357,7 +409,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
                           size="sm"
                           onClick={() => handleStatusUpdate(status)}
                           disabled={isUpdatingStatus || isUpdatingPayment}
-                          className="flex items-center gap-2 hover:bg-gray-50 transition-colors"
+                          className="flex items-center gap-2 hover:bg-neutral-900 hover:shadow-md cursor-pointer transition-colors"
                         >
                           <StatusIcon className="h-4 w-4" />
                           Mark as {config.label}
@@ -377,7 +429,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <DollarSign className="h-5 w-5 text-green-600" />
+                    <IndianRupee className="h-5 w-5 text-green-600" />
                     Update Payment Status
                   </CardTitle>
                 </CardHeader>
@@ -393,7 +445,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
                           size="sm"
                           onClick={() => handlePaymentStatusUpdate(paymentStatus)}
                           disabled={isUpdatingPayment || isUpdatingStatus}
-                          className="flex items-center gap-2 hover:bg-gray-50 transition-colors"
+                          className="flex items-center gap-2 hover:bg-neutral-900 hover:shadow-md cursor-pointer transition-colors"
                         >
                           <PaymentIcon className="h-4 w-4" />
                           Mark as {config.label}
@@ -440,6 +492,57 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
           ? 'destructive' : 'default'}
         isLoading={isUpdatingStatus || isUpdatingPayment}
       />
+
+      {/* Payment Method Selection Dialog */}
+      <Dialog open={showPaymentMethodSelector} onOpenChange={setShowPaymentMethodSelector}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <IndianRupee className="h-5 w-5 text-green-600" />
+              Select Payment Method
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Choose the payment method used for this appointment:
+            </p>
+            
+            <Select value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select payment method" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(paymentMethodConfig).map(([key, config]) => {
+                  const Icon = config.icon;
+                  return (
+                    <SelectItem key={key} value={key}>
+                      <div className="flex items-center gap-2 ">
+                        <Icon className={`h-4 w-4 ${config.color} cursor-pointer` } />
+                        {config.label}
+                      </div>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+            
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="outline" onClick={handleCancelPaymentMethod}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={handlePaymentMethodConfirm}
+                disabled={!selectedPaymentMethod}
+                className="gap-2"
+              >
+                <CheckCircle className="h-4 w-4" />
+                Mark as Paid
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }

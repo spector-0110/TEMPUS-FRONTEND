@@ -10,7 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Plus, Filter, Users, Clock, CheckCircle, XCircle, History } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Calendar, Plus, Filter, Users, Clock, CheckCircle, XCircle, History, CreditCard, Search, X } from 'lucide-react';
 import { ErrorDialog } from '@/components/ui/error-dialog';
 import { SuccessDialog } from '@/components/ui/success-dialog';
 import AppointmentCreationFlow from '@/components/appointments/AppointmentCreationFlow';
@@ -27,8 +28,8 @@ export default function AppointmentsPage() {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [activeTimeFilter, setActiveTimeFilter] = useState('today');
-  const [activeStatusFilter, setActiveStatusFilter] = useState('all');
   const [selectedDoctor, setSelectedDoctor] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [appointmentHistory, setAppointmentHistory] = useState([]);
   const hasLoadedAppointments = useRef(false);
   const [errorDialog, setErrorDialog] = useState({
@@ -63,7 +64,7 @@ export default function AppointmentsPage() {
     if (appointments.length > 0) {
       filterAppointments();
     }
-  }, [appointments, activeTimeFilter, activeStatusFilter, selectedDoctor]);
+  }, [appointments, activeTimeFilter, selectedDoctor, searchQuery]);
 
 
   // appointment loading function fetching appointments from backend
@@ -179,19 +180,26 @@ export default function AppointmentsPage() {
       const tomorrowStr = tomorrow.toISOString().split('T')[0];
       filtered = filtered.filter(apt => apt.appointmentDate === tomorrowStr);
     }
-
-    // Status-based filtering
-    if (activeStatusFilter !== 'all') {
-      filtered = filtered.filter(apt => apt.status === activeStatusFilter);
-    }
-
+    
     // Doctor-based filtering
     if (selectedDoctor !== 'all') {
       filtered = filtered.filter(apt => apt.doctorId === selectedDoctor);
     }
+
+    // Search-based filtering (by name or mobile number)
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(apt => {
+        const patientName = (apt.patientName || '').toLowerCase();
+        const mobile = (apt.mobile || apt.patientMobile || '').toString();
+        
+        return patientName.includes(query) || mobile.includes(query);
+      });
+    }
+
     console.log('Filtered Appointments:', filtered);
     setFilteredAppointments(filtered);
-  }, [appointments, activeTimeFilter, activeStatusFilter, selectedDoctor]);
+  }, [appointments, activeTimeFilter, selectedDoctor, searchQuery]);
 
   const handleAppointmentCreated = (appointmentDetails) => {
     setShowCreateDialog(false);
@@ -231,6 +239,27 @@ export default function AppointmentsPage() {
       case 'confirmed': return <CheckCircle className="w-4 h-4" />;
       default: return <Clock className="w-4 h-4" />;
     }
+  };
+
+  const getPaymentStatusColor = (paymentStatus) => {
+    switch (paymentStatus) {
+      case 'paid': return 'bg-emerald-100 text-emerald-800';
+      case 'unpaid': return 'bg-orange-100 text-orange-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getPaymentStatusIcon = (paymentStatus) => {
+    switch (paymentStatus) {
+      case 'paid': return <CheckCircle className="w-4 h-4" />;
+      case 'unpaid': return <XCircle className="w-4 h-4" />;
+      default: return <Clock className="w-4 h-4" />;
+    }
+  };
+
+  const getPaymentMethodDisplay = (paymentMethod) => {
+    if (!paymentMethod) return '';
+    return ` • ${paymentMethod.toUpperCase()}`;
   };
 
   const formatDate = (dateString) => {
@@ -310,24 +339,30 @@ export default function AppointmentsPage() {
     }
   };
 
-  const handlePaymentStatusChange = async (appointmentId, newPaymentStatus) => {
+  const handlePaymentStatusChange = async (appointmentId, newPaymentStatus, paymentMethod = null) => {
     try {
       // Update payment status in local state immediately for better UX
       setAppointments(prevAppointments => 
         prevAppointments.map(apt => 
           apt.id === appointmentId 
-            ? { ...apt, paymentStatus: newPaymentStatus }
+            ? { 
+                ...apt, 
+                paymentStatus: newPaymentStatus,
+                ...(paymentMethod && { paymentMethod })
+              }
             : apt
         )
       );
 
-      // Call API to update payment status
-      const res = await updateAppointmentPaymentStatus(appointmentId, newPaymentStatus);
+      // Call API to update payment status with optional payment method
+      const res = await updateAppointmentPaymentStatus(appointmentId, newPaymentStatus, paymentMethod);
 
       setSuccessDialog({
         isOpen: true,
         title: 'Payment Status Updated',
-        message: `Payment status has been updated to ${newPaymentStatus}.`,
+        message: paymentMethod 
+          ? `Payment status has been updated to ${newPaymentStatus} via ${paymentMethod.toUpperCase()}.`
+          : `Payment status has been updated to ${newPaymentStatus}.`,
       });
 
     } catch (error) {
@@ -478,6 +513,29 @@ export default function AppointmentsPage() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col lg:flex-row gap-4">
+            {/* Search Filter */}
+            <div className="flex-1">
+              <label className="text-sm font-medium mb-2 block">Search</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by patient name or mobile number..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 pr-10"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground hover:text-foreground transition-colors"
+                    type="button"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+
             {/* Time-based Filters */}
             <div className="flex-1">
               <label className="text-sm font-medium mb-2 block">Time Period</label>
@@ -490,7 +548,7 @@ export default function AppointmentsPage() {
               </Tabs>
             </div>
 
-            {/* Status-based Filters */}
+            {/* Status-based Filters
             <div className="flex-1">
               <label className="text-sm font-medium mb-2 block">Status</label>
               <Tabs value={activeStatusFilter} onValueChange={setActiveStatusFilter}>
@@ -502,7 +560,19 @@ export default function AppointmentsPage() {
                   <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
                 </TabsList>
               </Tabs>
-            </div>
+            </div> */}
+
+            {/* Payment Status Filter
+            <div className="flex-1">
+              <label className="text-sm font-medium mb-2 block">Payment Status</label>
+              <Tabs value={activePaymentFilter} onValueChange={setActivePaymentFilter}>
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="all">All</TabsTrigger>
+                  <TabsTrigger value="paid">Paid</TabsTrigger>
+                  <TabsTrigger value="unpaid">Unpaid</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div> */}
 
             {/* Doctor Filter */}
             <div className="flex-1">
@@ -563,6 +633,10 @@ export default function AppointmentsPage() {
                           <Badge className={`text-xs font-medium flex items-center gap-1 ${getStatusColor(appointment.status)}`}>
                             {getStatusIcon(appointment.status)}
                             {appointment.status.toUpperCase()}
+                          </Badge>
+                          <Badge className={`text-xs font-medium flex items-center gap-1 ${getPaymentStatusColor(appointment.paymentStatus || 'unpaid')}`}>
+                            {getPaymentStatusIcon(appointment.paymentStatus || 'unpaid')}
+                            {(appointment.paymentStatus || 'unpaid').toUpperCase()}{getPaymentMethodDisplay(appointment.paymentMethod)}
                           </Badge>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-2 gap-x-4 text-sm">

@@ -253,11 +253,18 @@ export async function updateAppointmentStatus(appointmentId, status) {
 }
 
 /**
- * Update appointment status
+ * Update appointment payment status with optional payment method
  */
-export async function updateAppointmentPaymentStatus(appointmentId, paymentStatus) {
+export async function updateAppointmentPaymentStatus(appointmentId, paymentStatus, paymentMethod = null) {
   try {
     const accessToken = await getAuthToken();
+
+    const requestBody = { 'paymentStatus': paymentStatus };
+    
+    // Add payment method if provided (for 'paid' status)
+    if (paymentMethod) {
+      requestBody.paymentMethod = paymentMethod;
+    }
 
     const response = await fetchWithTimeout(`${BASE_URL}/appointments/${appointmentId}/payment`, {
       method: 'PATCH',
@@ -265,7 +272,7 @@ export async function updateAppointmentPaymentStatus(appointmentId, paymentStatu
         'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ 'paymentStatus': paymentStatus })
+      body: JSON.stringify(requestBody)
     });
     
     return handleApiResponse(response, 'Failed to update appointment payment status');
