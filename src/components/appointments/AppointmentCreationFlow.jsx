@@ -238,6 +238,9 @@ const AppointmentCreationFlow = ({ doctors, onSuccess, onCancel }) => {
         throw new Error('Hospital information not available. Please refresh the page and try again.');
       }
 
+      // Calculate end time based on consultation duration
+      const endTime = calculateEndTime(selectedSlot.time, selectedSlot.consultationTime);
+
       // Create flat data structure expected by backend
       const appointmentData = {
         hospitalId: hospitalDetails.id,
@@ -247,7 +250,7 @@ const AppointmentCreationFlow = ({ doctors, onSuccess, onCancel }) => {
         age: parseInt(patientData.age),
         appointmentDate: selectedSlot.date,
         startTime: selectedSlot.time,
-        endTime: null, // Will be calculated by backend based on consultation time
+        endTime: endTime,
       };
 
       // Validate the complete appointment data
@@ -308,6 +311,15 @@ const AppointmentCreationFlow = ({ doctors, onSuccess, onCancel }) => {
       minute: '2-digit',
       hour12: true
     });
+  };
+
+  const calculateEndTime = (startTime, consultationMinutes) => {
+    const [hours, minutes] = startTime.split(':').map(Number);
+    const startDate = new Date();
+    startDate.setHours(hours, minutes, 0, 0);
+    
+    const endDate = new Date(startDate.getTime() + consultationMinutes * 60000);
+    return endDate.toTimeString().slice(0, 5); // Format as HH:MM
   };
 
   return (
@@ -409,7 +421,8 @@ const AppointmentCreationFlow = ({ doctors, onSuccess, onCancel }) => {
                     <p><span className="font-medium">Doctor:</span> Dr. {selectedDoctor?.name}</p>
                     <p><span className="font-medium">Specialization:</span> {selectedDoctor?.specialization}</p>
                     <p><span className="font-medium">Date:</span> {formatDate(selectedSlot?.date)}</p>
-                    <p><span className="font-medium">Time:</span> {formatTime(selectedSlot?.time)}</p>
+                    <p><span className="font-medium">Time:</span> {formatTime(selectedSlot?.time)} - {formatTime(calculateEndTime(selectedSlot?.time, selectedSlot?.consultationTime))}</p>
+                    <p><span className="font-medium">Duration:</span> {selectedSlot?.consultationTime} minutes</p>
                   </div>
                 </div>
               </div>
