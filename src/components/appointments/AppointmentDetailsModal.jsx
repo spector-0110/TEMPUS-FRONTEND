@@ -282,11 +282,11 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-gray-500" />
-                  <span>{formatAppointmentTime(appointment.appointmentDate)}</span>
+                  <span>{formatAppointmentTime(appointment.startTime)}</span>
                 </div>
-                {appointment.duration && (
-                  <div className="text-sm text-gray-600">
-                    Duration: {appointment.duration} minutes
+                {appointment.endTime && (
+                  <div className="text-sm text-gray-400">
+                    Duration: {Math.round((new Date(appointment.endTime) - new Date(appointment.startTime)) / (1000 * 60))} minutes
                   </div>
                 )}
               </CardContent>
