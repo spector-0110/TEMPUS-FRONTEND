@@ -1,10 +1,30 @@
 import supabase from './supabase';
+import CryptoJS from 'crypto-js';
 import { ServerConnectionError } from './errors';
 
 // Constants for API configuration
 const API_TIMEOUT = 8000; // 5 seconds timeout
-const BASE_URL =  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const BASE_URL =  'http://localhost:8000/api';
 const INDIA_POST_API = 'https://api.postalpincode.in/pincode';
+
+
+export function generateSignature(timestampMs, secret) {
+  // payload = JSON(body) + timestampMs
+  return CryptoJS.HmacSHA256(timestampMs,secret).toString();
+}
+
+export function getHeaders() {
+  
+  const timestampMs = Date.now().toString(); // UTC ms, no timezone
+  const signature = generateSignature(timestampMs, SECRET);
+  
+  return {
+    'Content-Type': 'application/json',
+    'x-timestamp': timestampMs,
+    'x-signature': signature,
+  };
+}
+
 
 /**
  * function to get the access token from Supabase session
@@ -608,9 +628,7 @@ export async function createAppointment(appointmentData) {
   try {
     const response = await fetchWithTimeout(`${BASE_URL}/appointments`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: getHeaders(),
       body: JSON.stringify(appointmentData),
       cache: 'no-store'
     });
