@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
+import AppointmentDetailsProvider from '@/context/AppointmentDetailsProvider';
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -29,8 +30,7 @@ export function NavMain({
     details: []
   });
 
-  // Get doctors list from hospital data
-  const doctors = hospitalDashboardDetails?.doctors || [];
+  const subdomain = hospitalDashboardDetails?.hospitalInfo?.subdomain || '';
 
   const handleAppointmentCreated = (appointmentDetails) => {
     setShowCreateDialog(false);
@@ -41,11 +41,10 @@ export function NavMain({
       title: 'Appointment Created',
       message: 'New appointment has been successfully created.',
       details: [
-        `Patient: ${appointmentDetails.patientName}`,
-        `Doctor: Dr. ${appointmentDetails.doctorName}`,
-        `Date: ${appointmentDetails.appointmentDate}`,
-        `Time: ${appointmentDetails.appointmentTime}`,
-        `Appointment ID: ${appointmentDetails.appointmentId || 'N/A'}`
+        `Patient: ${appointmentDetails.data.patientName}`,
+        `Doctor: Dr. ${appointmentDetails.data.doctor.name}`,
+        `Date: ${appointmentDetails.data.appointmentDate.split('T')[0]}`,
+        `Status: ${appointmentDetails.data.status}`,
       ]
     });
   };
@@ -85,11 +84,12 @@ export function NavMain({
       {/* Appointment Creation Dialog */}
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
         <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
-          <AppointmentCreationFlow 
-            doctors={doctors}
-            onSuccess={handleAppointmentCreated}
-            onCancel={() => setShowCreateDialog(false)}
-          />
+          <AppointmentDetailsProvider subdomain={subdomain}>
+              <AppointmentCreationFlow 
+                onSuccess={handleAppointmentCreated}
+                onCancel={() => setShowCreateDialog(false)}
+              />
+            </AppointmentDetailsProvider>
         </DialogContent>
       </Dialog>
 
