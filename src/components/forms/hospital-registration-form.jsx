@@ -8,7 +8,6 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { useHospital } from '@/context/HospitalProvider';
 import {
   Dialog,
   DialogContent,
@@ -17,14 +16,13 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { submitHospitalDetails, fetchHospitalFormFields } from '@/lib/api';
-import { CheckCircle, Building2, FileText, Send } from 'lucide-react';
+import { CheckCircle, Building2, MapPin, Phone, Mail, User, FileText, AlertTriangle } from 'lucide-react';
+import { fetchHospitalFormFields ,submitHospitalDetails } from '@/lib/api';
 
 const FORM_STORAGE_KEY = 'hospitalFormData';
 
 export default function HospitalRegistrationForm() {
   const router = useRouter();
-  const { refreshHospitalData } = useHospital();
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,6 +30,7 @@ export default function HospitalRegistrationForm() {
   const [formConfig, setFormConfig] = useState({ sections: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
 
   // Fetch form configuration on mount
   useEffect(() => {
@@ -53,39 +52,57 @@ export default function HospitalRegistrationForm() {
 
   // Restore form data from localStorage on mount
   useEffect(() => {
-    const savedData = localStorage.getItem(FORM_STORAGE_KEY);
-    if (savedData) {
+    // Try to get saved form data from localStorage
+    const savedFormData = localStorage.getItem(FORM_STORAGE_KEY);
+    
+    if (savedFormData) {
       try {
-        setFormData(JSON.parse(savedData));
-      } catch {
-        console.error('Failed to parse saved form data');
+        const parsedData = JSON.parse(savedFormData);
+        setFormData(parsedData);
+        return;
+      } catch (e) {
+        console.error('Error parsing saved form data:', e);
       }
     }
-  }, []);
 
-  // Save form data to localStorage on change
-  useEffect(() => {
-    if (Object.keys(formData).length > 0) {
-      localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(formData));
-    }
-  }, [formData]);
+    // Initialize with empty form data if no saved data exists
+    const initialData = {};
+    formConfig.sections.forEach(section => {
+      section.fields.forEach(field => {
+        initialData[field.id] = '';
+      });
+    });
+    setFormData(initialData);
+  }, [formConfig]);
 
   const validateField = useCallback((field, value) => {
     const { validation } = field;
     if (!validation) return '';
 
-    if (validation.required && !value) return `${field.label} is required`;
+    if (validation.required && (!value || value.toString().trim() === '')) {
+      return `${field.label} is required`;
+    }
 
-    if (validation.pattern && value) {
+    if (validation.pattern && value && value.toString().trim()) {
       const regex = new RegExp(validation.pattern);
       if (!regex.test(value)) return validation.message || `Invalid ${field.label}`;
     }
 
-    if (validation.minLength && value.length < validation.minLength)
+    if (validation.minLength && value && value.toString().length < validation.minLength) {
       return `${field.label} must be at least ${validation.minLength} characters`;
+    }
 
-    if (validation.maxLength && value.length > validation.maxLength)
+    if (validation.maxLength && value && value.toString().length > validation.maxLength) {
       return `${field.label} must not exceed ${validation.maxLength} characters`;
+    }
+
+    if (validation.min && value && parseInt(value) < validation.min) {
+      return `${field.label} must be at least ${validation.min}`;
+    }
+
+    if (validation.max && value && parseInt(value) > validation.max) {
+      return `${field.label} must not exceed ${validation.max}`;
+    }
 
     return '';
   }, []);
@@ -114,107 +131,314 @@ export default function HospitalRegistrationForm() {
       ? field.validation.transform(value)
       : value;
 
-    setFormData(prev => ({
-      ...prev,
+    const newFormData = {
+      ...formData,
       [field.id]: transformedValue,
-    }));
+    };
 
-    const error = validateField(field, transformedValue);
-    setErrors(prev => ({
-      ...prev,
-      [field.id]: error,
-    }));
-  };
+    setFormData(newFormData);
+    // Save to localStorage after each change
+    localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(newFormData));
 
-  const handleSuccessDialogClose = () => {
-    setShowSuccessDialog(false);
-    router.push('/dashboard');
+    // Clear error when user starts typing
+    if (errors[field.id]) {
+      const error = validateField(field, transformedValue);
+      setErrors(prev => ({
+        ...prev,
+        [field.id]: error,
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    setSubmitAttempted(true);
 
-    if (isSubmitting) return;
+    if (isSubmitting || isButtonDisabled) return;
 
+    // Check if there are any empty required fields
+    const hasEmptyRequiredFields = formConfig.sections.some(section => 
+      section.fields.some(field => 
+        field.required && (!formData[field.id] || formData[field.id].toString().trim() === '')
+      )
+    );
+
+    // First check for empty required fields
+    if (hasEmptyRequiredFields) {
+      toast.error('Please fill out all required fields before submitting.');
+      setIsButtonDisabled(false);
+      return;
+    }
+
+    // Then validate all field formats
     const isValid = validateForm();
     if (!isValid) {
-      toast.error('Please fill out all required fields correctly.');
+      toast.error('Please correct the errors in the form before submitting.');
+      setIsButtonDisabled(false);
       return;
     }
 
     setIsSubmitting(true);
+    setIsButtonDisabled(true);
 
     try {
-      await submitHospitalDetails(formData);
+      const response = await submitHospitalDetails(formData);
+      
+      // Clear saved form data after successful submission
       localStorage.removeItem(FORM_STORAGE_KEY);
-      await refreshHospitalData();
-      toast.success('Hospital details submitted successfully');
+      
       setShowSuccessDialog(true);
+      toast.success('Hospital details submitted successfully');
     } catch (error) {
       toast.error(error?.message || 'Submission failed, please try again.');
-      setIsSubmitting(false);
+      setTimeout(() => {
+        setIsButtonDisabled(false);
+      }, 3000);
+    } finally {
+      setTimeout(() => {
+        setIsButtonDisabled(false);
+      }, 5000);
     }
   };
 
+  const handleSuccessDialogAction = (action) => {
+    setShowSuccessDialog(false);
+    if (action === 'dashboard') {
+      router.push('/dashboard');
+    } else if (action === 'cancel') {
+      router.push('/dashboard');
+    }
+  };
+
+  const getFieldIcon = (sectionId) => {
+    const iconMap = {
+      'contact': Phone,
+      'basic': Building2,
+      'address': MapPin,
+      'additional': FileText
+    };
+
+    return iconMap[sectionId] || FileText;
+   
+  };
+
+  const getCompletionPercentage = () => {
+    const totalFields = formConfig.sections.reduce((acc, section) => acc + section.fields.length, 0);
+    const filledFields = formConfig.sections.reduce((acc, section) => {
+      return acc + section.fields.filter(field => {
+        const value = formData[field.id];
+        return value && value.toString().trim() !== '';
+      }).length;
+    }, 0);
+    return totalFields > 0 ? Math.round((filledFields / totalFields) * 100) : 0;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full mx-auto"></div>
+          <p className="text-slate-300 font-medium">Loading registration form...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-center">Hospital Registration</h1>
-
-      <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-8">
-        {isLoading ? (
-          <div className="flex justify-center items-center min-h-[200px]">
-            <Spinner />
-          </div>
-        ) : (
-          formConfig.sections.map(section => (
-            <Card key={section.id} className="p-6">
-              <h2 className="text-xl font-semibold mb-4">{section.title}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {section.fields.map(field => (
-                  <div key={field.id} className="space-y-2">
-                    <Label htmlFor={field.id}>
-                      {field.label}
-                      {field.required && <span className="text-red-500 ml-1">*</span>}
-                    </Label>
-                    <Input
-                      id={field.id}
-                      type={field.type}
-                      value={formData[field.id] || ''}
-                      onChange={(e) => handleChange(field, e.target.value)}
-                      className={errors[field.id] ? 'border-red-500' : ''}
-                      max={field.validation?.max}
-                    />
-                    {errors[field.id] && (
-                      <p className="text-sm text-red-500">{errors[field.id]}</p>
-                    )}
-                  </div>
-                ))}
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-800 to-slate-950">
+      {/* Header */}
+      <div className="bg-slate-900/90 backdrop-blur-md shadow-lg border-b border-slate-800/50">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg shadow-lg">
+                <Building2 className="w-6 h-6 text-white" />
               </div>
-            </Card>
-          ))
-        )}
+              <div>
+                <h1 className="text-2xl font-bold text-white">Hospital Registration</h1>
+                <p className="text-slate-300">Complete your hospital's registration profile</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-slate-400">Form Completion</div>
+              <div className="flex items-center space-x-2 mt-1">
+                <div className="w-32 bg-slate-700 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-cyan-400 to-blue-500 h-2 rounded-full transition-all duration-300 shadow-lg"
+                    style={{ width: `${getCompletionPercentage()}%` }}
+                  ></div>
+                </div>
+                <span className="text-sm font-semibold text-slate-200">{getCompletionPercentage()}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <div className="flex justify-end mt-6">
-          <Button
-            type="submit"
-            disabled={isSubmitting || isLoading || isButtonDisabled}
-            className="w-full md:w-auto"
-          >
-            {isSubmitting ? 'Submitting...' : isButtonDisabled ? 'Please wait...' : 'Submit Registration'}
-          </Button>
+      {/* Form Content */}
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit();
+      }}>
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid gap-8">
+              {formConfig.sections.map((section, sectionIndex) => {
+                const IconComponent = getFieldIcon(section.id);
+                const sectionErrors = section.fields.filter(field => errors[field.id]).length;
+                const sectionCompleted = section.fields.filter(field => {
+                  const value = formData[field.id];
+                  return value && value.toString().trim() !== '';
+                }).length;
+
+                return (
+                  <Card key={section.id} className="overflow-hidden shadow-2xl border border-slate-800/50 bg-slate-900/95 backdrop-blur-md">
+                    {/* Section Header */}
+                    <div className="bg-gradient-to-r from-slate-800 to-slate-700 px-6 py-4 border-b border-slate-700/50">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="p-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
+                            <IconComponent className="w-5 h-5 text-cyan-300" />
+                          </div>
+                          <div>
+                            <h2 className="text-xl font-semibold text-white">{section.title}</h2>
+                            <p className="text-slate-300 text-sm">
+                              Step {sectionIndex + 1} of {formConfig.sections.length}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-slate-300 text-sm">
+                            {sectionCompleted}/{section.fields.length} completed
+                          </div>
+                          {sectionErrors > 0 && (
+                            <div className="flex items-center text-red-400 text-sm mt-1">
+                              <AlertTriangle className="w-4 h-4 mr-1" />
+                              {sectionErrors} error{sectionErrors > 1 ? 's' : ''}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Section Content */}
+                    <div className="p-6 bg-slate-900/50">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {section.fields.map(field => (
+                          <div key={field.id} className="space-y-2">
+                            <Label htmlFor={field.id} className="text-sm font-medium text-slate-200 flex items-center">
+                              {field.label}
+                              {field.required && <span className="text-red-400 ml-1">*</span>}
+                            </Label>
+                            <div className="relative">
+                              <Input
+                                id={field.id}
+                                type={field.type}
+                                value={formData[field.id] || ''}
+                                onChange={(e) => handleChange(field, e.target.value)}
+                                className={`transition-all duration-200 bg-slate-800/90 border-slate-700 text-white placeholder-slate-500 focus:ring-2 ${
+                                  errors[field.id] 
+                                    ? 'border-red-500 focus:border-red-400 focus:ring-red-500/20' 
+                                    : 'border-slate-600 focus:border-cyan-400 focus:ring-cyan-400/20'
+                                } ${
+                                  formData[field.id] && !errors[field.id] 
+                                    ? 'border-emerald-400 bg-emerald-500/10' 
+                                    : ''
+                                }`}
+                                min={field.validation?.min}
+                                max={field.validation?.max}
+                                placeholder={`Enter ${field.label.toLowerCase()}`}
+                              />
+                              {formData[field.id] && !errors[field.id] && (
+                                <CheckCircle className="absolute right-3 top-3 w-4 h-4 text-emerald-400" />
+                              )}
+                            </div>
+                            {errors[field.id] && (
+                              <div className="flex items-center space-x-1 text-sm text-red-400">
+                                <AlertTriangle className="w-4 h-4" />
+                                <span>{errors[field.id]}</span>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+
+            {/* Submit Section */}
+            <div className="mt-8">
+              <Card className="bg-gradient-to-r from-slate-900/95 to-slate-800/95 backdrop-blur-md border border-slate-700/50 shadow-2xl">
+                <div className="p-6">
+                  <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+                    <div className="text-center md:text-left">
+                      <h3 className="text-lg font-semibold text-white">Ready to Submit?</h3>
+                      <p className="text-slate-300 text-sm mt-1">
+                        Please review all information before submitting your registration
+                      </p>
+                    </div>
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting || isButtonDisabled || formConfig.sections.some(section => 
+                        section.fields.some(field => 
+                          field.required && (!formData[field.id] || formData[field.id].toString().trim() === '')
+                        )
+                      )}
+                      size="lg"
+                      className="relative px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[200px] border-0"
+                    >
+                      {isSubmitting ? (
+                        <div className="flex items-center space-x-2">
+                          <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                          <span>Submitting...</span>
+                        </div>
+                      ) : isButtonDisabled ? (
+                        <div className="flex items-center space-x-2">
+                          <div className="animate-pulse w-4 h-4 bg-white/50 rounded-full"></div>
+                          <span>Please wait...</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center space-x-2">
+                          <CheckCircle className="w-4 h-4" />
+                          <span>Submit Registration</span>
+                        </div>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </div>
         </div>
       </form>
 
-      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Registration Successful!</DialogTitle>
-            <DialogDescription>
-              Your hospital has been successfully registered. You can now access your dashboard to manage your hospital details.
+      {/* Success Dialog */}
+      <Dialog open={showSuccessDialog} onOpenChange={() => {}}>
+        <DialogContent className="sm:max-w-md bg-slate-900 border-slate-800 text-white">
+          <DialogHeader className="text-center">
+            <div className="mx-auto mb-4 w-16 h-16 bg-emerald-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-emerald-400/30">
+              <CheckCircle className="w-8 h-8 text-emerald-400" />
+            </div>
+            <DialogTitle className="text-xl font-semibold text-white">
+              Registration Successful!
+            </DialogTitle>
+            <DialogDescription className="text-slate-300 mt-2">
+              Your hospital has been successfully registered in our system. You can now access your dashboard to manage your hospital details and start using our services.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
-            <Button onClick={() => router.push('/dashboard')}>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-6">
+            <Button
+              variant="outline"
+              onClick={() => handleSuccessDialogAction('cancel')}
+              className="w-full sm:w-auto bg-transparent border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
+            >
+              Maybe Later
+            </Button>
+            <Button
+              onClick={() => handleSuccessDialogAction('dashboard')}
+              className="w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white border-0"
+            >
               Go to Dashboard
             </Button>
           </DialogFooter>
