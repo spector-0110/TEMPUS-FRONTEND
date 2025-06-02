@@ -21,7 +21,7 @@ const Documentation = () => {
                     <h4 className="text-lg font-semibold mt-5 mb-2">Creating a New Doctor</h4>
                     <p className="mb-3">To add a new doctor to your hospital, navigate to the Doctors section and click "Add New Doctor". The following fields are required:</p>
                     
-                    <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md mb-4">
+                    <div className="  p-4 rounded-md mb-4">
                         <ul className="list-disc pl-6 space-y-2">
                             <li><strong>Name:</strong> Full name of the doctor (2-100 characters)</li>
                             <li><strong>Email:</strong> Valid email address format</li>
@@ -57,7 +57,7 @@ const Documentation = () => {
                         <li>Update schedule for each day of the week</li>
                     </ol>
 
-                    <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md mb-4">
+                    <div className=" p-4 rounded-md mb-4">
                         <p className="font-semibold mb-2">For each day, the following information is required:</p>
                         <ul className="list-disc pl-6 space-y-2">
                             <li><strong>Status:</strong> Active or Inactive for that day</li>
@@ -71,7 +71,7 @@ const Documentation = () => {
                         </ul>
                     </div>
                     
-                    <div className="bg-yellow-50 dark:bg-yellow-900 p-4 border-l-4 border-yellow-400 my-4">
+                    <div className=" p-4 border-l-4 border-yellow-400 my-4">
                         <p className="font-semibold">Important:</p>
                         <p>All 7 days of the week must be included in the schedule, even if the doctor is inactive on certain days.</p>
                     </div>
@@ -89,7 +89,7 @@ const Documentation = () => {
                         <li>Submit the changes</li>
                     </ol>
                     
-                    <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md mb-4">
+                    <div className=" p-4 rounded-md mb-4">
                         <p className="font-semibold mb-2">The following fields can be updated:</p>
                         <ul className="list-disc pl-6 space-y-2">
                             <li><strong>Hospital Information:</strong>
@@ -127,15 +127,15 @@ const Documentation = () => {
                     
                     <div className="space-y-4 mb-4">
                         <div className="border border-gray-200 dark:border-gray-700 rounded-md overflow-hidden">
-                            <div className="bg-gray-100 dark:bg-gray-800 p-3 font-medium">Form Validation Errors</div>
+                            <div className=" p-3 font-medium">Form Validation Errors</div>
                             <div className="p-4">
                                 <p className="mb-2"><strong>Symptoms:</strong> Red error text under fields, form doesn't submit</p>
                                 <p className="mb-2"><strong>Solution:</strong> Check the error messages and correct your inputs. Hover over fields for specific requirements.</p>
                             </div>
                         </div>
                         
-                        <div className="border border-gray-200 dark:border-gray-700 rounded-md overflow-hidden">
-                            <div className="bg-gray-100 dark:bg-gray-800 p-3 font-medium">API Connection Errors</div>
+                        <div className="border border-gray-900 dark:border-gray-700 rounded-md overflow-hidden">
+                            <div className=" p-3 font-medium">API Connection Errors</div>
                             <div className="p-4">
                                 <p className="mb-2"><strong>Symptoms:</strong> Error messages about connection failures or timeouts</p>
                                 <p className="mb-2"><strong>Solution:</strong> Check your internet connection. If the problem persists, try refreshing the page or logging out and back in.</p>
@@ -143,7 +143,7 @@ const Documentation = () => {
                         </div>
                         
                         <div className="border border-gray-200 dark:border-gray-700 rounded-md overflow-hidden">
-                            <div className="bg-gray-100 dark:bg-gray-800 p-3 font-medium">Schedule Validation Errors</div>
+                            <div className=" p-3 font-medium">Schedule Validation Errors</div>
                             <div className="p-4">
                                 <p className="mb-2"><strong>Symptoms:</strong> Error when saving doctor schedules</p>
                                 <p className="mb-2"><strong>Solution:</strong> Ensure all 7 days have schedules, even if inactive. Check that time ranges don't overlap and end times are after start times.</p>
@@ -166,7 +166,7 @@ const Documentation = () => {
                         <li>If problems persist, log out and log back in</li>
                     </ol>
                     
-                    <div className="bg-blue-50 dark:bg-blue-900 p-4 border-l-4 border-blue-400 my-4">
+                    <div className=" p-4 border-l-4 border-blue-400 my-4">
                         <p className="font-semibold">Tip:</p>
                         <p>Most operations in the system will display success or error messages to keep you informed about the status of your actions.</p>
                     </div>

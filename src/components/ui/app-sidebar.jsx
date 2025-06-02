@@ -46,29 +46,34 @@ export function AppSidebar({
       avatar: hospitalDetails?.logo || "/tempusLogo1.png",
   },
   navMain: [
-    {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: LayoutDashboardIcon,
-    },
+    // {
+    //   title: "Dashboard",
+    //   url: "/dashboard",
+    //   icon: LayoutDashboardIcon,
+    // },
     {
       title: "Appointments",
-      url: "/dashboard/appointments",
+      url: "/dashboard/",
       icon: ListIcon,
-    },
-    {
-      title: "Analytics",
-      url: "/dashboard/analytics",
-      icon: BarChartIcon,
     },
     {
       title: "Doctors",
       url: "/dashboard/doctors",
       icon: UsersIcon,
     },
-  ],
-  
-  navSecondary: [
+    {
+      title: "Analytics",
+      url: "/dashboard/analytics",
+      icon: BarChartIcon,
+    },
+    ],
+    
+    navSecondary: [
+     {
+      title: "Documentation",
+      url: "/dashboard/help/documentation",
+      icon: FileTextIcon,
+    },
     {
       title: "Get Help",
       url: "/dashboard/help",
