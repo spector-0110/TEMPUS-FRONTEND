@@ -113,9 +113,10 @@ export function AppSidebar({
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
               <a href="/dashboard">
                 <img
+                  style={{ backgroundColor: 'white' }}
                   src="/tempusLogo1.png"
                   alt="Tempus Logo"
-                  className="h-6 w-6 mr-2"
+                  className="h-8 w-8 mr-2 rounded *:hover:opacity-40 transition-opacity duration-500"
                 />
                 <span className="text-base font-semibold">{data.user.name}</span>
               </a>

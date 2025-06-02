@@ -18,6 +18,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { submitHospitalDetails, fetchHospitalFormFields } from '@/lib/api';
+import { CheckCircle, Building2, FileText, Send } from 'lucide-react';
 
 const FORM_STORAGE_KEY = 'hospitalFormData';
 
@@ -125,10 +126,15 @@ export default function HospitalRegistrationForm() {
     }));
   };
 
+  const handleSuccessDialogClose = () => {
+    setShowSuccessDialog(false);
+    router.push('/dashboard');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (isSubmitting || isButtonDisabled) return;
+    if (isSubmitting) return;
 
     const isValid = validateForm();
     if (!isValid) {
@@ -137,21 +143,16 @@ export default function HospitalRegistrationForm() {
     }
 
     setIsSubmitting(true);
-    setIsButtonDisabled(true);
 
     try {
       await submitHospitalDetails(formData);
       localStorage.removeItem(FORM_STORAGE_KEY);
       await refreshHospitalData();
       toast.success('Hospital details submitted successfully');
+      setShowSuccessDialog(true);
     } catch (error) {
       toast.error(error?.message || 'Submission failed, please try again.');
-    } finally {
       setIsSubmitting(false);
-      // Set a 3-second timeout before enabling the button again
-      setTimeout(() => {
-        setIsButtonDisabled(false);
-      }, 10000);
     }
   };
 
