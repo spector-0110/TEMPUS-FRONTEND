@@ -13,6 +13,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { SuccessDialog } from "@/components/ui/success-dialog"
 import { useHospital } from "@/context/HospitalProvider"
@@ -22,6 +23,7 @@ export function NavMain({
   items
 }) {
   const { hospitalDashboardDetails } = useHospital();
+  const { isMobile, setOpenMobile } = useSidebar();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [successDialog, setSuccessDialog] = useState({
     isOpen: false,
@@ -53,6 +55,13 @@ export function NavMain({
     setShowCreateDialog(true);
   };
 
+  const handleNavItemClick = () => {
+    // Close mobile sidebar when navigation item is clicked
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
@@ -70,7 +79,7 @@ export function NavMain({
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild tooltip={item.title}>
+              <SidebarMenuButton asChild tooltip={item.title} onClick={handleNavItemClick}>
                 <Link href={item.url}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>

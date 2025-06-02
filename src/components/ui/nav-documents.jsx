@@ -21,7 +21,14 @@ import {
 export function NavDocuments({
   items
 }) {
-  const { isMobile } = useSidebar()
+  const { isMobile, setOpenMobile } = useSidebar()
+
+  const handleNavItemClick = () => {
+    // Close mobile sidebar when navigation item is clicked
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -29,7 +36,7 @@ export function NavDocuments({
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton asChild onClick={handleNavItemClick}>
               <a href={item.url}>
                 <item.icon />
                 <span>{item.name}</span>

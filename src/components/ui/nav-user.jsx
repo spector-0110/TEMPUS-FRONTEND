@@ -38,8 +38,15 @@ export function NavUser({
   
   const { signOut } = useAuth();
 
-  const { isMobile } = useSidebar()
+  const { isMobile, setOpenMobile } = useSidebar()
   const router = useRouter()
+
+  const handleNavItemClick = () => {
+    // Close mobile sidebar when navigation item is clicked
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
 
   return (
@@ -85,21 +92,30 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => router.push("/dashboard/account")}>
+              <DropdownMenuItem onClick={() => {
+                handleNavItemClick();
+                router.push("/dashboard/account");
+              }}>
                 <UserCircleIcon />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push("/dashboard/subscriptions")}>
+              <DropdownMenuItem onClick={() => {
+                handleNavItemClick();
+                router.push("/dashboard/subscriptions");
+              }}>
                 <CreditCardIcon />
                 Billing
               </DropdownMenuItem>
-              <DropdownMenuItem >
+              <DropdownMenuItem onClick={handleNavItemClick}>
                 <BellIcon />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={signOut}>
+            <DropdownMenuItem onClick={() => {
+              handleNavItemClick();
+              signOut();
+            }}>
               <LogOutIcon />
               Log out
             </DropdownMenuItem>

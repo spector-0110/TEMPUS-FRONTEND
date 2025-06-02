@@ -74,11 +74,11 @@ export function AppSidebar({
       url: "/dashboard/help",
       icon: HelpCircleIcon,
     },
-    {
-      title: "Search",
-      url: "/dashboard/search",
-      icon: SearchIcon,
-    },
+    // {
+    //   title: "Search",
+    //   url: "/dashboard/search",
+    //   icon: SearchIcon,
+    // },
   ],
   
   // documents: [
