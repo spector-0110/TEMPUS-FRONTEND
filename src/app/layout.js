@@ -3,7 +3,7 @@ import { AuthProvider } from '@/context/AuthProvider';
 import ThemeProvider from '@/context/ThemeProvider';
 import { HospitalProvider } from '@/context/HospitalProvider';
 import { LogoutButton } from '@/components/ui/logout-button';
-// import { ThemeToggle } from '@/components/ui/ThemeToggle';
+// import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export const metadata = {
   title: 'Tempus - Hospital Management System',
@@ -15,10 +15,11 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <body className="bg-background text-foreground">
         <ThemeProvider
-           attribute="class"
-           defaultTheme="system"
-           enableSystem
-           disableTransitionOnChange
+          attribute="class"
+          defaultTheme="dark"
+          forcedTheme="dark"
+          enableSystem={false} // disable following user's OS theme
+          disableTransitionOnChange
         >
           <div className="fixed bottom-4 right-4 z-50">
             {/* <ThemeToggle /> */}

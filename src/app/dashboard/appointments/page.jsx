@@ -207,10 +207,10 @@ export default function AppointmentsPage() {
       title: 'Appointment Created',
       message: 'New appointment has been successfully created.',
       details: [
-        `Patient: ${appointmentDetails.patientName}`,
-        `Doctor: Dr. ${appointmentDetails.doctorName}`,
-        `Date: ${appointmentDetails.appointmentDate}`,
-        `Time: ${appointmentDetails.appointmentTime}`,
+        `Patient: ${appointmentDetails.data.patientName}`,
+        `Doctor: Dr. ${appointmentDetails.data.doctor.name}`,
+        `Date: ${appointmentDetails.data.appointmentDate.split('T')[0]}`,
+        `Status: ${appointmentDetails.data.status}`,
       ]
     });
     hasLoadedAppointments.current = false; // Reset to allow reload
