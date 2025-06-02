@@ -1,16 +1,15 @@
 'use client';
 
-import { useState, useEffect, useContext } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
+import { GalleryVerticalEnd } from 'lucide-react';
+
 import { useAuth } from '@/context/AuthProvider';
 import { useHospital } from '@/context/HospitalProvider';
-import { APP_NAME, APP_DESCRIPTION } from '@/lib/constants';
-import { GalleryVerticalEnd } from "lucide-react"
-import { LoginForm } from "@/components/forms/login-form"
-import { SignUpForm } from "@/components/forms/signup-form"
-import { ForgetPasswordForm } from "@/components/forms/forget-password-form"
+import { LoginForm } from '@/components/forms/login-form';
+import { SignUpForm } from '@/components/forms/signup-form';
+import { ForgetPasswordForm } from '@/components/forms/forget-password-form';
 
 export default function Home() {
   const { user, loading } = useAuth();
@@ -20,13 +19,9 @@ export default function Home() {
 
   useEffect(() => {
     if (user && !loading && !hospitalLoading) {
-      if (isProfileComplete) {
-        router.push('/dashboard');
-      } else {
-        router.push('/onboarding');
-      }
+      router.push(isProfileComplete ? '/dashboard' : '/onboarding');
     }
-  }, [user, loading, hospitalLoading, isProfileComplete, router]);
+  }, [user, loading, hospitalLoading, isProfileComplete]);
 
   const renderForm = () => {
     switch (formState) {
@@ -36,40 +31,30 @@ export default function Home() {
         return <ForgetPasswordForm onLoginClick={() => setFormState('login')} />;
       default:
         return (
-          <LoginForm 
+          <LoginForm
             onSignUpClick={() => setFormState('signup')}
-            onForgetPasswordClick={() => setFormState('forget-password')} 
+            onForgetPasswordClick={() => setFormState('forget-password')}
           />
         );
     }
   };
 
   return (
-    <div className="grid min-h-svh lg:grid-cols-2">
-      <div className="relative hidden bg-muted lg:block">
-        <Image
-          src="/Login.png"
-          alt="Image"
-          fill
-          priority
-          className="object-cover dark:brightness-[0.2] dark:grayscale"
-        />
+    <div className="min-h-svh bg-gradient-to-br from-gray-950 via-gray-800 to-gray-900 flex flex-col items-center justify-center px-4 py-10">
+      <div className="absolute top-6 left-6 md:left-20 flex items-center space-x-2">
+        <Link href="/" 
+          className="relative z-20 h-12 w-12 mr-2 rounded *:hover:opacity-40 transition-opacity duration-500 bg-white">
+          <img
+            style={{ backgroundColor: 'white' }}
+            src="/tempusLogo1.png"
+            alt="Tempus Logo"
+            className="h-12 w-14 mr-4 rounded-full *:hover:opacity-40 transition-opacity duration-500"
+            />
+        </Link>
       </div>
-      <div className="flex flex-col gap-4 p-6 md:p-10">
-        <div className="flex justify-center gap-2 md:justify-start">
-          <Link href="/" className="flex items-center gap-2 font-medium">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <GalleryVerticalEnd className="size-4" />
-            </div>
-            Tempus
-          </Link>
-        </div>
-        <div className="flex flex-1 items-center justify-center">
-          <div className="w-full max-w-xs">
-            {renderForm()}
-          </div>
-        </div>
+      <div className="w-full max-w-md mx-auto">
+        {renderForm()}
       </div>
     </div>
-  )
+  );
 }
