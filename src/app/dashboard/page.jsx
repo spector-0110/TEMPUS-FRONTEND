@@ -180,6 +180,16 @@ export default function AppointmentsPage() {
     } else if (activeTimeFilter === 'tomorrow') {
       const tomorrowStr = tomorrow.toISO().split('T')[0];
       filtered = filtered.filter(apt => apt.appointmentDate === tomorrowStr);
+    } else if (activeTimeFilter === 'history') {
+      // For history, we can use the appointmentHistory state which is already set
+      // Exclude today and tomorrow from history
+      const todayStr = today.toISODate();
+      const tomorrowStr = tomorrow.toISODate();
+
+      filtered = appointmentHistory.filter(apt => 
+        apt.appointmentDate !== todayStr && apt.appointmentDate !== tomorrowStr
+      );
+      filtered = appointmentHistory;
     }
     
     // Doctor-based filtering
