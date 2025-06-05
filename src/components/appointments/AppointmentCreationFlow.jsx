@@ -16,7 +16,7 @@ import { useDetails } from '@/context/AppointmentDetailsProvider';
  * Multi-step appointment creation flow
  * Steps: Patient Details → Doctor Selection → Time Slot → Confirmation
  */
-const AppointmentCreationFlow = ({ onSuccess,onCancel }) => {
+const AppointmentCreationFlow = ({ onSuccess }) => {
   const { hospitalInfo, doctors,  details, loading, isReady } = useDetails();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -98,8 +98,6 @@ const AppointmentCreationFlow = ({ onSuccess,onCancel }) => {
       if (doctor.availability.tomorrow && doctor.availability.tomorrow.slots) {
         allSlots.push(...doctor.availability.tomorrow.slots);
       }
-
-      console.log('Available slots:', allSlots);
       
       // Transform slots to include required properties for SlotPicker
       const transformedSlots = allSlots.map(slot => ({
@@ -110,9 +108,10 @@ const AppointmentCreationFlow = ({ onSuccess,onCancel }) => {
         time: slot.start, // For backward compatibility
         timeDisplay: slot.timeDisplay,
         available: slot.available,
-        datetime: new Date(`${slot.date}T${slot.start}:00`)
+        datetime: new Date(`${slot.date}T${slot.start}:00`),
+        maxCapacity: slot.maxCapacity,
+        patientCount: slot.patientCount || 0, 
       }));
-      
       setAvailableSlots(transformedSlots);
       
       if (transformedSlots.length === 0) {
@@ -316,9 +315,9 @@ const AppointmentCreationFlow = ({ onSuccess,onCancel }) => {
         
         <Progress value={progressPercentage} className="mb-4" />
         
-        <div className="flex justify-between ">
+        <div className="flex justify-between">
           {steps.map((step) => (
-            <div key={step.number} className="flex flex-col items-center text-center ">
+            <div key={step.number} className="flex flex-col items-center text-center">
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium mb-2 ${
                   currentStep > step.number
@@ -450,13 +449,13 @@ const AppointmentCreationFlow = ({ onSuccess,onCancel }) => {
         
 
         <div className="flex gap-3">
-          <Button
+          {/* <Button
             variant="outline"
             onClick={onCancel}
             disabled={isLoading || isSubmitting}
           >
             Cancel
-          </Button>
+          </Button> */}
           
           {currentStep < 4 ? (
             <Button
@@ -482,5 +481,4 @@ const AppointmentCreationFlow = ({ onSuccess,onCancel }) => {
     </div>
   );
 };
-
 export default AppointmentCreationFlow;

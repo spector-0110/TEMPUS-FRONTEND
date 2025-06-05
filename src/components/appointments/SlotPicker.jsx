@@ -29,45 +29,40 @@ const SlotPicker = ({
     }
   }, [availableSlots]);
 
-  const groupSlotsByDate = () => {
-    // Get current IST time
-    
-    const nowInIST = DateTime.now().setZone('Asia/Kolkata');
+ const groupSlotsByDate = () => {
+  const nowInIST = DateTime.now().setZone('Asia/Kolkata');
 
+  const grouped = availableSlots.reduce((acc, slot) => {
+    const slotStart = DateTime.fromISO(`${slot.date}T${slot.start}`, { zone: 'Asia/Kolkata' });
+    const slotEnd = DateTime.fromISO(`${slot.date}T${slot.end}`, { zone: 'Asia/Kolkata' });
 
-    console.log('Current IST Time:', nowInIST.toISO());
-    const grouped = availableSlots.reduce((acc, slot) => {
-      // Create a DateTime in IST
-      const slotDateTime = DateTime.fromISO(`${slot.date}T${slot.start}`, { zone: 'Asia/Kolkata' });
-
-      if (slotDateTime > nowInIST) {
-        const date = slot.date;
-        if (!acc[date]) {
-          acc[date] = [];
-        }
-        acc[date].push(slot);
+    // Include both future and currently running slots
+    if (slotStart > nowInIST || (nowInIST >= slotStart && nowInIST < slotEnd)) {
+      const date = slot.date;
+      if (!acc[date]) {
+        acc[date] = [];
       }
-
-      return acc;
-    }, {});
-
-    // Sort slots by time for each date
-    Object.keys(grouped).forEach(date => {
-      grouped[date].sort((a, b) => {
-        const timeA = a.start ;
-        const timeB = b.start ;
-        return timeA.localeCompare(timeB);
-      });
-    });
-
-    setGroupedSlots(grouped);
-    
-    // Auto-select first available date
-    const firstDate = Object.keys(grouped).sort()[0];
-    if (firstDate && !selectedDate) {
-      setSelectedDate(firstDate);
+      acc[date].push(slot);
     }
-  };
+
+    return acc;
+  }, {});
+
+  // Sort slots by time for each date
+  Object.keys(grouped).forEach(date => {
+    grouped[date].sort((a, b) => {
+      return a.start.localeCompare(b.start);
+    });
+  });
+
+  setGroupedSlots(grouped);
+
+  // Auto-select first available date
+  const firstDate = Object.keys(grouped).sort()[0];
+  if (firstDate && !selectedDate) {
+    setSelectedDate(firstDate);
+  }
+};
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -285,13 +280,27 @@ const SlotPicker = ({
                           }`}
                           disabled={!slot.available}
                         >
-                          <div className="text-center">
+                          <div className="text-center group relative">
                             <div className={`font-medium ${isSelected ? 'text-white' : 'text-gray-50'}`}>
-                              {slot.start ? slot.start : formatTime(slot.time)}
+                              {`${slot.start.split(':')[0]}:00 - ${parseInt(slot.start.split(':')[0]) + 1}:00`}
                             </div>
                           
                             <div className={`text-[10px] opacity-75 mt-1 ${isSelected ? 'text-white' : 'text-gray-50'}`}>
-                              {slot.end}
+                              {slot.available ? "available" : 'Full'}
+                            </div>
+                            
+                            {/* Message-like Tooltip */}
+                            <div className="absolute -top-[4.5rem] left-1/2 transform -translate-x-1/2 hidden group-hover:block min-w-[200px] z-50">
+                              <div className="bg-gray-900 text-white p-3 rounded-lg shadow-lg relative">
+                                <div className="text-sm font-medium mb-1">Slot Capacity</div>
+                                <div className="text-xs text-gray-300">
+                                  {`${slot.patientCount} patients booked`}
+                                  <br />
+                                  {`${slot.maxCapacity - slot.patientCount} slots remaining`}
+                                </div>
+                                {/* Arrow */}
+                                <div className="absolute bottom-[-8px] left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-gray-900"></div>
+                              </div>
                             </div>
                             
                             {!slot.available && (

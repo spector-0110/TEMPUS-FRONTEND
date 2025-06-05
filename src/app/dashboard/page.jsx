@@ -69,9 +69,9 @@ export default function AppointmentsPage() {
 
 
   // appointment loading function fetching appointments from backend
-  const loadAppointments = useCallback(async () => {
-    // Prevent multiple simultaneous API calls
-    if (isLoadingAppointments) {
+  const loadAppointments = useCallback(async (forceReload = false) => {
+    // Prevent multiple simultaneous API calls, unless force reload is requested
+    if (isLoadingAppointments && !forceReload) {
       return;
     }
     try {
@@ -156,7 +156,7 @@ export default function AppointmentsPage() {
     } finally {
       setIsLoadingAppointments(false);
     }
-  }, [isLoadingAppointments]);
+  }, []); // Remove dependency on isLoadingAppointments to prevent unnecessary re-renders
 
   const filterAppointments = useCallback(() => {
     // Ensure appointments is an array before filtering
@@ -166,6 +166,7 @@ export default function AppointmentsPage() {
     }
     
     let filtered = [...appointments];
+    console.log('Filtering appointments:', filtered)
     // Time-based filtering using Luxon for proper timezone handling
     const today = DateTime.now().setZone('Asia/Kolkata');
     const tomorrow = today.plus({ days: 1 });
@@ -212,6 +213,11 @@ export default function AppointmentsPage() {
 
   const handleAppointmentCreated = (appointmentDetails) => {
     setShowCreateDialog(false);
+    
+    // Force reload appointments immediately after creation
+    loadAppointments(true); // Force reload by passing true
+    
+    // Show success dialog after triggering the reload
     setSuccessDialog({
       isOpen: true,
       title: 'Appointment Created',
@@ -223,8 +229,6 @@ export default function AppointmentsPage() {
         `Status: ${appointmentDetails.data.status}`,
       ]
     });
-    hasLoadedAppointments.current = false; // Reset to allow reload
-    loadAppointments(); // Refresh appointments list
   };
 
   const getStatusColor = (status) => {
