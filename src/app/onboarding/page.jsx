@@ -37,7 +37,9 @@ export default function OnboardingPage() {
     checkServer();
   }, [router]);
   
-  if (authLoading || hospitalLoading) {
+  // Show loading spinner while authentication or hospital data is loading
+  // or if profile is complete (waiting for redirect)
+  if (authLoading || hospitalLoading || (!authLoading && !hospitalLoading && isProfileComplete)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
           <Spinner />
@@ -45,14 +47,20 @@ export default function OnboardingPage() {
     );
   }
 
-  if (isProfileComplete) {
-    return null;
+  // Only show the hospital registration form if user is authenticated and profile is incomplete
+  if (user && !isProfileComplete) {
+    return (
+      <main className="min-h-screen p-4">
+          <HospitalRegistrationForm />
+      </main>
+    );
   }
-
+  
+  // Return loading state as fallback while redirections are processing
   return (
-    <main className="min-h-screen p-4">
-        <HospitalRegistrationForm />
-    </main>
+    <div className="flex items-center justify-center min-h-screen">
+      <Spinner />
+    </div>
   );
 }
 
