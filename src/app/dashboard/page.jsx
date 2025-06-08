@@ -654,6 +654,14 @@ export default function AppointmentsPage() {
                         >
                           View Details
                         </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="whitespace-nowrap"
+                          onClick={() => handleViewDetails(appointment)}
+                        >
+                          View History
+                        </Button>
                       </div>
                     </div>
                   </div>

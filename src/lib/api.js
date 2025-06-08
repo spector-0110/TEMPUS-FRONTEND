@@ -695,3 +695,31 @@ export async function fetchDoctorAvailableSlots(doctorId, date = null) {
   }
 }
 
+
+/**
+ * Fetch doctor available slots for internal booking
+ */
+export async function fetchPatientHistoryUsingMobileNumber(mobileNumber) {
+  try {
+    const accessToken = await getAuthToken();
+    
+    const response = await fetchWithTimeout(`${BASE_URL}/appointments/mobile`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ mobileNumber }),
+      cache: 'no-store'
+    });
+
+    const result = await handleApiResponse(response, 'Failed to fetch paient history');
+    
+    return result.data || {};
+  } catch (error) {
+    console.error('fetchPatientHistoryUsingMobileNumber - Error fetching paient history:', error);
+    throw error;
+  }
+}
+
+
