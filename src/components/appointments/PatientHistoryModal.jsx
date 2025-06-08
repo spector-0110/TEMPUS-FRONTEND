@@ -112,9 +112,7 @@ export default function PatientHistoryModal({
   };
 
   const formatTime = (timeString) => {
-    if (!timeString) return '';
-    const date = new Date(timeString);
-    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+   return timeString.split('T')[1].slice(0, 5);
   };
   
   return (
@@ -122,10 +120,10 @@ export default function PatientHistoryModal({
       <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
-            Patient Appointment History
+            Patient Appointment History:
             {patientInfo && (
               <span className="block text-sm text-muted-foreground mt-1">
-                {patientInfo.patientName} • {patientInfo.mobileNumber}
+                 {patientInfo.mobileNumber}
               </span>
             )}
           </DialogTitle>
@@ -184,14 +182,14 @@ export default function PatientHistoryModal({
                           <span className="font-medium">Time:</span> {formatTime(apt.startTime)}
                         </div>
                         <div>
-                          <span className="font-medium">Created:</span> {new Date(apt.createdAt).toLocaleDateString()}
+                          <span className="font-medium">Phone:</span> { apt.mobile}
                         </div>
                       </div>
-                      {apt.doctor?.specialization && (
+                      {/* {apt.doctor?.specialization && (
                         <div className="mt-2 text-sm">
                           <span className="font-medium">Specialization:</span> {apt.doctor.specialization}
                         </div>
-                      )}
+                      )} */}
                     </div>
                     <div className="flex sm:flex-col gap-2 sm:items-end">
                       <Button

@@ -724,7 +724,7 @@ export default function AppointmentsPage() {
         }}
         appointment={selectedAppointment}
         onViewDetails={(apt) => {
-          setShowHistoryModal(false);
+          // Keep history modal open when viewing details
           setSelectedAppointment(apt);
           setShowDetailsModal(true);
         }}
