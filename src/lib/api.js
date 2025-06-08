@@ -697,27 +697,27 @@ export async function fetchDoctorAvailableSlots(doctorId, date = null) {
 
 
 /**
- * Fetch doctor available slots for internal booking
+ * Fetch patient history using mobile number
  */
 export async function fetchPatientHistoryUsingMobileNumber(mobileNumber) {
   try {
     const accessToken = await getAuthToken();
     
-    const response = await fetchWithTimeout(`${BASE_URL}/appointments/mobile`, {
+    // Using query parameters instead of body for GET request
+    const response = await fetchWithTimeout(`${BASE_URL}/appointments/mobile?mobileNumber=${encodeURIComponent(mobileNumber)}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ mobileNumber }),
       cache: 'no-store'
     });
 
-    const result = await handleApiResponse(response, 'Failed to fetch paient history');
+    const result = await handleApiResponse(response, 'Failed to fetch patient history');
     
-    return result.data || {};
+    return result;
   } catch (error) {
-    console.error('fetchPatientHistoryUsingMobileNumber - Error fetching paient history:', error);
+    console.error('fetchPatientHistoryUsingMobileNumber - Error fetching patient history:', error);
     throw error;
   }
 }

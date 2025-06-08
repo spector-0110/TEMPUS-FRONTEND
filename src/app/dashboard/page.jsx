@@ -16,7 +16,8 @@ import { ErrorDialog } from '@/components/ui/error-dialog';
 import { SuccessDialog } from '@/components/ui/success-dialog';
 import AppointmentCreationFlow from '@/components/appointments/AppointmentCreationFlow';
 import AppointmentDetailsModal from '@/components/appointments/AppointmentDetailsModal';
-import {getTodayAndTomorrowandPastWeekAppointments , updateAppointmentStatus, updateAppointmentPaymentStatus}  from "@/lib/api"
+import PatientHistoryModal from '@/components/appointments/PatientHistoryModal';
+import {getTodayAndTomorrowandPastWeekAppointments, updateAppointmentStatus, updateAppointmentPaymentStatus, fetchPatientHistoryUsingMobileNumber}  from "@/lib/api"
 import AppointmentDetailsProvider from '@/context/AppointmentDetailsProvider';
 import { DateTime } from 'luxon';
 
@@ -28,6 +29,7 @@ export default function AppointmentsPage() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [activeTimeFilter, setActiveTimeFilter] = useState('today');
   const [selectedDoctor, setSelectedDoctor] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -290,6 +292,12 @@ export default function AppointmentsPage() {
   const handleViewDetails = (appointment) => {
     setSelectedAppointment(appointment);
     setShowDetailsModal(true);
+  };
+  
+  // Handle viewing patient appointment history
+  const handleViewHistory = (appointment) => {
+    setSelectedAppointment(appointment);
+    setShowHistoryModal(true);
   };
 
   const handleStatusChange = async (appointmentId, newStatus) => {
@@ -658,7 +666,7 @@ export default function AppointmentsPage() {
                           variant="outline"
                           size="sm"
                           className="whitespace-nowrap"
-                          onClick={() => handleViewDetails(appointment)}
+                          onClick={() => handleViewHistory(appointment)}
                         >
                           View History
                         </Button>
@@ -705,6 +713,21 @@ export default function AppointmentsPage() {
         onPaymentStatusChange={handlePaymentStatusChange}
         onEdit={handleEditAppointment}
         onCancel={handleCancelAppointment}
+      />
+
+      {/* Patient History Modal */}
+      <PatientHistoryModal
+        isOpen={showHistoryModal}
+        onClose={() => {
+          setShowHistoryModal(false);
+          setSelectedAppointment(null);
+        }}
+        appointment={selectedAppointment}
+        onViewDetails={(apt) => {
+          setShowHistoryModal(false);
+          setSelectedAppointment(apt);
+          setShowDetailsModal(true);
+        }}
       />
     </div>
   );
