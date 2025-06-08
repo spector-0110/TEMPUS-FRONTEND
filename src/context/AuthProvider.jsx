@@ -25,10 +25,8 @@ export function AuthProvider({ children }) {
         // Subscribe to auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, session) => {
-            console.log('Auth state changed:', event);
             
             if (event === 'SIGNED_OUT') {
-              console.log('User signed out, clearing state');
               setUser(null);
               // Use a timeout to ensure state is updated before navigation
               setTimeout(() => {
@@ -38,18 +36,15 @@ export function AuthProvider({ children }) {
             }
             
             if (session) {
-              console.log('Session available, updating user');
               const { data } = await supabase.auth.getUser();
               setUser(data?.user || null);
             } else {
-              console.log('No session, clearing user');
               setUser(null);
             }
           }
         );
         
         return () => {
-          console.log('Unsubscribing from auth changes');
           subscription?.unsubscribe();
         };
       } catch (error) {
@@ -69,7 +64,6 @@ export function AuthProvider({ children }) {
     isAuthenticated: !!user,
     signOut: async () => {
       try {
-        console.log('Signing out user');
         
         // Call Supabase signOut first to ensure server-side session is cleared
         await supabaseSignOut();

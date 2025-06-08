@@ -31,20 +31,17 @@ export function getHeaders() {
  * This will first try localStorage for faster access and fallback to Supabase API
  */
 async function getAuthToken() {
-  console.log('getAuthToken - Starting token retrieval');
   let accessToken = null;
   
   try {
     // First try to get from localStorage directly if available in browser context
     if (typeof window !== 'undefined' && window.localStorage) {
-      console.log('getAuthToken - Trying localStorage approach');
       const supabaseKey = Object.keys(localStorage).find(key => key.startsWith('sb-'));
       
       if (supabaseKey) {
         try {
           const storedAuth = JSON.parse(localStorage.getItem(supabaseKey));
           if (storedAuth && storedAuth.access_token) {
-            console.log('getAuthToken - Found token in localStorage');
             accessToken = storedAuth.access_token;
           }
         } catch (e) {
@@ -55,14 +52,12 @@ async function getAuthToken() {
     
     // If localStorage approach didn't work, try the Supabase API with timeout
     if (!accessToken) {
-      console.log('getAuthToken - Falling back to supabase.auth.getSession()');
       const sessionPromise = supabase.auth.getSession();
       const timeoutPromise = new Promise((_, reject) => 
         setTimeout(() => reject(new Error('Supabase session retrieval timed out after 5s')), 5000)
       );
       
       const session = await Promise.race([sessionPromise, timeoutPromise]);
-      console.log('getAuthToken - Session promise resolved');
       
       const token = session?.data;
       accessToken = token?.session?.access_token;
@@ -73,7 +68,6 @@ async function getAuthToken() {
       throw new Error('Authentication required. Please login again.');
     }
     
-    console.log('getAuthToken - Successfully retrieved access token');
     return accessToken;
   } catch (error) {
     console.error('getAuthToken - Failed to retrieve auth token:', error);
@@ -86,27 +80,26 @@ async function getAuthToken() {
  */
 async function handleApiResponse(response, errorMessage = 'Request failed') {
   if (!response.ok) {
+    let errorData;
+    
     try {
-      const errorData = await response.json();
-      // Create a custom error object with all the details from the backend
-      const apiError = new Error(errorData.error || errorMessage);
-      console.error('handleApiResponse - Full error data:', errorData);
-      apiError.status = response.status;
-      apiError.data = errorData; // Store the complete error data from the backend
-      apiError.message = errorData.error || errorMessage;
-
-      console.error('handleApiResponse - Error response:', apiError.message);
-
-      throw apiError;
+      errorData = await response.json();
     } catch (parseError) {
       console.error('Could not parse error response:', parseError);
-      // If we can't parse the response, throw a basic error with the status
       const basicError = new Error(errorMessage);
       basicError.status = response.status;
       basicError.statusText = response.statusText;
       throw basicError;
     }
+    
+    const apiError = new Error(errorData.error || errorMessage);
+    apiError.status = response.status;
+    apiError.data = errorData;
+    
+    console.error('handleApiResponse - Error response:', apiError.message);
+    throw apiError;
   }
+  
   return response.json();
 }
 
@@ -338,8 +331,9 @@ export async function submitHospitalDetails(formData) {
       },
       body: JSON.stringify(formData)
     });
-    
-    return handleApiResponse(response, 'Failed to submit hospital details');
+
+    const res=await handleApiResponse(response, 'Failed to submit hospital details');
+    return res;
   } catch (error) {
     console.error('Error submitting form data:', {
       message: error.message,

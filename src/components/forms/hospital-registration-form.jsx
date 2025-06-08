@@ -16,9 +16,10 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { CheckCircle, Building2, MapPin, Phone, Mail, User, FileText, AlertTriangle } from 'lucide-react';
-import { fetchHospitalFormFields ,submitHospitalDetails } from '@/lib/api';
-import {useIsMobile} from '@/hooks/use-mobile';
+import { CheckCircle, Building2, MapPin, Phone, Mail, User, FileText, AlertTriangle, XCircle } from 'lucide-react';
+import { fetchHospitalFormFields, submitHospitalDetails } from '@/lib/api';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { ErrorDialog } from '@/components/ui/error-dialog';
 
 const FORM_STORAGE_KEY = 'hospitalFormData';
 
@@ -28,11 +29,19 @@ export default function HospitalRegistrationForm() {
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [formConfig, setFormConfig] = useState({ sections: [] });
   const [isLoading, setIsLoading] = useState(true);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [errorDialog, setErrorDialog] = useState({
+    isOpen: false,
+    title: 'Registration Error',
+    message: '',
+    details: [],
+    errorType: 'api',
+    statusCode: null,
+    errorData: null
+  });
 
   // Fetch form configuration on mount
   useEffect(() => {
@@ -153,9 +162,14 @@ export default function HospitalRegistrationForm() {
   };
 
   const handleSubmit = async (e) => {
-    setSubmitAttempted(true);
+    e.preventDefault();
+    
+    // Prevent multiple submissions
+    if (isSubmitting) {
+      return;
+    }
 
-    if (isSubmitting || isButtonDisabled) return;
+    setSubmitAttempted(true);
 
     // Check if there are any empty required fields
     const hasEmptyRequiredFields = formConfig.sections.some(section => 
@@ -167,7 +181,6 @@ export default function HospitalRegistrationForm() {
     // First check for empty required fields
     if (hasEmptyRequiredFields) {
       toast.error('Please fill out all required fields before submitting.');
-      setIsButtonDisabled(false);
       return;
     }
 
@@ -175,12 +188,10 @@ export default function HospitalRegistrationForm() {
     const isValid = validateForm();
     if (!isValid) {
       toast.error('Please correct the errors in the form before submitting.');
-      setIsButtonDisabled(false);
       return;
     }
 
     setIsSubmitting(true);
-    setIsButtonDisabled(true);
 
     try {
       const response = await submitHospitalDetails(formData);
@@ -188,27 +199,80 @@ export default function HospitalRegistrationForm() {
       // Clear saved form data after successful submission
       localStorage.removeItem(FORM_STORAGE_KEY);
       
-      setShowSuccessDialog(true);
       toast.success('Hospital details submitted successfully');
+      
+      // Show success dialog
+      setShowSuccessDialog(true);
+      
     } catch (error) {
-      toast.error(error?.message || 'Submission failed, please try again.');
-      setTimeout(() => {
-        setIsButtonDisabled(false);
-      }, 3000);
+      console.error('Submission error:', error);
+      
+      // Prepare error details for the dialog
+      let errorMessage = 'Submission failed, please try again.';
+      let errorDetails = [];
+      let statusCode = null;
+      let errorData = null;
+      
+      // Extract useful information from the error
+      if (error) {
+        // If there's a message, use it
+        if (error.error) {
+          errorMessage = error.error;
+        }
+        
+        // If there's a status code (for API errors)
+        if (error.status) {
+          statusCode = error.status;
+        }
+        
+        // If there are validation errors or other details
+        if (error.data) {
+          errorData = error.data;
+          
+          // Format validation errors if present
+          if (Array.isArray(error.data.errors)) {
+            errorDetails = error.data.errors.map(err => {
+              if (typeof err === 'string') return err;
+              if (err.field && err.message) return `${err.field}: ${err.message}`;
+              return JSON.stringify(err);
+            });
+          } else if (typeof error.data === 'object') {
+            // Handle other error data formats
+            errorDetails = Object.entries(error.data).map(([key, value]) => 
+              `${key}: ${typeof value === 'object' ? JSON.stringify(value) : value}`
+            );
+          }
+        }
+      }
+      
+      // Show toast for immediate feedback
+      toast.error(errorMessage);
+      
+      // Open the error dialog with details
+      setErrorDialog({
+        isOpen: true,
+        title: 'Registration Error',
+        message: errorMessage,
+        details: errorDetails,
+        errorType: 'api',
+        statusCode,
+        errorData: errorData || error
+      });
     } finally {
-      setTimeout(() => {
-        setIsButtonDisabled(false);
-      }, 5000);
+      // Always reset submission state in finally block
+      setIsSubmitting(false);
     }
   };
 
   const handleSuccessDialogAction = (action) => {
+    
+    // Close the dialog immediately
     setShowSuccessDialog(false);
-    if (action === 'dashboard') {
-      router.push('/dashboard');
-    } else if (action === 'cancel') {
-      router.push('/dashboard');
-    }
+    
+    // Navigate to dashboard
+    // Hard refresh the page
+    window.location.reload(true);
+    router.push('/dashboard');
   };
 
   const getFieldIcon = (sectionId) => {
@@ -220,7 +284,6 @@ export default function HospitalRegistrationForm() {
     };
 
     return iconMap[sectionId] || FileText;
-   
   };
 
   const getCompletionPercentage = () => {
@@ -233,6 +296,13 @@ export default function HospitalRegistrationForm() {
     }, 0);
     return totalFields > 0 ? Math.round((filledFields / totalFields) * 100) : 0;
   };
+
+  // Check if form has required empty fields for button disabled state
+  const hasRequiredEmptyFields = formConfig.sections.some(section => 
+    section.fields.some(field => 
+      field.required && (!formData[field.id] || formData[field.id].toString().trim() === '')
+    )
+  );
 
   if (isLoading) {
     return (
@@ -285,10 +355,7 @@ export default function HospitalRegistrationForm() {
       {/* Add margin-top to account for fixed header */}
       <div className={`${isMobile ? 'mt-7' : 'mt-11'}`}>
         {/* Form Content */}
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          handleSubmit();
-        }}>
+        <form onSubmit={handleSubmit}>
           <div className="container mx-auto px-4 py-8">
             <div className="max-w-5xl mx-auto">
               <div className="grid gap-8">
@@ -390,11 +457,7 @@ export default function HospitalRegistrationForm() {
                       </div>
                       <Button
                         type="submit"
-                        disabled={isSubmitting || isButtonDisabled || formConfig.sections.some(section => 
-                          section.fields.some(field => 
-                            field.required && (!formData[field.id] || formData[field.id].toString().trim() === '')
-                          )
-                        )}
+                        disabled={isSubmitting || hasRequiredEmptyFields}
                         size="lg"
                         className="relative px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[200px] border-0"
                       >
@@ -402,11 +465,6 @@ export default function HospitalRegistrationForm() {
                           <div className="flex items-center space-x-2">
                             <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
                             <span>Submitting...</span>
-                          </div>
-                        ) : isButtonDisabled ? (
-                          <div className="flex items-center space-x-2">
-                            <div className="animate-pulse w-4 h-4 bg-white/50 rounded-full"></div>
-                            <span>Please wait...</span>
                           </div>
                         ) : (
                           <div className="flex items-center space-x-2">
@@ -423,8 +481,23 @@ export default function HospitalRegistrationForm() {
           </div>
         </form>
 
+        {/* Error Dialog */}
+        <ErrorDialog
+          isOpen={errorDialog.isOpen}
+          onClose={() => setErrorDialog(prev => ({ ...prev, isOpen: false }))}
+          title={errorDialog.title}
+          message={errorDialog.message}
+          details={errorDialog.details}
+          errorType={errorDialog.errorType}
+          statusCode={errorDialog.statusCode}
+          errorData={errorDialog.errorData}
+        />
+        
         {/* Success Dialog */}
-        <Dialog open={showSuccessDialog} onOpenChange={() => {}}>
+        <Dialog 
+          open={showSuccessDialog} 
+          onOpenChange={setShowSuccessDialog}
+        >
           <DialogContent className="sm:max-w-md bg-slate-900 border-slate-800 text-white">
             <DialogHeader className="text-center">
               <div className="mx-auto mb-4 w-16 h-16 bg-emerald-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-emerald-400/30">
@@ -438,13 +511,6 @@ export default function HospitalRegistrationForm() {
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-6">
-              <Button
-                variant="outline"
-                onClick={() => handleSuccessDialogAction('cancel')}
-                className="w-full sm:w-auto bg-transparent border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
-              >
-                Maybe Later
-              </Button>
               <Button
                 onClick={() => handleSuccessDialogAction('dashboard')}
                 className="w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white border-0"
