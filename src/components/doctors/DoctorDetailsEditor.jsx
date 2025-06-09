@@ -5,16 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { DialogFooter } from '@/components/ui/dialog';
+import { uploadDoctorImage, deleteDoctorImage } from '@/lib/uploadDoctorImage';
 
-/**
- * Component for editing doctor details
- * @param {Object} doctor - The doctor object to edit (null for create mode)
- * @param {Function} onSave - Callback function when saving doctor data
- * @param {Function} onCancel - Callback function when cancelling
- * @param {boolean} isLoading - External loading state from parent component
- */
 const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) => {
+
+
   const isEditMode = doctor && doctor.id;
+  const [hospitalDetails, setHospitalDetails] = useState(null);
   const [doctorData, setDoctorData] = useState({
     name: '',
     email: '',
@@ -31,6 +28,9 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
   // Store original data for comparison in edit mode
   const [originalData, setOriginalData] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   // Reset submitting state when external loading state changes
   useEffect(() => {
@@ -38,6 +38,18 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
       setIsSubmitting(false);
     }
   }, [isLoading, isSubmitting]);
+
+   useEffect(() => {
+    const storedDetails = localStorage.getItem('hospitalDetails');
+    if (storedDetails) {
+      try {
+        const parsed = JSON.parse(storedDetails);
+        setHospitalDetails(parsed);
+      } catch (error) {
+        console.error('Error parsing hospital details:', error);
+      }
+    }
+  }, []);
   
   useEffect(() => {
     if (doctor) {
@@ -66,9 +78,21 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
     }
   }, [doctor, isEditMode]);
   
+  // Cleanup preview URL when component unmounts
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+  
   // Check if data has changed
   const hasDataChanged = () => {
     if (!isEditMode || !originalData) return true;
+    
+    // If a new file is selected, consider it as a change
+    if (selectedFile) return true;
     
     const fieldsToCompare = ['name', 'email', 'phone', 'specialization', 'qualification', 'experience', 'age', 'photo', 'aadhar', 'status'];
     
@@ -110,45 +134,128 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
     }
   };
   
-  const handleSubmit = (e) => {
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) {
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      return;
+    }
+
+    // Validate file type and size
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (!allowedTypes.includes(file.type)) {
+      alert('Only JPEG, JPG, PNG, and WebP images are allowed');
+      e.target.value = '';
+      return;
+    }
+
+    if (file.size > maxSize) {
+      alert('File size must be less than 5MB');
+      e.target.value = '';
+      return;
+    }
+
+    setSelectedFile(file);
+    
+    // Create preview URL
+    const preview = URL.createObjectURL(file);
+    setPreviewUrl(preview);
+
+    // reset the input value to allow re-uploading the same file
+    e.target.value = '';
+  };
+  
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Prevent submission if no changes in edit mode
-    if (isEditMode && !hasDataChanged()) {
+    // Prevent submission if no changes in edit mode and no file selected
+    if (isEditMode && !hasDataChanged() && !selectedFile) {
       console.log('No changes detected, not submitting');
       return;
     }
     
     // Set submitting state to disable button
     setIsSubmitting(true);
+    setIsUploading(selectedFile ? true : false);
     
-    // Ensure numeric fields are properly typed before submitting
-    // Remove id field from doctorData before creating formattedData
-    const { id, ...doctorDataWithoutId } = doctorData;
-    const formattedData = {
-      ...doctorDataWithoutId,
-      doctor_id: id, // Add doctor_id from the existing id
-      experience: doctorData.experience === '' || doctorData.experience === null ? 0 : 
-           typeof doctorData.experience === 'number' ? doctorData.experience : 
-           parseInt(doctorData.experience, 10),
-      age: doctorData.age === '' || doctorData.age === null ? 30 : 
-         typeof doctorData.age === 'number' ? doctorData.age : 
-         parseInt(doctorData.age, 10)
-    };
+    try {
+      let photoUrl = doctorData.photo;
+      
+      // Upload image if a new file is selected
+      if (selectedFile && hospitalDetails?.subdomain) {
+        try {
 
-    // If creating a new doctor, exclude the status field
-    if (!isEditMode) {
-      delete formattedData.status;
-      delete formattedData.doctor_id;
+          // Delete previous image if in edit mode and the doctor has a custom photo
+          // if (isEditMode && doctorData.photo && !doctorData.photo.includes('/doctor.png')) {
+          //   try {
+          //     await deleteDoctorImage(doctorData.photo);
+          //     console.log('Previous doctor image deleted');
+          //   } catch (deleteError) {
+          //     console.error('Failed to delete previous image:', deleteError);
+          //     // Continue with upload even if delete fails
+          //   }
+          // }
+          
+          photoUrl = await uploadDoctorImage(
+            selectedFile,
+            hospitalDetails.subdomain,
+            doctorData.name || 'unnamed-doctor'
+          );
+        } catch (error) {
+          console.error('Image upload failed:', error);
+          alert(`Image upload failed: ${error.message}`);
+          setIsSubmitting(false);
+          setIsUploading(false);
+          return;
+        }
+      }
+      
+      // Ensure numeric fields are properly typed before submitting
+      // Remove id field from doctorData before creating formattedData
+      const { id, ...doctorDataWithoutId } = doctorData;
+      const formattedData = {
+        ...doctorDataWithoutId,
+        photo: photoUrl, // Use the uploaded URL or existing photo
+        doctor_id: id, // Add doctor_id from the existing id
+        experience: doctorData.experience === '' || doctorData.experience === null ? 0 : 
+             typeof doctorData.experience === 'number' ? doctorData.experience : 
+             parseInt(doctorData.experience, 10),
+        age: doctorData.age === '' || doctorData.age === null ? 30 : 
+           typeof doctorData.age === 'number' ? doctorData.age : 
+           parseInt(doctorData.age, 10)
+      };
+
+      // If creating a new doctor, exclude the status field
+      if (!isEditMode) {
+        delete formattedData.status;
+        delete formattedData.doctor_id;
+      }
+
+      
+      // Call the parent's onSave function
+      await onSave(formattedData);
+      
+      // Clear selected file after successful submission
+      setSelectedFile(null);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(null);
+      }
+      
+    } catch (error) {
+      console.error('Submit failed:', error);
+      alert(`Submit failed: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+      setIsUploading(false);
     }
-  
-    console.log('Submitting doctor data:', formattedData);
-    
-    onSave(formattedData);
   };
   
   // Determine if submit button should be disabled
-  const isSubmitDisabled = isSubmitting || isLoading || (isEditMode && !hasDataChanged());
+  const isSubmitDisabled = isSubmitting || isLoading || (isEditMode && !hasDataChanged() && !selectedFile);
   
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto p-2">
@@ -241,19 +348,8 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
             required
           />
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="photo">Photo URL</Label>
-          <Input
-            id="photo"
-            name="photo"
-            type="url"
-            value={doctorData.photo}
-            onChange={handleChange}
-            placeholder="https://example.com/doctor-photo.jpg"
-          />
-        </div>
-        
+
+
         <div className="space-y-2">
           <Label htmlFor="aadhar">Aadhar Number</Label>
           <Input
@@ -264,6 +360,41 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
             placeholder="XXXX XXXX XXXX"
           />
         </div>
+        
+       <div className="space-y-2">
+          <Label htmlFor="photo">Photo</Label>
+          <div className="space-y-2">
+            <Input
+              id="photo"
+              name="photo"
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/webp"
+              onChange={handleFileChange}
+            />
+            {isUploading && (
+              <div className="text-sm text-blue-600">
+                Processing image...
+              </div>
+            )}
+            {/* Image Preview */}
+            <div className="mt-2">
+              <div className="w-20 h-20 border border-gray-300 rounded-lg overflow-hidden bg-gray-50">
+                <img
+                  src={previewUrl || doctorData.photo || '/doctor.png'}
+                  alt="Doctor preview"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = '/doctor.png';
+                  }}
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Max file size: 5MB. Supported formats: JPEG, PNG, WebP
+              </p>
+            </div>
+          </div>
+        </div>
+        
         
         {isEditMode && (
           <div className="space-y-2">
@@ -284,12 +415,20 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
       </div>
       
       {/* Show message when no changes detected in edit mode */}
-      {isEditMode && !hasDataChanged() && (
+      {isEditMode && !hasDataChanged() && !selectedFile && (
         <div className="text-sm text-muted-foreground text-center py-2">
           No changes detected. Make changes to enable save.
         </div>
       )}
       
+      {/* Show message when image is uploading
+      {isUploading && (
+        <div className="text-sm text-blue-600 text-center py-2">
+          Please wait while the image is being uploaded...
+        </div>
+      )}
+       */}
+
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
@@ -299,7 +438,7 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
           disabled={isSubmitDisabled}
           className={isSubmitDisabled ? "opacity-50 cursor-not-allowed" : ""}
         >
-          {(isSubmitting || isLoading)
+          {(isSubmitting || isLoading || isUploading)
             ? (isEditMode ? 'Saving...' : 'Adding...') 
             : (isEditMode ? 'Save Changes' : 'Add Doctor')
           }
