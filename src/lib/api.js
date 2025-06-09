@@ -268,7 +268,7 @@ export async function updateAppointmentStatus(appointmentId, status) {
 /**
  * Update appointment payment status with optional payment method
  */
-export async function updateAppointmentPaymentStatus(appointmentId, paymentStatus, paymentMethod = null) {
+export async function updateAppointmentPaymentStatus(appointmentId, paymentStatus, paymentMethod = null, amount) {
   try {
     const accessToken = await getAuthToken();
 
@@ -278,6 +278,12 @@ export async function updateAppointmentPaymentStatus(appointmentId, paymentStatu
     if (paymentMethod) {
       requestBody.paymentMethod = paymentMethod;
     }
+    // Add amount if provided (for 'paid' status)
+    if (amount) { 
+      requestBody.amount = amount;
+    }
+
+    console.log('updateAppointmentPaymentStatus - Request Body:', requestBody);
 
     const response = await fetchWithTimeout(`${BASE_URL}/appointments/${appointmentId}/payment`, {
       method: 'PATCH',

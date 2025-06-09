@@ -43,8 +43,22 @@ export default function PatientHistoryModal({
       const response = await fetchPatientHistoryUsingMobileNumber(mobileNumber);
       
       if (response && response.data) {
-        setPatientHistory(response.data.appointments || []);
-        setPatientInfo(response.data.summary?.patientInfo || null);
+        // Format appointments before setting them in state
+        const formattedAppointments = response.data.appointments.map(apt => formatAppointment(apt)) || [];
+        setPatientHistory(formattedAppointments);
+        
+        // Extract and enhance patient info with status breakdown
+        const patientInfoData = response.data.summary?.patientInfo || null;
+        const statusBreakdown = response.data.summary?.statusBreakdown || {};
+        
+        if (patientInfoData) {
+          setPatientInfo({
+            ...patientInfoData,
+            statusBreakdown
+          });
+        } else {
+          setPatientInfo(null);
+        }
       } else {
         setPatientHistory([]);
         setPatientInfo(null);
@@ -115,6 +129,37 @@ export default function PatientHistoryModal({
    return timeString.split('T')[1].slice(0, 5);
   };
   
+  const extractTimeFromISO = (isoString) => {
+    return isoString.split('T')[1].slice(0, 5);
+  };
+
+  const formatAppointment = (apt) => ({
+        id: apt.id,
+        hospitalId: apt.hospitalId,
+        doctorId: apt.doctorId,
+        patientName: apt.patientName,
+        mobile: apt.mobile,
+        age: apt.age,
+        appointmentDate: apt.appointmentDate.split('T')[0], // Extract date part (YYYY-MM-DD)
+        appointmentTime: extractTimeFromISO(apt.startTime), // Extract time from startTime ISO string
+        startTime: apt.startTime,
+        endTime: apt.endTime,
+        status: apt.status,
+        notificationStatus: apt.notificationStatus,
+        paymentStatus: apt.paymentStatus,
+        createdAt: apt.createdAt,
+        doctor: apt.doctor,
+        // Legacy format for compatibility
+        patient: {
+          name: apt.patientName,
+          mobile: apt.mobile,
+          age: apt.age
+        },
+        patientMobile: apt.mobile,
+        doctorName: apt.doctor?.name,
+        datetime: new Date(apt.appointmentDate)
+  });
+  
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -122,9 +167,14 @@ export default function PatientHistoryModal({
           <DialogTitle className="text-xl font-bold">
             Patient Appointment History:
             {patientInfo && (
-              <span className="block text-sm text-muted-foreground mt-1">
-                 {patientInfo.mobileNumber}
-              </span>
+              <div className="mt-1">
+                <span className="block text-lg font-medium">
+                  {patientInfo.patientName}
+                </span>
+                <span className="block text-sm text-muted-foreground">
+                  {patientInfo.mobileNumber}
+                </span>
+              </div>
             )}
           </DialogTitle>
         </DialogHeader>
@@ -147,10 +197,22 @@ export default function PatientHistoryModal({
           </div>
         ) : (
           <div className="space-y-6 my-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium">
-                All Appointments ({patientHistory.length})
-              </h3>
+            <div className="flex flex-col gap-2 mb-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">
+                  All Appointments ({patientHistory.length})
+                </h3>
+              </div>
+              {patientInfo && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  {Object.entries(patientInfo.statusBreakdown || {}).map(([status, count]) => (
+                    <Badge key={status} className={`text-xs py-1.5 px-3 font-medium justify-center ${getStatusColor(status)}`}>
+                      {getStatusIcon(status)}
+                      <span className="ml-1">{status.toUpperCase()}: {count}</span>
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
             
             {patientHistory.map((apt) => (
@@ -179,10 +241,10 @@ export default function PatientHistoryModal({
                           <span className="font-medium">Date:</span> {formatDate(apt.appointmentDate)}
                         </div>
                         <div>
-                          <span className="font-medium">Time:</span> {formatTime(apt.startTime)}
+                          <span className="font-medium">Time:</span> {apt.appointmentTime || formatTime(apt.startTime)}
                         </div>
                         <div>
-                          <span className="font-medium">Phone:</span> { apt.mobile}
+                          <span className="font-medium">Phone:</span> {apt.mobile}
                         </div>
                       </div>
                       {/* {apt.doctor?.specialization && (

@@ -336,7 +336,7 @@ export default function AppointmentsPage() {
     }
   };
 
-  const handlePaymentStatusChange = async (appointmentId, newPaymentStatus, paymentMethod = null) => {
+  const handlePaymentStatusChange = async (appointmentId, newPaymentStatus, paymentMethod = null, amount = null) => {
     try {
       // Update payment status in local state immediately for better UX
       setAppointments(prevAppointments => 
@@ -345,21 +345,24 @@ export default function AppointmentsPage() {
             ? { 
                 ...apt, 
                 paymentStatus: newPaymentStatus,
-                ...(paymentMethod && { paymentMethod })
+                ...(paymentMethod && { paymentMethod }),
+                ...(amount && { amount })
               }
             : apt
         )
       );
 
-      // Call API to update payment status with optional payment method
-      const res = await updateAppointmentPaymentStatus(appointmentId, newPaymentStatus, paymentMethod);
+      // Call API to update payment status with optional payment method and amount
+      const res = await updateAppointmentPaymentStatus(appointmentId, newPaymentStatus, paymentMethod, amount);
 
       setSuccessDialog({
         isOpen: true,
         title: 'Payment Status Updated',
-        message: paymentMethod 
-          ? `Payment status has been updated to ${newPaymentStatus} via ${paymentMethod.toUpperCase()}.`
-          : `Payment status has been updated to ${newPaymentStatus}.`,
+        message: paymentMethod && amount
+          ? `Payment status has been updated to ${newPaymentStatus} via ${paymentMethod.toUpperCase()} for ₹${amount}.`
+          : paymentMethod 
+            ? `Payment status has been updated to ${newPaymentStatus} via ${paymentMethod.toUpperCase()}.`
+            : `Payment status has been updated to ${newPaymentStatus}.`,
       });
 
     } catch (error) {

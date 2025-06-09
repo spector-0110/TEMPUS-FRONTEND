@@ -75,6 +75,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('');
+  const [paymentAmount, setPaymentAmount] = useState('');
   const [showPaymentMethodSelector, setShowPaymentMethodSelector] = useState(false);
   const [confirmationDialog, setConfirmationDialog] = useState({
     isOpen: false,
@@ -127,6 +128,13 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
   const handlePaymentMethodConfirm = () => {
     if (!selectedPaymentMethod) return;
     
+    // Validate payment amount is a positive integer
+    const amount = parseInt(paymentAmount, 10);
+    if (!amount || amount <= 0 || isNaN(amount)) {
+      alert("Please enter a valid positive amount");
+      return;
+    }
+    
     const paymentMethodInfo = paymentMethodConfig[selectedPaymentMethod];
     setShowPaymentMethodSelector(false);
     setConfirmationDialog({
@@ -134,18 +142,20 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
       type: 'payment',
       newValue: 'paid',
       paymentMethod: selectedPaymentMethod,
+      amount: amount,
       title: `Confirm Payment`,
-      description: `Are you sure you want to mark this appointment as paid via ${paymentMethodInfo.label}? This action will update the payment status and method.`
+      description: `Are you sure you want to mark this appointment as paid ₹${amount} via ${paymentMethodInfo.label}? This action will update the payment status and method.`
     });
   };
 
   const handleCancelPaymentMethod = () => {
     setShowPaymentMethodSelector(false);
     setSelectedPaymentMethod('');
+    setPaymentAmount('');
   };
 
   const handleConfirmUpdate = async () => {
-    const { type, newValue, paymentMethod } = confirmationDialog;
+    const { type, newValue, paymentMethod, amount } = confirmationDialog;
     
     setConfirmationDialog(prev => ({ ...prev, isOpen: false }));
     
@@ -163,7 +173,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
       try {
         // Pass payment method along with status when marking as paid
         if (newValue === 'paid' && paymentMethod) {
-          await onPaymentStatusChange(appointment.id, newValue, paymentMethod);
+          await onPaymentStatusChange(appointment.id, newValue, paymentMethod, amount);
         } else {
           await onPaymentStatusChange(appointment.id, newValue);
         }
@@ -192,6 +202,30 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
 
   const formatAppointmentTime = (date) => {
     return date.split('T')[1].slice(0, 5); // Extract time part from ISO string
+  };
+  
+  const formatCreationDate = (dateString) => {
+      const monthMap = {
+      '01': 'Jan',
+      '02': 'Feb',
+      '03': 'Mar',
+      '04': 'Apr',
+      '05': 'May',
+      '06': 'Jun',
+      '07': 'Jul',
+      '08': 'Aug',
+      '09': 'Sep',
+      '10': 'Oct',
+      '11': 'Nov',
+      '12': 'Dec',
+    };
+
+    const [datePart, timePart] = dateString.split('T');
+    const [year, month, day] = datePart.split('-');
+    const [hour, minute] = timePart.split(':');
+
+    const formattedDate = `${day}-${monthMap[month]}-${year} ${hour}:${minute}`;
+    return formattedDate;
   };
 
   const canUpdateStatus = (currentStatus) => {
@@ -289,6 +323,14 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
                     Duration: {Math.round((new Date(appointment.endTime) - new Date(appointment.startTime)) / (1000 * 60))} minutes
                   </div>
                 )}
+                {appointment.createdAt && (
+                  <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100">
+                    <Calendar className="h-3.5 w-3.5 text-gray-400" />
+                    <span className="text-xs text-gray-500">
+                      Created on: {formatCreationDate(appointment.createdAt)}
+                    </span>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -300,19 +342,38 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
                   Doctor
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-gray-500" />
-                  <span className="font-medium">Dr. {appointment.doctor?.name}</span>
-                </div>
-                <div className="text-sm text-gray-600">
-                  {appointment.doctor?.specialization}
-                </div>
-                {appointment.doctor?.department && (
-                  <div className="text-sm text-gray-600">
-                    {appointment.doctor.department}
+              <CardContent>
+                <div className="flex gap-4">
+                  {/* Doctor Photo on the left */}
+                  <div className="flex-shrink-0">
+                    {appointment.doctor?.photo ? (
+                      <img 
+                        src={appointment.doctor.photo} 
+                        alt={`Dr. ${appointment.doctor.name}`}
+                        className="w-16 h-16 rounded-xl object-cover border border-gray-200"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
+                        <User className="h-8 w-8 text-gray-400" />
+                      </div>
+                    )}
                   </div>
-                )}
+                  {/* Doctor Details on the right */}
+                  <div className="flex-grow space-y-2">
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4 text-gray-500" />
+                      <span className="font-medium">Dr. {appointment.doctor?.name}</span>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {appointment.doctor?.specialization}
+                    </div>
+                    {appointment.doctor?.department && (
+                      <div className="text-sm text-gray-600">
+                        {appointment.doctor.department}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -527,13 +588,33 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
               </SelectContent>
             </Select>
             
+            <div className="space-y-2">
+              <label htmlFor="paymentAmount" className="text-sm font-medium">
+                Payment Amount
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2">
+                  <IndianRupee className="h-4 w-4 text-muted-foreground" />
+                </span>
+                <input
+                  id="paymentAmount"
+                  type="number"
+                  min="1"
+                  value={paymentAmount}
+                  onChange={(e) => setPaymentAmount(e.target.value)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-9 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  placeholder="Enter amount"
+                />
+              </div>
+            </div>
+            
             <div className="flex justify-end gap-2 pt-4">
               <Button variant="outline" onClick={handleCancelPaymentMethod}>
                 Cancel
               </Button>
               <Button 
                 onClick={handlePaymentMethodConfirm}
-                disabled={!selectedPaymentMethod}
+                disabled={!selectedPaymentMethod || !paymentAmount || parseInt(paymentAmount, 10) <= 0}
                 className="gap-2"
               >
                 <CheckCircle className="h-4 w-4" />
