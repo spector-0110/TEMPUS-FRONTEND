@@ -168,7 +168,6 @@ export default function AppointmentsPage() {
     }
     
     let filtered = [...appointments];
-    console.log('Filtering appointments:', filtered)
     // Time-based filtering using Luxon for proper timezone handling
     const today = DateTime.now().setZone('Asia/Kolkata');
     const tomorrow = today.plus({ days: 1 });
