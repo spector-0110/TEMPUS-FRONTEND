@@ -431,7 +431,7 @@ export async function updateHospitalDetailsAPI(updateData) {
 /**
  * Get hospital dashboard - used to populate data
  */
-export async function getHospitalDashboard(updateData) {
+export async function getHospitalDashboard() {
   try {
 
     const accessToken = await getAuthToken();
@@ -441,7 +441,6 @@ export async function getHospitalDashboard(updateData) {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(updateData),
         // Ensure we're not caching responses
         cache: 'no-store'
       });

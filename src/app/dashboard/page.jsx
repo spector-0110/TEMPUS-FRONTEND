@@ -408,7 +408,7 @@ export default function AppointmentsPage() {
   if (loading) {
     return (
       <div className="flex h-full w-full items-center justify-center">
-        <Spinner size="lg" />
+        <Spinner size="xl" />
       </div>
     );
   }
@@ -606,7 +606,7 @@ export default function AppointmentsPage() {
         <CardContent className="flex-1 overflow-hidden p-0">
           {isLoadingAppointments ? (
             <div className="flex justify-center items-center h-full">
-              <Spinner size="md" />
+              <Spinner size="xl" />
             </div>
           ) : filteredAppointments.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full p-6">
