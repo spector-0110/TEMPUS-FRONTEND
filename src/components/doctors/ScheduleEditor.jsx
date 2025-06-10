@@ -80,7 +80,7 @@ const ScheduleEditor = ({ doctorId, initialSchedules, onSave, onCancel }) => {
     const processed = schedules.map(s => ({
       ...s,
       dayOfWeek: Number(s.dayOfWeek),
-      avgConsultationTime: parseInt(s.avgConsultationTime, 10),
+      avgConsultationTime: parseInt(s.avgConsultationTime, 5),
       timeRanges: s.timeRanges.map(({ start, end }) => ({ start, end })),
     }));
 
@@ -136,7 +136,7 @@ const ScheduleEditor = ({ doctorId, initialSchedules, onSave, onCancel }) => {
             <Input
               id={`consultation-${schedule.dayOfWeek}`}
               type="number"
-              min="5"
+              min="2"
               max="60"
               value={schedule.avgConsultationTime}
               onChange={(e) => updateConsultationTime(schedule.dayOfWeek, e.target.value)}
