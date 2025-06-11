@@ -3,7 +3,7 @@ import CryptoJS from 'crypto-js';
 import { ServerConnectionError } from './errors';
 
 // Constants for API configuration
-const API_TIMEOUT = 8000; // 5 seconds timeout
+const API_TIMEOUT = 15000; // 15 seconds timeout
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 const INDIA_POST_API = 'https://api.postalpincode.in/pincode';
 

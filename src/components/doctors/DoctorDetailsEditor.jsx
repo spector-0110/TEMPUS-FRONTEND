@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { DialogFooter } from '@/components/ui/dialog';
-import { uploadDoctorImage, deleteDoctorImage } from '@/lib/uploadDoctorImage';
+import { uploadDoctorImage, deleteDoctorImage,  } from '@/lib/uploadDoctorImage';
 
 const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) => {
 
@@ -48,6 +48,8 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
       } catch (error) {
         console.error('Error parsing hospital details:', error);
       }
+    } else {
+      console.warn('No hospital details found in localStorage');
     }
   }, []);
   
@@ -112,29 +114,57 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
   };
   
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    
-    // Reset submitting state when user makes changes after submission
-    if (isSubmitting) {
-      setIsSubmitting(false);
-    }
-    
-    // Convert numeric fields to actual numbers
-    if (name === 'experience' || name === 'age') {
-      const parsedValue = value === '' ? '' : parseInt(value, 10);
-      setDoctorData(prev => ({
-        ...prev,
-        [name]: parsedValue
-      }));
-    } else {
-      setDoctorData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
-  };
+  const { name, value } = e.target;
   
-  const handleFileChange = (e) => {
+  // Reset submitting state when user makes changes after submission
+  if (isSubmitting) {
+    setIsSubmitting(false);
+  }
+  
+  // Convert numeric fields to actual numbers
+  if (name === 'experience' || name === 'age') {
+    const parsedValue = value === '' ? '' : parseInt(value, 10);
+    
+    // For experience validation based on age
+    if (name === 'experience') {
+      const currentAge = doctorData.age;
+      // Assuming someone starts working at age 18 at the earliest
+      const maxPossibleExperience = currentAge ? currentAge - 18 : null;
+      
+      if (maxPossibleExperience !== null && parsedValue > maxPossibleExperience) {
+        // Alert the user about invalid experience value
+        alert(`Experience cannot exceed ${maxPossibleExperience} years based on the doctor's age of ${currentAge}`);
+        // Return early without updating state
+        return;
+      }
+    }
+    
+    // For age validation based on experience
+    if (name === 'age') {
+      const currentExperience = doctorData.experience;
+      const minimumAge = currentExperience ? currentExperience + 18 : 18;
+      
+      if (parsedValue < minimumAge && currentExperience) {
+        // Alert the user about invalid age value
+        alert(`Age must be at least ${minimumAge} years based on ${currentExperience} years of experience`);
+        // Return early without updating state
+        return;
+      }
+    }
+    
+    setDoctorData(prev => ({
+      ...prev,
+      [name]: parsedValue
+    }));
+  } else {
+    setDoctorData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }
+};
+  
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) {
       setSelectedFile(null);
@@ -159,7 +189,9 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
     }
 
     setSelectedFile(file);
-    
+      if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
     // Create preview URL
     const preview = URL.createObjectURL(file);
     setPreviewUrl(preview);
@@ -185,19 +217,16 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
       let photoUrl = doctorData.photo;
       
       // Upload image if a new file is selected
-      if (selectedFile && hospitalDetails?.subdomain) {
+      if (selectedFile) {
         try {
-
           // Delete previous image if in edit mode and the doctor has a custom photo
-          // if (isEditMode && doctorData.photo && !doctorData.photo.includes('/doctor.png')) {
-          //   try {
-          //     await deleteDoctorImage(doctorData.photo);
-          //     console.log('Previous doctor image deleted');
-          //   } catch (deleteError) {
-          //     console.error('Failed to delete previous image:', deleteError);
-          //     // Continue with upload even if delete fails
-          //   }
-          // }
+          if (isEditMode && doctorData.photo && !doctorData.photo.includes('/doctor.png')) {
+            try {
+              await deleteDoctorImage(doctorData.photo);
+            } catch (deleteError) {
+              console.error('Failed to delete previous image:', deleteError);
+            }
+          }
           
           photoUrl = await uploadDoctorImage(
             selectedFile,
@@ -206,12 +235,15 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
           );
         } catch (error) {
           console.error('Image upload failed:', error);
-          alert(`Image upload failed: ${error.message}`);
+          
+          alert(`Image upload failed: ${error.message}. Check console for details.`);
           setIsSubmitting(false);
           setIsUploading(false);
           return;
         }
       }
+
+      setIsUploading(false);
       
       // Ensure numeric fields are properly typed before submitting
       // Remove id field from doctorData before creating formattedData
@@ -293,6 +325,9 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
             value={doctorData.phone}
             onChange={handleChange}
             placeholder="XXXXXXXXXX"
+            maxLength={10}
+            type="number"
+            pattern="[0-9]{10}"
             required
           />
         </div>
@@ -328,11 +363,17 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
             name="experience"
             type="number"
             min="0"
+            max={doctorData.age ? doctorData.age - 18 : ""}
             value={doctorData.experience}
             onChange={handleChange}
             placeholder="10"
             required
           />
+          {doctorData.age && (
+            <p className="text-xs text-gray-500">
+              Maximum: {doctorData.age - 18} years (based on current age)
+            </p>
+          )}
         </div>
         
         <div className="space-y-2">
@@ -358,6 +399,9 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
             value={doctorData.aadhar}
             onChange={handleChange}
             placeholder="XXXX XXXX XXXX"
+            pattern="[0-9]{12}"
+            title="Aadhar number must be exactly 12 digits"
+            maxLength={12}
           />
         </div>
         
