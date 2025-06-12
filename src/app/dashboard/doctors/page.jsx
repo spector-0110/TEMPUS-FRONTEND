@@ -60,16 +60,17 @@ const DoctorsPage = () => {
       // Call the API to update the doctor details
       await updateDoctorDetails(validationResult.data);
       
-      // Refresh data from server
-      await backgroundRefresh();
-      
-      // Show success dialog
+       // Show success dialog
       setSuccessDialog({
         isOpen: true,
         title: 'Doctor Updated',
         message: 'Doctor details have been successfully updated.',
         details: []
       });
+      
+      // Refresh data from server
+      await backgroundRefresh();
+      
     } catch (error) {
       const errorObj = error || {};
       const errorMessage = errorObj.message || 'Unknown error';

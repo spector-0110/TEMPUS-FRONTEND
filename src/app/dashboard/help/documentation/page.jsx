@@ -8,9 +8,9 @@ const Documentation = () => {
             </div>
             <div className="prose max-w-none dark:prose-invert">
                 <section className="mb-10">
-                    <h2 className="text-2xl font-bold mb-4">Tempus Hospital Management System</h2>
+                    <h2 className="text-2xl font-bold mb-4">Tiqora Hospital Management System</h2>
                     <p className="mb-4">
-                        Welcome to the comprehensive documentation for the Tempus Hospital Management System. 
+                        Welcome to the comprehensive documentation for the Tiqora Hospital Management System. 
                         This guide provides detailed information about required fields, features, and error handling procedures.
                     </p>
                 </section>

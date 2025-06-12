@@ -46,8 +46,8 @@ export default function Home() {
           className="relative z-20 h-12 w-12 mr-2 rounded *:hover:opacity-40 transition-opacity duration-500 bg-white">
           <img
             style={{ backgroundColor: 'white' }}
-            src="/tempusLogo1.png"
-            alt="Tempus Logo"
+            src="/tiqoraLogo1.png"
+            alt="Tiqora Logo"
             className="h-12 w-14 mr-4 rounded-full *:hover:opacity-40 transition-opacity duration-500"
             />
         </Link>

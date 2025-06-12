@@ -39,10 +39,10 @@ export default function HelpPage() {
             </p>
           </div>
           <a
-            href="mailto:support@tempus.com"
+            href="mailto:info@tiqora.com"
             className="mt-6 text-base font-medium break-all"
           >
-            support@tempus.com
+            info@tiqora.com
           </a>
         </Card>
 

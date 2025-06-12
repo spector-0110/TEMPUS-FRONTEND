@@ -6,7 +6,7 @@ import { LogoutButton } from '@/components/ui/logout-button';
 // import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 export const metadata = {
-  title: 'Tempus - Hospital Management System',
+  title: 'Tiqora - Hospital Management System',
   description: 'Modern healthcare management platform',
 };
 

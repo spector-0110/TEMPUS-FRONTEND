@@ -43,7 +43,7 @@ export function AppSidebar({
   user: {
       name: hospitalDetails?.name || "Hospital Admin",
       email: hospitalDetails?.adminEmail || "admin@example.com",
-      avatar: hospitalDetails?.logo || "/tempusLogo1.png",
+      avatar: hospitalDetails?.logo || "/tiqoraLogo1.png",
   },
   navMain: [
     // {
@@ -114,8 +114,8 @@ export function AppSidebar({
               <a href="/dashboard">
                 <img
                   style={{ backgroundColor: 'white' }}
-                  src="/tempusLogo1.png"
-                  alt="Tempus Logo"
+                  src="/tiqoraLogo1.png"
+                  alt="Tiqora Logo"
                   className="h-8 w-8 mr-2 rounded *:hover:opacity-40 transition-opacity duration-500"
                 />
                 <span className="text-base font-semibold">{data.user.name}</span>

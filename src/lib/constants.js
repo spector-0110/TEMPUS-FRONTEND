@@ -66,5 +66,5 @@ export const shadows = {
 };
 
 // Application-specific constants
-export const APP_NAME = 'Tempus';
+export const APP_NAME = 'Tiqora';
 export const APP_DESCRIPTION = 'Modern healthcare management platform';
