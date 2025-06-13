@@ -13,6 +13,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
+      </head>
       <body className="bg-background text-foreground">
         <ThemeProvider
           attribute="class"

@@ -4,20 +4,21 @@ import { ServerConnectionError } from './errors';
 
 // Constants for API configuration
 const API_TIMEOUT = 15000; // 15 seconds timeout
+const PAYMENT_API_TIMEOUT = 60000; // 60 seconds timeout for payment APIs
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
 const INDIA_POST_API = 'https://api.postalpincode.in/pincode';
 
 
 export function generateSignature(timestampMs, secret) {
   // payload = JSON(body) + timestampMs
-  return CryptoJS.HmacSHA256(timestampMs,secret).toString();
+  return CryptoJS.HmacSHA256(timestampMs, secret).toString();
 }
 
 export function getHeaders() {
-  
+
   const timestampMs = Date.now().toString(); // UTC ms, no timezone
   const signature = generateSignature(timestampMs, SECRET);
-  
+
   return {
     'Content-Type': 'application/json',
     'x-timestamp': timestampMs,
@@ -32,12 +33,12 @@ export function getHeaders() {
  */
 async function getAuthToken() {
   let accessToken = null;
-  
+
   try {
     // First try to get from localStorage directly if available in browser context
     if (typeof window !== 'undefined' && window.localStorage) {
       const supabaseKey = Object.keys(localStorage).find(key => key.startsWith('sb-'));
-      
+
       if (supabaseKey) {
         try {
           const storedAuth = JSON.parse(localStorage.getItem(supabaseKey));
@@ -49,25 +50,25 @@ async function getAuthToken() {
         }
       }
     }
-    
+
     // If localStorage approach didn't work, try the Supabase API with timeout
     if (!accessToken) {
       const sessionPromise = supabase.auth.getSession();
-      const timeoutPromise = new Promise((_, reject) => 
+      const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error('Supabase session retrieval timed out after 5s')), 5000)
       );
-      
+
       const session = await Promise.race([sessionPromise, timeoutPromise]);
-      
+
       const token = session?.data;
       accessToken = token?.session?.access_token;
     }
-    
+
     if (!accessToken) {
       console.error('getAuthToken - No valid access token found');
       throw new Error('Authentication required. Please login again.');
     }
-    
+
     return accessToken;
   } catch (error) {
     console.error('getAuthToken - Failed to retrieve auth token:', error);
@@ -81,7 +82,7 @@ async function getAuthToken() {
 async function handleApiResponse(response, errorMessage = 'Request failed') {
   if (!response.ok) {
     let errorData;
-    
+
     try {
       errorData = await response.json();
     } catch (parseError) {
@@ -91,15 +92,15 @@ async function handleApiResponse(response, errorMessage = 'Request failed') {
       basicError.statusText = response.statusText;
       throw basicError;
     }
-    
+
     const apiError = new Error(errorData.error || errorMessage);
     apiError.status = response.status;
     apiError.data = errorData;
-    
+
     console.error('handleApiResponse - Error response:', apiError.message);
     throw apiError;
   }
-  
+
   return response.json();
 }
 
@@ -108,13 +109,16 @@ async function handleApiResponse(response, errorMessage = 'Request failed') {
  */
 async function fetchWithTimeout(url, options = {}) {
   const controller = new AbortController();
+  const timeout = options.timeout || API_TIMEOUT;
+  delete options.timeout; // Remove timeout from options to avoid fetch API errors
+
   const id = setTimeout(() => {
     controller.abort();
-  }, API_TIMEOUT);
-  
+  }, timeout);
+
   try {
     const startTime = Date.now();
-    
+
     // Combine user signal with our timeout signal if provided
     let signal = controller.signal;
     if (options.signal) {
@@ -122,25 +126,25 @@ async function fetchWithTimeout(url, options = {}) {
       const userController = { signal: options.signal };
       signal = AbortSignal.any([controller.signal, userController.signal]);
     }
-    
+
     const response = await fetch(url, {
       ...options,
       signal
     });
-    
+
     // const endTime = Date.now();
     // const responseTime = endTime - startTime;
     // console.log(`fetchWithTimeout [${requestId}] - Response received in ${responseTime}ms with status: ${response.status}`);
-    
+
     // if (responseTime > API_TIMEOUT * 0.8) {
     //   // Log warning for slow responses that are close to timeout
     //   console.warn(`fetchWithTimeout [${requestId}] - Response was slow (${responseTime}ms), close to timeout threshold`);
     // }
-    
+
     clearTimeout(id);
     return response;
   } catch (error) {
-    clearTimeout(id);    
+    clearTimeout(id);
     // Provide more detailed error information
     if (error.name === 'AbortError') {
       throw new ServerConnectionError(`Request to ${url} timed out after ${API_TIMEOUT}ms`);
@@ -149,7 +153,7 @@ async function fetchWithTimeout(url, options = {}) {
     } else if (error.message?.includes('NetworkError')) {
       throw new ServerConnectionError(`Network error while connecting to ${url}: ${error.message}`);
     }
-    
+
     throw error;
   }
 }
@@ -160,7 +164,7 @@ async function fetchWithTimeout(url, options = {}) {
 export async function checkServerStatus() {
   try {
     const response = await fetchWithTimeout(`${BASE_URL}`);
-    const res= await handleApiResponse(response, 'Server is not responding');
+    const res = await handleApiResponse(response, 'Server is not responding');
     return res;
   } catch (error) {
     if (error instanceof TypeError && error.message === 'Failed to fetch') {
@@ -179,7 +183,7 @@ export async function checkServerStatus() {
 export async function fetchHospitalFormFields() {
   try {
     const accessToken = await getAuthToken();
-    
+
     const response = await fetchWithTimeout(`${BASE_URL}/hospitals/form-config`, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -212,7 +216,7 @@ export async function fetchHospitalDetails() {
         'Content-Type': 'application/json'
       }
     });
-    
+
     return handleApiResponse(response, 'Failed to fetch hospital details');
   } catch (error) {
     console.error('Error fetching hospital details:', error);
@@ -234,7 +238,7 @@ export async function getTodayAndTomorrowandPastWeekAppointments() {
         'Content-Type': 'application/json'
       }
     });
-    
+
     return handleApiResponse(response, 'Failed to fetch appointment details');
   } catch (error) {
     console.error('Error fetching appointment details:', error);
@@ -257,7 +261,7 @@ export async function updateAppointmentStatus(appointmentId, status) {
       },
       body: JSON.stringify({ status })
     });
-    
+
     return handleApiResponse(response, 'Failed to update appointment status');
   } catch (error) {
     console.error('Error updating appointment status:', error);
@@ -273,13 +277,13 @@ export async function updateAppointmentPaymentStatus(appointmentId, paymentStatu
     const accessToken = await getAuthToken();
 
     const requestBody = { 'paymentStatus': paymentStatus };
-    
+
     // Add payment method if provided (for 'paid' status)
     if (paymentMethod) {
       requestBody.paymentMethod = paymentMethod;
     }
     // Add amount if provided (for 'paid' status)
-    if (amount) { 
+    if (amount) {
       requestBody.amount = amount;
     }
 
@@ -293,7 +297,7 @@ export async function updateAppointmentPaymentStatus(appointmentId, paymentStatu
       },
       body: JSON.stringify(requestBody)
     });
-    
+
     return handleApiResponse(response, 'Failed to update appointment payment status');
   } catch (error) {
     console.error('Error updating appointment payment status:', error);
@@ -314,7 +318,7 @@ export async function fetchAppointmentHistory() {
         'Content-Type': 'application/json'
       }
     });
-    
+
     return handleApiResponse(response, 'Failed to fetch appointment history details');
   } catch (error) {
     console.error('Error fetching appointment history details:', error);
@@ -328,7 +332,7 @@ export async function fetchAppointmentHistory() {
 export async function submitHospitalDetails(formData) {
   try {
     const accessToken = await getAuthToken();
-    
+
     const response = await fetchWithTimeout(`${BASE_URL}/hospitals/initial-details`, {
       method: 'POST',
       headers: {
@@ -338,7 +342,7 @@ export async function submitHospitalDetails(formData) {
       body: JSON.stringify(formData)
     });
 
-    const res=await handleApiResponse(response, 'Failed to submit hospital details');
+    const res = await handleApiResponse(response, 'Failed to submit hospital details');
     return res;
   } catch (error) {
     console.error('Error submitting form data:', {
@@ -355,7 +359,7 @@ export async function submitHospitalDetails(formData) {
 export async function getOTPforHospitalDetailsUpdate(formData) {
   try {
     const accessToken = await getAuthToken();
-    
+
     const response = await fetchWithTimeout(`${BASE_URL}/hospitals/request-edit-verification`, {
       method: 'POST',
       headers: {
@@ -364,7 +368,7 @@ export async function getOTPforHospitalDetailsUpdate(formData) {
       },
       body: JSON.stringify(formData)
     });
-    
+
     return handleApiResponse(response, 'Failed to submit hospital details');
   } catch (error) {
     console.error('Error submitting form data:', {
@@ -381,7 +385,7 @@ export async function getOTPforHospitalDetailsUpdate(formData) {
 export async function verifyOTPforHospitalDeatailsUpdate(formData) {
   try {
     const accessToken = await getAuthToken();
-    
+
     const response = await fetchWithTimeout(`${BASE_URL}/hospitals/verify-edit-otp`, {
       method: 'POST',
       headers: {
@@ -390,7 +394,7 @@ export async function verifyOTPforHospitalDeatailsUpdate(formData) {
       },
       body: JSON.stringify(formData)
     });
-    
+
     return handleApiResponse(response, 'Failed to submit hospital details');
   } catch (error) {
     console.error('Error submitting form data:', {
@@ -409,15 +413,15 @@ export async function updateHospitalDetailsAPI(updateData) {
 
     const accessToken = await getAuthToken();
     const response = await fetchWithTimeout(`${BASE_URL}/hospitals/update`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateData),
-        // Ensure we're not caching responses
-        cache: 'no-store'
-      });
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updateData),
+      // Ensure we're not caching responses
+      cache: 'no-store'
+    });
 
     const result = await handleApiResponse(response, 'Failed to update hospital details');
 
@@ -436,14 +440,14 @@ export async function getHospitalDashboard() {
 
     const accessToken = await getAuthToken();
     const response = await fetchWithTimeout(`${BASE_URL}/hospitals/dashboard`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        // Ensure we're not caching responses
-        cache: 'no-store'
-      });
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      // Ensure we're not caching responses
+      cache: 'no-store'
+    });
 
     const result = await handleApiResponse(response, 'Failed to fetch hospital dashboard details');
 
@@ -463,22 +467,22 @@ export async function createDoctor(updateData) {
   try {
     const accessToken = await getAuthToken();
     const response = await fetchWithTimeout(`${BASE_URL}/doctors/create-doctor`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateData),
-        // Ensure we're not caching responses
-        cache: 'no-store'
-      });
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updateData),
+      // Ensure we're not caching responses
+      cache: 'no-store'
+    });
 
     const result = await handleApiResponse(response, 'Failed to create doctor');
 
     return result;
   } catch (error) {
     console.error('createDoctor- Error creating doctor:', {
-    
+
       error
     });
     throw error;  // Pass through the detailed error from the backend
@@ -493,15 +497,15 @@ export async function updateDoctorDetails(updateData) {
 
     const accessToken = await getAuthToken();
     const response = await fetchWithTimeout(`${BASE_URL}/doctors/update-doctor`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateData),
-        // Ensure we're not caching responses
-        cache: 'no-store'
-      });
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updateData),
+      // Ensure we're not caching responses
+      cache: 'no-store'
+    });
 
     const result = await handleApiResponse(response, 'Failed to update doctor details');
 
@@ -525,15 +529,15 @@ export async function updateDoctorSchedule(updateData) {
 
     const accessToken = await getAuthToken();
     const response = await fetchWithTimeout(`${BASE_URL}/doctors/schedules`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateData),
-        // Ensure we're not caching responses
-        cache: 'no-store'
-      });
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updateData),
+      // Ensure we're not caching responses
+      cache: 'no-store'
+    });
 
     const result = await handleApiResponse(response, 'Failed to update doctor schedule details');
 
@@ -574,7 +578,7 @@ export async function fetchLocationByPincode(pincode) {
   try {
     const response = await fetchWithTimeout(`${INDIA_POST_API}/${pincode}`);
     const data = await handleApiResponse(response, 'Failed to fetch location by pincode');
-    
+
     if (data[0].Status === 'Success') {
       const postOffice = data[0].PostOffice[0];
       return {
@@ -652,11 +656,11 @@ export async function fetchAppointments(filters = {}) {
   try {
     const accessToken = await getAuthToken();
     const queryParams = new URLSearchParams();
-    
+
     if (filters.date) queryParams.append('date', filters.date);
     if (filters.status) queryParams.append('status', filters.status);
     if (filters.doctorId) queryParams.append('doctorId', filters.doctorId);
-    
+
     const response = await fetchWithTimeout(`${BASE_URL}/appointments?${queryParams.toString()}`, {
       method: 'GET',
       headers: {
@@ -682,7 +686,7 @@ export async function fetchDoctorAvailableSlots(doctorId, date = null) {
     const accessToken = await getAuthToken();
     const queryParams = new URLSearchParams();
     if (date) queryParams.append('date', date);
-    
+
     const response = await fetchWithTimeout(`${BASE_URL}/doctors/${doctorId}/available-slots?${queryParams.toString()}`, {
       method: 'GET',
       headers: {
@@ -707,7 +711,7 @@ export async function fetchDoctorAvailableSlots(doctorId, date = null) {
 export async function fetchPatientHistoryUsingMobileNumber(mobileNumber) {
   try {
     const accessToken = await getAuthToken();
-    
+
     // Using query parameters instead of body for GET request
     const response = await fetchWithTimeout(`${BASE_URL}/appointments/mobile?mobileNumber=${encodeURIComponent(mobileNumber)}`, {
       method: 'GET',
@@ -719,10 +723,60 @@ export async function fetchPatientHistoryUsingMobileNumber(mobileNumber) {
     });
 
     const result = await handleApiResponse(response, 'Failed to fetch patient history');
-    
+
     return result;
   } catch (error) {
     console.error('fetchPatientHistoryUsingMobileNumber - Error fetching patient history:', error);
+    throw error;
+  }
+}
+
+/**
+ * Creates a new Razorpay subscription order
+ */
+export async function createSubscriptionOrder(data) {
+  try {
+
+    const accessToken = await getAuthToken();
+
+    const response = await fetchWithTimeout(`${BASE_URL}/subscriptions/create-renew`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data),
+      timeout: PAYMENT_API_TIMEOUT, // Use extended timeout for payment
+    });
+
+    return await handleApiResponse(response, 'Failed to create subscription order');
+  } catch (error) {
+    console.error('createSubscriptionOrder - Error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Verifies Razorpay payment and activates subscription
+ */
+export async function verifySubscriptionPayment(data) {
+  try {
+
+    const accessToken = await getAuthToken();
+
+    const response = await fetchWithTimeout(`${BASE_URL}/subscriptions/verify-payment`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data),
+      timeout: PAYMENT_API_TIMEOUT, // Use extended timeout for payment
+    });
+
+    return await handleApiResponse(response, 'Failed to verify payment');
+  } catch (error) {
+    console.error('verifySubscriptionPayment - Error:', error);
     throw error;
   }
 }

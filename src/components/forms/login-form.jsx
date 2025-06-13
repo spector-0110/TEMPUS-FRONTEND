@@ -108,6 +108,8 @@ return (
                                 onChange={(e) => setPassword(e.target.value)}
                                 disabled={loading || googleLoading}
                                 required
+                                placeholder="••••••"
+
                                 className="pr-10 focus-visible:ring-2 focus-visible:ring-primary transition"
                             />
                             <button

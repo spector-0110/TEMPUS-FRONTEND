@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { useHospital } from '@/context/HospitalProvider';
 import { 
   Card, 
@@ -13,11 +14,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { CreditCard, Calendar, TrendingUp, Clock, AlertTriangle, CheckCircle, Shield, Zap } from 'lucide-react';
 
 const SubscriptionPage = () => {
-  const { hospitalDashboardDetails } = useHospital();
+  const { hospitalDashboardDetails, refreshHospitalDashboard } = useHospital();
   const [activeTab, setActiveTab] = useState('current');
-  
   const subscription = hospitalDashboardDetails?.subscription;
   
   // Format date to readable format
@@ -71,7 +73,7 @@ const SubscriptionPage = () => {
     }
   };
 
-  // Handle subscription button click - functionality to be added later
+  // Handle subscription button click
   const handleGetSubscription = () => {
     // This function will be implemented later
     console.log('Get subscription clicked');
@@ -79,7 +81,39 @@ const SubscriptionPage = () => {
 
   return (
     <div className="container mx-auto p-6 max-w-6xl">
-      <h1 className="text-3xl font-bold mb-6">Subscription Management</h1>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-3xl font-bold">Subscription Management</h1>
+          <p className="text-muted-foreground mt-1">
+            Manage your healthcare system subscription and billing
+          </p>
+        </div>
+        
+        {/* Quick Action Button */}
+        {needsRenewal() && (
+          <Button 
+            onClick={handleGetSubscription}
+            className="flex items-center gap-2"
+            size="lg"
+          >
+            <Zap className="h-4 w-4" />
+            {subscription?.currentStatus ? 'Renew Subscription' : 'Get Subscription'}
+          </Button>
+        )}
+      </div>
+
+      {/* Status Alert */}
+      {needsRenewal() && (
+        <Alert className="mb-6 border-orange-200 bg-orange-50">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription className="font-medium text-orange-800">
+            {subscription?.currentStatus?.status === 'EXPIRED' 
+              ? '⚠️ Your subscription has expired. Please renew to continue using all features.'
+              : '⚠️ Your subscription needs attention. Please complete your payment to activate all features.'
+            }
+          </AlertDescription>
+        </Alert>
+      )}
       
       <Tabs defaultValue="current" value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-3 w-[600px]">
@@ -160,7 +194,9 @@ const SubscriptionPage = () => {
               )}
             </CardContent>
             <CardFooter>
-              <Button onClick={handleGetSubscription}>Get Subscription</Button>
+              <Button onClick={handleGetSubscription} className="w-full">
+                {subscription?.currentStatus ? 'Manage Subscription' : 'Get Subscription'}
+              </Button>
             </CardFooter>
           </Card>
         </TabsContent>
@@ -179,19 +215,35 @@ const SubscriptionPage = () => {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="p-4 border rounded-lg">
                       <p className="text-sm text-muted-foreground">Total Upgrades</p>
-                      <p className="text-2xl font-bold">{subscription.history.upgrades}</p>
+                      <p className="text-2xl font-bold">
+                        {typeof subscription.history.upgrades === 'object' 
+                          ? JSON.stringify(subscription.history.upgrades) 
+                          : subscription.history.upgrades || 0}
+                      </p>
                     </div>
                     <div className="p-4 border rounded-lg">
                       <p className="text-sm text-muted-foreground">Total Downgrades</p>
-                      <p className="text-2xl font-bold">{subscription.history.downgrades}</p>
+                      <p className="text-2xl font-bold">
+                        {typeof subscription.history.downgrades === 'object' 
+                          ? JSON.stringify(subscription.history.downgrades) 
+                          : subscription.history.downgrades || 0}
+                      </p>
                     </div>
                     <div className="p-4 border rounded-lg">
                       <p className="text-sm text-muted-foreground">Total Renewals</p>
-                      <p className="text-2xl font-bold">{subscription.history.renewals}</p>
+                      <p className="text-2xl font-bold">
+                        {typeof subscription.history.renewals === 'object' 
+                          ? JSON.stringify(subscription.history.renewals) 
+                          : subscription.history.renewals || 0}
+                      </p>
                     </div>
                     <div className="p-4 border rounded-lg">
                       <p className="text-sm text-muted-foreground">Total Transactions</p>
-                      <p className="text-2xl font-bold">{subscription.history.totalTransactions}</p>
+                      <p className="text-2xl font-bold">
+                        {typeof subscription.history.totalTransactions === 'object' 
+                          ? JSON.stringify(subscription.history.totalTransactions) 
+                          : subscription.history.totalTransactions || 0}
+                      </p>
                     </div>
                   </div>
 
@@ -213,11 +265,19 @@ const SubscriptionPage = () => {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                           <p className="text-sm text-muted-foreground">Price</p>
-                          <p className="font-medium">₹{subscription.history.latestPlan.totalPrice}</p>
+                          <p className="font-medium">
+                            ₹{typeof subscription.history.latestPlan.totalPrice === 'object' 
+                              ? JSON.stringify(subscription.history.latestPlan.totalPrice) 
+                              : subscription.history.latestPlan.totalPrice || 0}
+                          </p>
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">Doctor Count</p>
-                          <p className="font-medium">{subscription.history.latestPlan.doctorCount}</p>
+                          <p className="font-medium">
+                            {typeof subscription.history.latestPlan.doctorCount === 'object' 
+                              ? JSON.stringify(subscription.history.latestPlan.doctorCount) 
+                              : subscription.history.latestPlan.doctorCount || 0}
+                          </p>
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">Billing Cycle</p>
@@ -237,13 +297,21 @@ const SubscriptionPage = () => {
                             {subscription.history.latestPlan.paymentMethod && (
                               <div>
                                 <p className="text-sm text-muted-foreground">Payment Method</p>
-                                <p className="font-medium">{subscription.history.latestPlan.paymentMethod}</p>
+                                <p className="font-medium">
+                                  {typeof subscription.history.latestPlan.paymentMethod === 'object' 
+                                    ? JSON.stringify(subscription.history.latestPlan.paymentMethod) 
+                                    : subscription.history.latestPlan.paymentMethod}
+                                </p>
                               </div>
                             )}
                             {subscription.history.latestPlan.paymentDetails && (
                               <div>
                                 <p className="text-sm text-muted-foreground">Payment Details</p>
-                                <p className="font-medium">{subscription.history.latestPlan.paymentDetails}</p>
+                                <p className="font-medium">
+                                  {typeof subscription.history.latestPlan.paymentDetails === 'object' 
+                                    ? JSON.stringify(subscription.history.latestPlan.paymentDetails) 
+                                    : subscription.history.latestPlan.paymentDetails}
+                                </p>
                               </div>
                             )}
                           </div>
