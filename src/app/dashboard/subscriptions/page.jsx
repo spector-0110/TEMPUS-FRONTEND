@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CreditCard, Calendar, TrendingUp, Clock, AlertTriangle, CheckCircle, Shield, Zap } from 'lucide-react';
+import { CreditCard, Calendar, TrendingUp, Clock, AlertTriangle, CheckCircle, Shield, Zap, DollarSign, Activity, Timer } from 'lucide-react';
 import { SubscriptionModal } from '@/components/subscription/SubscriptionModal';
 
 const SubscriptionPage = () => {
@@ -26,6 +26,7 @@ const SubscriptionPage = () => {
   const [activeTab, setActiveTab] = useState('current');
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const subscription = hospitalDashboardDetails?.subscription;
+  const subscriptionUsage = hospitalDashboardDetails?.subscription.subscriptionUsage;
   
   // Format date to readable format
   const formatDate = (dateString) => {
@@ -139,6 +140,44 @@ const SubscriptionPage = () => {
         )}
       </div>
 
+      {/* Quick Usage Summary */}
+      {subscriptionUsage && (
+        <div className={`${isMobile ? 'mb-4' : 'mb-6'}`}>
+          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+            <CardContent className="p-4">
+              <div className={`grid ${isMobile ? 'grid-cols-2 gap-4' : 'grid-cols-4 gap-4'}`}>
+                <div className="text-center">
+                  <p className="text-sm font-medium text-blue-600">Days Used</p>
+                  <p className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-blue-800`}>
+                    {subscriptionUsage.usageMetrics?.daysUsed || 0}
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-medium text-green-600">Days Left</p>
+                  <p className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-green-800`}>
+                    {subscriptionUsage.remainingDays}
+                  </p>
+                </div>
+                <div className={`text-center ${isMobile ? 'col-span-2' : ''}`}>
+                  <p className="text-sm font-medium text-purple-600">Remaining Value</p>
+                  <p className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-purple-800`}>
+                    ₹{subscriptionUsage.remainingAmount?.toFixed(2)}
+                  </p>
+                </div>
+                {!isMobile && (
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-orange-600">Usage</p>
+                    <p className="text-xl font-bold text-orange-800">
+                      {subscriptionUsage.usageMetrics?.percentageUsed}%
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Status Alert */}
       {needsRenewal() && (
         <Alert className="mb-6 border-orange-200 bg-orange-50">
@@ -178,6 +217,66 @@ const SubscriptionPage = () => {
             <CardContent>
               {subscription?.currentStatus ? (
                 <div className="space-y-6">
+                  {/* Usage Overview - if subscriptionUsage exists */}
+                  {subscriptionUsage && (
+                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-medium mb-4 text-blue-800`}>
+                        Subscription Usage
+                      </h3>
+                      <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-2 md:grid-cols-4 gap-4'}`}>
+                        <div className="text-center">
+                          <p className="text-sm text-blue-600">Days Used</p>
+                          <p className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-blue-800`}>
+                            {subscriptionUsage.usageMetrics?.daysUsed || 0}
+                          </p>
+                          <p className="text-xs text-blue-600">
+                            of {subscriptionUsage.totalDays} days
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm text-green-600">Remaining Days</p>
+                          <p className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-green-800`}>
+                            {subscriptionUsage.remainingDays}
+                          </p>
+                          <p className="text-xs text-green-600">
+                            {subscriptionUsage.usageMetrics?.percentageRemaining}% remaining
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm text-purple-600">Amount Used</p>
+                          <p className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-purple-800`}>
+                            ₹{(parseFloat(subscriptionUsage.subscriptionDetails?.totalPrice || 0) - subscriptionUsage.remainingAmount).toFixed(2)}
+                          </p>
+                          <p className="text-xs text-purple-600">
+                            {subscriptionUsage.usageMetrics?.percentageUsed}% used
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm text-orange-600">Daily Rate</p>
+                          <p className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-orange-800`}>
+                            ₹{subscriptionUsage.dailyRate?.toFixed(2)}
+                          </p>
+                          <p className="text-xs text-orange-600">per day</p>
+                        </div>
+                      </div>
+                      
+                      {/* Progress Bar */}
+                      <div className="mt-4">
+                        <div className="flex justify-between text-sm text-gray-600 mb-2">
+                          <span>Usage Progress</span>
+                          <span>{subscriptionUsage.usageMetrics?.percentageUsed}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${subscriptionUsage.usageMetrics?.percentageUsed || 0}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Existing subscription details */}
                   <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 gap-4'}`}>
                     <div className="space-y-2">
                       <p className="text-sm text-muted-foreground">Status</p>
@@ -235,7 +334,19 @@ const SubscriptionPage = () => {
                   </div>
                 </div>
               ) : (
-                <p className="text-muted-foreground">No active subscription found.</p>
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground mb-4">No active subscription found.</p>
+                  {subscriptionUsage && (
+                    <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <p className="text-sm text-yellow-800 mb-2">
+                        ⚠️ Usage data detected but no active subscription found.
+                      </p>
+                      <p className="text-xs text-yellow-600">
+                        Please contact support if you believe this is an error.
+                      </p>
+                    </div>
+                  )}
+                </div>
               )}
             </CardContent>
             <CardFooter>
@@ -381,61 +492,190 @@ const SubscriptionPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {subscription?.doctorTrends && subscription?.billingPerformance ? (
+              {(subscription?.doctorTrends && subscription?.billingPerformance) || subscriptionUsage ? (
                 <div className="space-y-8">
-                  <div className={`grid ${isMobile ? 'grid-cols-1 gap-6' : 'grid-cols-1 md:grid-cols-2 gap-6'}`}>
-                    {/* Doctor Trends */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className={`${isMobile ? 'text-base' : 'text-lg'}`}>
-                          Doctor Trends
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm text-muted-foreground">Current Count</p>
-                            <p className="font-medium">{subscription.doctorTrends.currentCount}</p>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm text-muted-foreground">Trend</p>
-                            <p className={`font-medium ${getTrendInfo(subscription.doctorTrends.trend).color}`}>
-                              {getTrendInfo(subscription.doctorTrends.trend).icon} {subscription.doctorTrends.trend}
-                            </p>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm text-muted-foreground">Growth</p>
-                            <p className="font-medium">{subscription.doctorTrends.growth}%</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                  {/* Usage Analytics - if subscriptionUsage exists */}
+                  {subscriptionUsage && (
+                    <div className="space-y-6">
+                      <h3 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold`}>
+                        Current Usage Analytics
+                      </h3>
+                      
+                      <div className={`grid ${isMobile ? 'grid-cols-1 gap-6' : 'grid-cols-1 md:grid-cols-3 gap-6'}`}>
+                        {/* Time Utilization */}
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className={`${isMobile ? 'text-sm' : 'text-base'} flex items-center gap-2`}>
+                              <Timer className="h-4 w-4" />
+                              Time Utilization
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm text-muted-foreground">Total Duration</p>
+                                <p className="font-medium">{subscriptionUsage.totalDays} days</p>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm text-muted-foreground">Days Used</p>
+                                <p className="font-medium text-blue-600">
+                                  {subscriptionUsage.usageMetrics?.daysUsed || 0} days
+                                </p>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm text-muted-foreground">Days Remaining</p>
+                                <p className="font-medium text-green-600">{subscriptionUsage.remainingDays} days</p>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                <div 
+                                  className="bg-blue-600 h-2 rounded-full"
+                                  style={{ width: `${subscriptionUsage.usageMetrics?.percentageUsed || 0}%` }}
+                                ></div>
+                              </div>
+                              <p className="text-center text-sm text-muted-foreground">
+                                {subscriptionUsage.usageMetrics?.percentageUsed}% utilized
+                              </p>
+                            </div>
+                          </CardContent>
+                        </Card>
 
-                    {/* Billing Performance */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className={`${isMobile ? 'text-base' : 'text-lg'}`}>
-                          Billing Performance
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm text-muted-foreground">Preferred Cycle</p>
-                            <p className="font-medium">{subscription.billingPerformance.cyclePreference}</p>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm text-muted-foreground">Renewal Rate</p>
-                            <p className="font-medium">{subscription.billingPerformance.renewalRate}%</p>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm text-muted-foreground">Average Cycle (days)</p>
-                            <p className="font-medium">{subscription.billingPerformance.averageCycleDuration}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                        {/* Financial Utilization */}
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className={`${isMobile ? 'text-sm' : 'text-base'} flex items-center gap-2`}>
+                              <DollarSign className="h-4 w-4" />
+                              Financial Utilization
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm text-muted-foreground">Total Value</p>
+                                <p className="font-medium">₹{subscriptionUsage.subscriptionDetails?.totalPrice}</p>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm text-muted-foreground">Amount Used</p>
+                                <p className="font-medium text-purple-600">
+                                  ₹{(parseFloat(subscriptionUsage.subscriptionDetails?.totalPrice || 0) - subscriptionUsage.remainingAmount).toFixed(2)}
+                                </p>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm text-muted-foreground">Remaining</p>
+                                <p className="font-medium text-green-600">₹{subscriptionUsage.remainingAmount?.toFixed(2)}</p>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                <div 
+                                  className="bg-purple-600 h-2 rounded-full"
+                                  style={{ width: `${subscriptionUsage.usageMetrics?.percentageUsed || 0}%` }}
+                                ></div>
+                              </div>
+                              <p className="text-center text-sm text-muted-foreground">
+                                {subscriptionUsage.usageMetrics?.percentageRemaining}% remaining value
+                              </p>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        {/* Daily Metrics */}
+                        <Card>
+                          <CardHeader className="pb-3">
+                            <CardTitle className={`${isMobile ? 'text-sm' : 'text-base'} flex items-center gap-2`}>
+                              <Activity className="h-4 w-4" />
+                              Daily Metrics
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm text-muted-foreground">Daily Rate</p>
+                                <p className="font-medium">₹{subscriptionUsage.dailyRate?.toFixed(2)}</p>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm text-muted-foreground">Avg. Cost/Doctor</p>
+                                <p className="font-medium text-orange-600">
+                                  ₹{(subscriptionUsage.dailyRate / (subscriptionUsage.subscriptionDetails?.doctorCount || 1))?.toFixed(2)}
+                                </p>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm text-muted-foreground">Total Doctors</p>
+                                <p className="font-medium">{subscriptionUsage.subscriptionDetails?.doctorCount}</p>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm text-muted-foreground">Billing Cycle</p>
+                                <p className="font-medium text-blue-600">
+                                  {subscriptionUsage.subscriptionDetails?.billingCycle === 'MONTHLY' ? 'Monthly' : 
+                                   subscriptionUsage.subscriptionDetails?.billingCycle === 'YEARLY' ? 'Yearly' : 
+                                   subscriptionUsage.subscriptionDetails?.billingCycle}
+                                </p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Existing analytics content */}
+                  {subscription?.doctorTrends && subscription?.billingPerformance && (
+                    <div>
+                      <h3 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold mb-6`}>
+                        Historical Analytics
+                      </h3>
+                      <div className={`grid ${isMobile ? 'grid-cols-1 gap-6' : 'grid-cols-1 md:grid-cols-2 gap-6'}`}>
+                        {/* Doctor Trends */}
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className={`${isMobile ? 'text-base' : 'text-lg'}`}>
+                              Doctor Trends
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm text-muted-foreground">Current Count</p>
+                                <p className="font-medium">{subscription.doctorTrends.currentCount}</p>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm text-muted-foreground">Trend</p>
+                                <p className={`font-medium ${getTrendInfo(subscription.doctorTrends.trend).color}`}>
+                                  {getTrendInfo(subscription.doctorTrends.trend).icon} {subscription.doctorTrends.trend}
+                                </p>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm text-muted-foreground">Growth</p>
+                                <p className="font-medium">{subscription.doctorTrends.growth}%</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        {/* Billing Performance */}
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className={`${isMobile ? 'text-base' : 'text-lg'}`}>
+                              Billing Performance
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm text-muted-foreground">Preferred Cycle</p>
+                                <p className="font-medium">{subscription.billingPerformance.cyclePreference}</p>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm text-muted-foreground">Renewal Rate</p>
+                                <p className="font-medium">{subscription.billingPerformance.renewalRate}%</p>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm text-muted-foreground">Average Cycle (days)</p>
+                                <p className="font-medium">{subscription.billingPerformance.averageCycleDuration}</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <p className="text-muted-foreground">No analytics data available.</p>
