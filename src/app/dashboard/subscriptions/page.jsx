@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useHospital } from '@/context/HospitalProvider';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { 
   Card, 
   CardHeader, 
@@ -16,10 +17,14 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CreditCard, Calendar, TrendingUp, Clock, AlertTriangle, CheckCircle, Shield, Zap } from 'lucide-react';
+import { SubscriptionModal } from '@/components/subscription/SubscriptionModal';
 
 const SubscriptionPage = () => {
-  const { hospitalDashboardDetails, refreshHospitalDashboard } = useHospital();
+  const { hospitalDashboardDetails, debouncedRefresh } = useHospital();
+  const isMobile = useIsMobile();
+  
   const [activeTab, setActiveTab] = useState('current');
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const subscription = hospitalDashboardDetails?.subscription;
   
   // Format date to readable format
@@ -62,7 +67,7 @@ const SubscriptionPage = () => {
   // Get payment status badge color
   const getPaymentStatusBadge = (status) => {
     switch(status?.toUpperCase()) {
-      case 'PAID':
+      case 'SUCCESS':
         return <Badge className="bg-green-500">Paid</Badge>;
       case 'PENDING':
         return <Badge className="bg-yellow-500">Pending</Badge>;
@@ -75,16 +80,48 @@ const SubscriptionPage = () => {
 
   // Handle subscription button click
   const handleGetSubscription = () => {
-    // This function will be implemented later
-    console.log('Get subscription clicked');
+    setShowSubscriptionModal(true);
+  };
+
+  // Handle successful subscription
+  const handleSubscriptionSuccess = (newSubscription) => {
+    toast.success('Subscription activated successfully!', {
+      description: `Your subscription has been successfully activated.`
+    });
+    
+    // Refresh hospital dashboard to get updated subscription data
+    if (debouncedRefresh) {
+      debouncedRefresh();
+    }
+    
+    // Switch to current tab to show updated subscription
+    setActiveTab('current');
+    
+    // Close modal
+    setShowSubscriptionModal(false);
+  };
+
+  // Get current doctor count for modal
+  const getCurrentDoctorCount = () => {
+    return subscription?.currentStatus?.doctorCount || 1;
+  };
+
+  // Check if subscription is expired or needs renewal
+  const needsRenewal = () => {
+    if (!subscription?.currentStatus) return true;
+    
+    const status = subscription.currentStatus.status?.toUpperCase();
+    return status === 'EXPIRED' || status === 'PENDING';
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">Subscription Management</h1>
-          <p className="text-muted-foreground mt-1">
+    <div className={`container mx-auto p-3 sm:p-6 max-w-6xl ${isMobile ? 'px-2' : ''}`}>
+      <div className={`flex ${isMobile ? 'flex-col space-y-4' : 'items-center justify-between'} mb-6`}>
+        <div className={isMobile ? 'text-center' : ''}>
+          <h1 className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold`}>
+            Subscription Management
+          </h1>
+          <p className={`text-muted-foreground mt-1 ${isMobile ? 'text-sm' : ''}`}>
             Manage your healthcare system subscription and billing
           </p>
         </div>
@@ -93,8 +130,8 @@ const SubscriptionPage = () => {
         {needsRenewal() && (
           <Button 
             onClick={handleGetSubscription}
-            className="flex items-center gap-2"
-            size="lg"
+            className={`flex items-center gap-2 ${isMobile ? 'w-full' : ''}`}
+            size={isMobile ? "default" : "lg"}
           >
             <Zap className="h-4 w-4" />
             {subscription?.currentStatus ? 'Renew Subscription' : 'Get Subscription'}
@@ -116,24 +153,32 @@ const SubscriptionPage = () => {
       )}
       
       <Tabs defaultValue="current" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-3 w-[600px]">
-          <TabsTrigger value="current">Current Subscription</TabsTrigger>
-          <TabsTrigger value="history">Subscription History</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        <TabsList className={`grid grid-cols-3 ${isMobile ? 'w-full h-12' : 'w-[600px]'}`}>
+          <TabsTrigger value="current" className={isMobile ? 'text-xs' : ''}>
+            {isMobile ? 'Current' : 'Current Subscription'}
+          </TabsTrigger>
+          <TabsTrigger value="history" className={isMobile ? 'text-xs' : ''}>
+            {isMobile ? 'History' : 'Subscription History'}
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className={isMobile ? 'text-xs' : ''}>
+            Analytics
+          </TabsTrigger>
         </TabsList>
         
         <TabsContent value="current" className="mt-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl">Current Subscription</CardTitle>
-              <CardDescription>
+              <CardTitle className={`${isMobile ? 'text-xl' : 'text-2xl'}`}>
+                Current Subscription
+              </CardTitle>
+              <CardDescription className={isMobile ? 'text-sm' : ''}>
                 Details about your active subscription plan
               </CardDescription>
             </CardHeader>
             <CardContent>
               {subscription?.currentStatus ? (
                 <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 gap-4'}`}>
                     <div className="space-y-2">
                       <p className="text-sm text-muted-foreground">Status</p>
                       <div className="font-medium">
@@ -148,7 +193,7 @@ const SubscriptionPage = () => {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 gap-4'}`}>
                     <div className="space-y-2">
                       <p className="text-sm text-muted-foreground">Price</p>
                       <p className="font-medium">₹{subscription.currentStatus.totalPrice}</p>
@@ -159,7 +204,7 @@ const SubscriptionPage = () => {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 gap-4'}`}>
                     <div className="space-y-2">
                       <p className="text-sm text-muted-foreground">Billing Cycle</p>
                       <p className="font-medium">
@@ -176,7 +221,7 @@ const SubscriptionPage = () => {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 gap-4'}`}>
                     <div className="space-y-2">
                       <p className="text-sm text-muted-foreground">End Date</p>
                       <p className="font-medium">{formatDate(subscription.currentStatus.endDate)}</p>
@@ -204,121 +249,119 @@ const SubscriptionPage = () => {
         <TabsContent value="history" className="mt-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl">Subscription History</CardTitle>
-              <CardDescription>
+              <CardTitle className={`${isMobile ? 'text-xl' : 'text-2xl'}`}>
+                Subscription History
+              </CardTitle>
+              <CardDescription className={isMobile ? 'text-sm' : ''}>
                 Your subscription history and changes over time
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {subscription?.history ? (
-                <div className="space-y-8">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {subscription?.history.history && Array.isArray(subscription.history.history) && subscription.history.history.length > 0 ? (
+                <div className="space-y-6">
+                  {/* Summary Stats */}
+                  <div className={`grid ${isMobile ? 'grid-cols-2 gap-4' : 'grid-cols-2 md:grid-cols-4 gap-4'}`}>
                     <div className="p-4 border rounded-lg">
-                      <p className="text-sm text-muted-foreground">Total Upgrades</p>
-                      <p className="text-2xl font-bold">
-                        {typeof subscription.history.upgrades === 'object' 
-                          ? JSON.stringify(subscription.history.upgrades) 
-                          : subscription.history.upgrades || 0}
+                      <p className="text-sm text-muted-foreground">Total Records</p>
+                      <p className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold`}>
+                        {subscription.history.history.length}
                       </p>
                     </div>
                     <div className="p-4 border rounded-lg">
-                      <p className="text-sm text-muted-foreground">Total Downgrades</p>
-                      <p className="text-2xl font-bold">
-                        {typeof subscription.history.downgrades === 'object' 
-                          ? JSON.stringify(subscription.history.downgrades) 
-                          : subscription.history.downgrades || 0}
+                      <p className="text-sm text-muted-foreground">Successful Payments</p>
+                      <p className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-green-600`}>
+                        {subscription.history.history.filter(record => record.paymentStatus === 'SUCCESS').length}
                       </p>
                     </div>
                     <div className="p-4 border rounded-lg">
-                      <p className="text-sm text-muted-foreground">Total Renewals</p>
-                      <p className="text-2xl font-bold">
-                        {typeof subscription.history.renewals === 'object' 
-                          ? JSON.stringify(subscription.history.renewals) 
-                          : subscription.history.renewals || 0}
+                      <p className="text-sm text-muted-foreground">Failed Payments</p>
+                      <p className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-red-600`}>
+                        {subscription.history.history.filter(record => record.paymentStatus === 'FAILED').length}
                       </p>
                     </div>
                     <div className="p-4 border rounded-lg">
-                      <p className="text-sm text-muted-foreground">Total Transactions</p>
-                      <p className="text-2xl font-bold">
-                        {typeof subscription.history.totalTransactions === 'object' 
-                          ? JSON.stringify(subscription.history.totalTransactions) 
-                          : subscription.history.totalTransactions || 0}
+                      <p className="text-sm text-muted-foreground">Pending Payments</p>
+                      <p className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-yellow-600`}>
+                        {subscription.history.history.filter(record => record.paymentStatus === 'PENDING').length}
                       </p>
                     </div>
                   </div>
 
-                  {subscription.history.latestPlan && (
-                    <div className="border rounded-lg p-4 space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="text-lg font-medium">Latest Plan Details</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {formatDate(subscription.history.latestPlan.startDate)} - {formatDate(subscription.history.latestPlan.endDate)}
-                          </p>
-                        </div>
-                        <div className="flex flex-col gap-2 items-end">
-                          <div>{getPaymentStatusBadge(subscription.history.latestPlan.paymentStatus)}</div>
-                          <p className="text-xs text-muted-foreground">Created: {formatDate(subscription.history.latestPlan.createdAt)}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Price</p>
-                          <p className="font-medium">
-                            ₹{typeof subscription.history.latestPlan.totalPrice === 'object' 
-                              ? JSON.stringify(subscription.history.latestPlan.totalPrice) 
-                              : subscription.history.latestPlan.totalPrice || 0}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Doctor Count</p>
-                          <p className="font-medium">
-                            {typeof subscription.history.latestPlan.doctorCount === 'object' 
-                              ? JSON.stringify(subscription.history.latestPlan.doctorCount) 
-                              : subscription.history.latestPlan.doctorCount || 0}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Billing Cycle</p>
-                          <p className="font-medium">
-                            {subscription.history.latestPlan.billingCycle === 'MONTHLY' 
-                              ? 'Monthly' 
-                              : subscription.history.latestPlan.billingCycle === 'YEARLY' 
-                                ? 'Yearly' 
-                                : subscription.history.latestPlan.billingCycle}
-                          </p>
-                        </div>
-                      </div>
-
-                      {(subscription.history.latestPlan.paymentMethod || subscription.history.latestPlan.paymentDetails) && (
-                        <div className="mt-2 pt-2 border-t border-border">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {subscription.history.latestPlan.paymentMethod && (
-                              <div>
-                                <p className="text-sm text-muted-foreground">Payment Method</p>
-                                <p className="font-medium">
-                                  {typeof subscription.history.latestPlan.paymentMethod === 'object' 
-                                    ? JSON.stringify(subscription.history.latestPlan.paymentMethod) 
-                                    : subscription.history.latestPlan.paymentMethod}
-                                </p>
-                              </div>
-                            )}
-                            {subscription.history.latestPlan.paymentDetails && (
-                              <div>
-                                <p className="text-sm text-muted-foreground">Payment Details</p>
-                                <p className="font-medium">
-                                  {typeof subscription.history.latestPlan.paymentDetails === 'object' 
-                                    ? JSON.stringify(subscription.history.latestPlan.paymentDetails) 
-                                    : subscription.history.latestPlan.paymentDetails}
-                                </p>
-                              </div>
-                            )}
+                  {/* History Records */}
+                  <div className="space-y-4">
+                    <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-medium`}>
+                      Subscription Records (Most Recent First)
+                    </h3>
+                    <div className="space-y-4">
+                      {subscription.history.history
+                        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                        .map((record, index) => (
+                        <div key={record.id} className="border rounded-lg p-4 space-y-4">
+                          <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'items-center justify-between'}`}>
+                            <div className={isMobile ? 'text-center' : ''}>
+                              <h4 className={`${isMobile ? 'text-sm' : 'text-base'} font-medium`}>
+                                Record #{subscription.history.history.length - index}
+                              </h4>
+                              <p className="text-sm text-muted-foreground">
+                                {formatDate(record.startDate)} - {formatDate(record.endDate)}
+                              </p>
+                            </div>
+                            <div className={`flex ${isMobile ? 'flex-row justify-center' : 'flex-col'} gap-2 items-${isMobile ? 'center' : 'end'}`}>
+                              <div>{getPaymentStatusBadge(record.paymentStatus)}</div>
+                              <p className="text-xs text-muted-foreground">Created: {formatDate(record.createdAt)}</p>
+                            </div>
                           </div>
+                          
+                          <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-3 gap-4'}`}>
+                            <div>
+                              <p className="text-sm text-muted-foreground">Price</p>
+                              <p className="font-medium">₹{record.totalPrice}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">Doctor Count</p>
+                              <p className="font-medium">{record.doctorCount}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">Billing Cycle</p>
+                              <p className="font-medium">
+                                {record.billingCycle === 'MONTHLY' 
+                                  ? 'Monthly' 
+                                  : record.billingCycle === 'YEARLY' 
+                                    ? 'Yearly' 
+                                    : record.billingCycle}
+                              </p>
+                            </div>
+                          </div>
+
+                          {(record.paymentMethod || (record.paymentDetails && Object.keys(record.paymentDetails).length > 0)) && (
+                            <div className="mt-2 pt-2 border-t border-border">
+                              <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 md:grid-cols-2 gap-4'}`}>
+                                {record.paymentMethod && (
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">Payment Method</p>
+                                    <p className="font-medium">{record.paymentMethod}</p>
+                                  </div>
+                                )}
+                                {record.paymentDetails && Object.keys(record.paymentDetails).length > 0 && (
+                                  <div>
+                                    <p className="text-sm text-muted-foreground">Payment ID</p>
+                                    <p className="font-medium text-xs font-mono">
+                                      {record.paymentDetails.id || 'N/A'}
+                                    </p>
+                                    {record.paymentDetails.method && (
+                                      <p className="text-xs text-muted-foreground mt-1">
+                                        Method: {record.paymentDetails.method}
+                                      </p>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      )}
+                      ))}
                     </div>
-                  )}
+                  </div>
                 </div>
               ) : (
                 <p className="text-muted-foreground">No subscription history found.</p>
@@ -330,19 +373,23 @@ const SubscriptionPage = () => {
         <TabsContent value="analytics" className="mt-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl">Subscription Analytics</CardTitle>
-              <CardDescription>
+              <CardTitle className={`${isMobile ? 'text-xl' : 'text-2xl'}`}>
+                Subscription Analytics
+              </CardTitle>
+              <CardDescription className={isMobile ? 'text-sm' : ''}>
                 Analytics and trends for your subscription
               </CardDescription>
             </CardHeader>
             <CardContent>
               {subscription?.doctorTrends && subscription?.billingPerformance ? (
                 <div className="space-y-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className={`grid ${isMobile ? 'grid-cols-1 gap-6' : 'grid-cols-1 md:grid-cols-2 gap-6'}`}>
                     {/* Doctor Trends */}
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-lg">Doctor Trends</CardTitle>
+                        <CardTitle className={`${isMobile ? 'text-base' : 'text-lg'}`}>
+                          Doctor Trends
+                        </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-4">
@@ -367,7 +414,9 @@ const SubscriptionPage = () => {
                     {/* Billing Performance */}
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-lg">Billing Performance</CardTitle>
+                        <CardTitle className={`${isMobile ? 'text-base' : 'text-lg'}`}>
+                          Billing Performance
+                        </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-4">
@@ -395,6 +444,16 @@ const SubscriptionPage = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Subscription Modal */}
+      <SubscriptionModal
+        isOpen={showSubscriptionModal}
+        onClose={() => setShowSubscriptionModal(false)}
+        onSuccess={handleSubscriptionSuccess}
+        currentDoctorCount={getCurrentDoctorCount()}
+        hospitalName={hospitalDashboardDetails?.hospitalInfo?.name || ''}
+        hospitalEmail={hospitalDashboardDetails?.hospitalInfo?.adminEmail || ''}
+      />
     </div>
   );
 };

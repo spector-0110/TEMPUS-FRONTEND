@@ -764,7 +764,7 @@ export async function verifySubscriptionPayment(data) {
 
     const accessToken = await getAuthToken();
 
-    const response = await fetchWithTimeout(`${BASE_URL}/subscriptions/verify-payment`, {
+    const response = await fetchWithTimeout(`${BASE_URL}/subscriptions/verify-renew`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
