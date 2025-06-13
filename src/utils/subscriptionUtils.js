@@ -2,7 +2,7 @@
 
 export const PRICING_CONFIG = {
   BASE_PRICE_PER_DOCTOR: 4999.99,
-  YEARLY_DISCOUNT_PERCENTAGE: 20,
+  YEARLY_DISCOUNT_PERCENTAGE: 12,
   VOLUME_DISCOUNTS: [
     { minDoctors: 10, discount: 10, label: '10+ doctors' },
     { minDoctors: 20, discount: 15, label: '20+ doctors' },
@@ -17,11 +17,10 @@ export const BILLING_CYCLES = {
 
 /**
  * Calculate the applicable volume discount
- * @param {number} doctorCount - Number of doctors
- * @returns {Object} - { discount: number, label: string }
+ * @param {number} doctorCount
+ * @returns {{ discount: number, label: string }}
  */
 export function getVolumeDiscount(doctorCount) {
-  // Find the highest applicable discount
   const applicableDiscount = PRICING_CONFIG.VOLUME_DISCOUNTS
     .filter(tier => doctorCount >= tier.minDoctors)
     .sort((a, b) => b.discount - a.discount)[0];
@@ -31,8 +30,8 @@ export function getVolumeDiscount(doctorCount) {
 
 /**
  * Calculate subscription pricing with all applicable discounts
- * @param {number} doctorCount - Number of doctors
- * @param {string} billingCycle - MONTHLY or YEARLY
+ * @param {number} doctorCount
+ * @param {string} billingCycle - 'MONTHLY' or 'YEARLY'
  * @returns {Object} - Detailed pricing breakdown
  */
 export function calculateSubscriptionPrice(doctorCount, billingCycle) {
@@ -52,30 +51,30 @@ export function calculateSubscriptionPrice(doctorCount, billingCycle) {
 
   const basePrice = PRICING_CONFIG.BASE_PRICE_PER_DOCTOR;
   const subtotal = basePrice * doctorCount;
-  
+
   const volumeDiscountInfo = getVolumeDiscount(doctorCount);
   const volumeDiscountAmount = (subtotal * volumeDiscountInfo.discount) / 100;
-  
+  const afterVolumeDiscount = subtotal - volumeDiscountAmount;
+
   let yearlyDiscountAmount = 0;
+  let finalPrice = afterVolumeDiscount;
+
   if (billingCycle === BILLING_CYCLES.YEARLY) {
-    yearlyDiscountAmount = (subtotal * PRICING_CONFIG.YEARLY_DISCOUNT_PERCENTAGE) / 100;
+    yearlyDiscountAmount = (afterVolumeDiscount * PRICING_CONFIG.YEARLY_DISCOUNT_PERCENTAGE) / 100;
+    finalPrice = (afterVolumeDiscount - yearlyDiscountAmount) * 12;
   }
-  
+
   const totalDiscountAmount = volumeDiscountAmount + yearlyDiscountAmount;
-  const finalPrice = subtotal - totalDiscountAmount;
   const pricePerDoctor = finalPrice / doctorCount;
-  
-  // Calculate savings compared to monthly without any discounts
-  const monthlyBaseTotal = subtotal;
-  const savings = monthlyBaseTotal - finalPrice;
-  
+  const savings = (subtotal * (billingCycle === BILLING_CYCLES.YEARLY ? 12 : 1)) - finalPrice;
+
   const discountDetails = [];
   if (volumeDiscountInfo.discount > 0) {
     discountDetails.push({
       type: 'volume',
       label: `Volume discount (${volumeDiscountInfo.label})`,
       percentage: volumeDiscountInfo.discount,
-      amount: volumeDiscountAmount
+      amount: Math.round(volumeDiscountAmount * 100) / 100
     });
   }
   if (yearlyDiscountAmount > 0) {
@@ -83,24 +82,23 @@ export function calculateSubscriptionPrice(doctorCount, billingCycle) {
       type: 'yearly',
       label: 'Annual billing discount',
       percentage: PRICING_CONFIG.YEARLY_DISCOUNT_PERCENTAGE,
-      amount: yearlyDiscountAmount
+      amount: Math.round(yearlyDiscountAmount * 12 * 100) / 100
     });
   }
-  
+
   return {
     basePrice,
-    subtotal,
-    yearlyDiscount: yearlyDiscountAmount,
-    volumeDiscount: volumeDiscountAmount,
-    totalDiscount: totalDiscountAmount,
-    finalPrice: Math.round(finalPrice * 100) / 100, // Round to 2 decimal places
+    subtotal: Math.round(subtotal * 100) / 100,
+    yearlyDiscount: Math.round(yearlyDiscountAmount * 12 * 100) / 100,
+    volumeDiscount: Math.round(volumeDiscountAmount * 100) / 100,
+    totalDiscount: Math.round(totalDiscountAmount * 12 * 100) / 100,
+    finalPrice: Math.round(finalPrice * 100) / 100,
     pricePerDoctor: Math.round(pricePerDoctor * 100) / 100,
     savings: Math.round(savings * 100) / 100,
     discountDetails,
     volumeDiscountInfo
   };
 }
-
 /**
  * Format price to Indian currency format
  * @param {number} amount - Amount to format
