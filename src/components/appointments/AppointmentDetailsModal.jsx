@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
-import { Calendar, Clock, User, Phone, Mail, MapPin, Stethoscope, AlertCircle, CheckCircle, XCircle, CreditCard, Smartphone, IndianRupee } from "lucide-react";
+import { Calendar, Clock, User, Phone, Mail, MapPin, Stethoscope, AlertCircle, CheckCircle, XCircle, CreditCard, Smartphone, IndianRupee, FileText, Download } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
 
@@ -84,8 +84,82 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
     title: '',
     description: ''
   });
+  const [downloadingFiles, setDownloadingFiles] = useState({});
 
   if (!appointment) return null;
+
+  // Function to download file to local device
+
+  const downloadFile = async (url, fileName) => {
+    try {
+      // Track this specific file download
+      setDownloadingFiles(prev => ({ ...prev, [fileName]: true }));
+      
+      // Fetch the file
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error('Failed to download file');
+      }
+      
+      // Get the blob from the response
+      const blob = await response.blob();
+      
+      // Determine MIME type for PDF or images
+      const fileExtension = fileName.split('.').pop()?.toLowerCase();
+      let mimeType;
+      
+      switch (fileExtension) {
+        case 'pdf':
+          mimeType = 'application/pdf';
+          break;
+        case 'jpg':
+        case 'jpeg':
+          mimeType = 'image/jpeg';
+          break;
+        case 'png':
+          mimeType = 'image/png';
+          break;
+        case 'gif':
+          mimeType = 'image/gif';
+          break;
+        case 'webp':
+          mimeType = 'image/webp';
+          break;
+        default:
+          // Use the blob's type or default to octet-stream
+          mimeType = blob.type || 'application/octet-stream';
+      }
+      
+      // Create a blob with the correct MIME type
+      const typedBlob = new Blob([blob], { type: mimeType });
+      
+      // Create a URL for the blob
+      const blobUrl = window.URL.createObjectURL(typedBlob);
+      
+      // Create a temporary anchor element
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = fileName; // Set the file name
+      
+      // Append to the document
+      document.body.appendChild(link);
+      
+      // Programmatically click the link to trigger download
+      link.click();
+      
+      // Clean up
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+      
+      // Mark download as complete for this file
+      setDownloadingFiles(prev => ({ ...prev, [fileName]: false }));
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      setDownloadingFiles(prev => ({ ...prev, [fileName]: false }));
+      alert(`Failed to download ${fileName}. Please try again.`);
+    }
+  };
 
   const statusInfo = statusConfig[appointment.status?.toLowerCase()];
   const StatusIcon = statusInfo.icon;
@@ -446,7 +520,6 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
               </CardContent>
             </Card>
           )}
-
           {/* Status Update Actions */}
           <div className="grid md:grid-cols-2 gap-6">
             {/* Appointment Status Updates */}
@@ -531,6 +604,73 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
             </Card>
           )}
         </div>
+
+
+        {/* Documents Section */}
+          {appointment.documents && appointment.documents.length > 0 && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-purple-600" />
+                  Documents
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {appointment.documents.map((doc, index) => {
+                    const fileName = doc.split('/').pop();
+                    const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(fileName);
+                    const isPdf = /\.pdf$/i.test(fileName);
+                    
+                    return (
+                      <div key={index} className="flex items-center justify-between border rounded-md p-3 hover:bg-gray-900 transition-colors">
+                        <div className="flex items-center gap-3">
+                          {isImage ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500">
+                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                              <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                          ) : isPdf ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-500">
+                              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                              <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
+                              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                              <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                          )}
+                          <span className="text-sm truncate max-w-[150px]">{fileName}</span>
+                        </div>
+                        <button 
+                          onClick={() => downloadFile(doc, fileName)}
+                          disabled={downloadingFiles[fileName]}
+                          className="flex items-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md px-2 py-1 transition-colors disabled:opacity-50"
+                        >
+                          {downloadingFiles[fileName] ? (
+                            <>
+                              <svg className="animate-spin -ml-1 mr-2 h-3 w-3 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              Downloading...
+                            </>
+                          ) : (
+                            <>
+                              <Download className="h-3 w-3" />
+                              Download
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
         <div className="flex justify-end pt-4">
           <Button variant="outline" onClick={onClose}>

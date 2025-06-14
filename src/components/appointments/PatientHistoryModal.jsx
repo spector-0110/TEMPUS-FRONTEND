@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { History, CheckCircle, XCircle, Clock, ExternalLink } from 'lucide-react';
+import { History, CheckCircle, XCircle, Clock, ExternalLink, FileText } from 'lucide-react';
 import { fetchPatientHistoryUsingMobileNumber } from '@/lib/api';
 
 export default function PatientHistoryModal({ 
@@ -149,6 +149,7 @@ export default function PatientHistoryModal({
         paymentStatus: apt.paymentStatus,
         createdAt: apt.createdAt,
         doctor: apt.doctor,
+        documents: apt.documents || [], // Add documents array
         // Legacy format for compatibility
         patient: {
           name: apt.patientName,
@@ -233,7 +234,7 @@ export default function PatientHistoryModal({
                           {(apt.paymentStatus || 'unpaid').toUpperCase()}{getPaymentMethodDisplay(apt.paymentMethod)}
                         </Badge>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-2 gap-x-4 text-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-y-2 gap-x-4 text-sm">
                         <div>
                           <span className="font-medium">Doctor:</span> Dr. {apt.doctor?.name}
                         </div>
@@ -245,6 +246,16 @@ export default function PatientHistoryModal({
                         </div>
                         <div>
                           <span className="font-medium">Phone:</span> {apt.mobile}
+                        </div>
+                        <div>
+                          {apt.documents && apt.documents.length > 0 && (
+                          <div className="text-sm">
+                            <span className="font-medium flex items-center gap-1">
+                              <FileText className="h-3.5 w-3.5 text-purple-600" />
+                              Documents:
+                            </span> {apt.documents.length} file{apt.documents.length !== 1 ? 's' : ''}
+                          </div>
+                        )}
                         </div>
                       </div>
                       {/* {apt.doctor?.specialization && (
@@ -260,7 +271,6 @@ export default function PatientHistoryModal({
                         className="whitespace-nowrap"
                         onClick={() => onViewDetails(apt)}
                       >
-                        <ExternalLink className="w-4 h-4 mr-2" />
                         View Details
                       </Button>
                     </div>

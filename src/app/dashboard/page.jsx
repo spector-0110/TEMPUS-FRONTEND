@@ -11,7 +11,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Calendar, Plus, Filter, Users, Clock, CheckCircle, XCircle, History, CreditCard, Search, X } from 'lucide-react';
+import { Calendar, Plus, Filter, Users, Clock, CheckCircle, XCircle, History, CreditCard, Search, X ,FileText} from 'lucide-react';
 import { ErrorDialog } from '@/components/ui/error-dialog';
 import { SuccessDialog } from '@/components/ui/success-dialog';
 import AppointmentCreationFlow from '@/components/appointments/AppointmentCreationFlow';
@@ -113,6 +113,7 @@ export default function AppointmentsPage() {
         paymentStatus: apt.paymentStatus,
         createdAt: apt.createdAt,
         doctor: apt.doctor,
+        documents: apt.documents || [], // Add documents array
         // Legacy format for compatibility
         patient: {
           name: apt.patientName,
@@ -640,7 +641,7 @@ export default function AppointmentsPage() {
                             {(appointment.paymentStatus || 'unpaid').toUpperCase()}{getPaymentMethodDisplay(appointment.paymentMethod)}
                           </Badge>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-2 gap-x-4 text-sm">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-y-2 gap-x-4 text-sm">
                           <div>
                             <span className="font-medium">Doctor:</span> Dr. {appointment.doctor?.name || appointment.doctorName}
                           </div>
@@ -653,6 +654,18 @@ export default function AppointmentsPage() {
                           <div>
                             <span className="font-medium">Phone:</span> {appointment.mobile || appointment.patientMobile}
                           </div>
+
+                          <div>
+                            {appointment.documents && appointment.documents.length > 0 && (
+                              <div className="text-sm">
+                                <span className="font-medium flex items-center gap-1">
+                                  <FileText className="h-3.5 w-3.5 text-purple-600" />
+                                  Documents:
+                                </span> {appointment.documents.length} file{appointment.documents.length !== 1 ? 's' : ''}
+                              </div>
+                            )}
+                        </div>
+                          
                         </div>
                       </div>
                       <div className="flex sm:flex-col gap-2 sm:items-end">
