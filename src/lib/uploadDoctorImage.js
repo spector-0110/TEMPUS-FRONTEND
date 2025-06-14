@@ -1,6 +1,6 @@
 // uploadDoctorImage.js
-import supabase from './supabase';
-import { getCurrentUser } from './auth';
+import {getSupabaseClient} from './supabase';
+import { getCurrentUser, } from './auth';
 
 /**
  * Upload an image to Supabase Storage
@@ -36,7 +36,7 @@ export async function uploadDoctorImage(file, hospitalName, doctorName) {
     const filePath = `${cleanHospitalName}/doctor-image/${doctorName}/${fileName}`;
 
     // Add timeout to upload operation
-    const uploadPromise = supabase.storage
+    const uploadPromise = getSupabaseClient().storage
       .from('doctor-pics')
       .upload(filePath, file, {
         cacheControl: '3600',
@@ -54,7 +54,7 @@ export async function uploadDoctorImage(file, hospitalName, doctorName) {
       throw new Error(`Upload failed: ${error.message}`);
     }
 
-    const { data: publicUrlData } = supabase.storage
+    const { data: publicUrlData } = getSupabaseClient().storage
       .from('doctor-pics')
       .getPublicUrl(filePath);
 
@@ -88,7 +88,7 @@ export async function deleteDoctorImage(publicUrl) {
     const filePath = urlParts[1];
     
     // Add timeout to delete operation
-    const deletePromise = supabase.storage
+    const deletePromise = getSupabaseClient().storage
       .from('doctor-pics')
       .remove([filePath]);
     
