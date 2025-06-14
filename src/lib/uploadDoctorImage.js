@@ -1,6 +1,5 @@
 // uploadDoctorImage.js
 import supabase from './supabase';
-import { getCurrentUser, } from './auth';
 
 /**
  * Upload an image to Supabase Storage
