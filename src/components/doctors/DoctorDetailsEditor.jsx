@@ -356,6 +356,21 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
           />
         </div>
         
+          
+        <div className="space-y-2">
+          <Label htmlFor="age">Age</Label>
+          <Input
+            id="age"
+            name="age"
+            type="number"
+            min="18"
+            value={doctorData.age}
+            onChange={handleChange}
+            placeholder="45"
+            required
+          />
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="experience">Experience (years)</Label>
           <Input
@@ -375,21 +390,6 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
             </p>
           )}
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="age">Age</Label>
-          <Input
-            id="age"
-            name="age"
-            type="number"
-            min="18"
-            value={doctorData.age}
-            onChange={handleChange}
-            placeholder="45"
-            required
-          />
-        </div>
-
 
         <div className="space-y-2">
           <Label htmlFor="aadhar">Aadhar Number</Label>
