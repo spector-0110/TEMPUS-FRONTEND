@@ -13,7 +13,8 @@ import {
   calculateSubscriptionPrice, 
   formatPrice, 
   validateDoctorCount, 
-  BILLING_CYCLES 
+  BILLING_CYCLES,
+  PRICING_CONFIG,
 } from '@/utils/subscriptionUtils';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useRazorpay } from '@/hooks/useRazorpay';
@@ -231,7 +232,7 @@ export function SubscriptionModal({
                           onClick={() => handleBillingCycleChange(BILLING_CYCLES.YEARLY)}
                         >
                           <Badge className="absolute -top-2 -right-2 bg-green-600 text-white text-xs">
-                            Save 20%
+                            {PRICING_CONFIG.YEARLY_DISCOUNT_PERCENTAGE} % OFF
                           </Badge>
                           <span className="font-semibold">Yearly</span>
                           <span className="text-sm opacity-90">Pay annually</span>

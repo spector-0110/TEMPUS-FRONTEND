@@ -6,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { DialogFooter } from '@/components/ui/dialog';
 import { uploadDoctorImage, deleteDoctorImage,  } from '@/lib/uploadDoctorImage';
+import SearchableDropdown from '@/components/ui/searchable-dropdown';
+import { MEDICAL_SPECIALIZATIONS, MEDICAL_QUALIFICATIONS } from '@/data/medical-data';
 
 const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) => {
 
@@ -16,8 +18,8 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
     name: '',
     email: '',
     phone: '',
-    specialization: '',
-    qualification: '',
+    specialization: [], // Changed to array for multi-select
+    qualification: [], // Changed to array for multi-select
     experience: null, 
     age: null, 
     photo: '/doctor.png', // Default photo URL
@@ -55,13 +57,49 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
   
   useEffect(() => {
     if (doctor) {
+      // Handle specialization - convert string to array or keep array
+      let specializationValues = [];
+      if (doctor.specialization) {
+        if (Array.isArray(doctor.specialization)) {
+          specializationValues = doctor.specialization;
+        } else {
+          // Split comma-separated string and match against values
+          const specializationStrings = doctor.specialization.split(',').map(s => s.trim());
+          specializationValues = specializationStrings.map(specString => {
+            const matchingSpecialization = MEDICAL_SPECIALIZATIONS.find(
+              spec => spec.label.toLowerCase() === specString.toLowerCase() || 
+                     spec.value === specString
+            );
+            return matchingSpecialization ? matchingSpecialization.value : specString;
+          });
+        }
+      }
+      
+      // Handle qualification - convert string to array or keep array
+      let qualificationValues = [];
+      if (doctor.qualification) {
+        if (Array.isArray(doctor.qualification)) {
+          qualificationValues = doctor.qualification;
+        } else {
+          // Split comma-separated string and match against values
+          const qualificationStrings = doctor.qualification.split(',').map(q => q.trim());
+          qualificationValues = qualificationStrings.map(qualString => {
+            const matchingQualification = MEDICAL_QUALIFICATIONS.find(
+              qual => qual.label.toLowerCase() === qualString.toLowerCase() || 
+                     qual.value === qualString
+            );
+            return matchingQualification ? matchingQualification.value : qualString;
+          });
+        }
+      }
+      
       const formattedDoctor = {
         id: doctor.id,
         name: doctor.name || '',
         email: doctor.email || '',
         phone: doctor.phone || '',
-        specialization: doctor.specialization || '',
-        qualification: doctor.qualification || '',
+        specialization: specializationValues,
+        qualification: qualificationValues,
         experience: typeof doctor.experience === 'number' ? doctor.experience : 
                    doctor.experience ? parseInt(doctor.experience, 10) : null,
         age: typeof doctor.age === 'number' ? doctor.age : 
@@ -102,6 +140,15 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
       const original = originalData[field];
       const current = doctorData[field];
       
+      // Handle array comparisons for specialization and qualification
+      if (field === 'specialization' || field === 'qualification') {
+        const originalArray = Array.isArray(original) ? original : [];
+        const currentArray = Array.isArray(current) ? current : [];
+        
+        if (originalArray.length !== currentArray.length) return true;
+        return originalArray.some((item, index) => item !== currentArray[index]);
+      }
+      
       // Handle null/empty comparisons for numeric fields
       if (field === 'experience' || field === 'age') {
         const originalValue = original === null || original === '' ? null : Number(original);
@@ -119,6 +166,15 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
   // Reset submitting state when user makes changes after submission
   if (isSubmitting) {
     setIsSubmitting(false);
+  }
+  
+  // Handle array values for specialization and qualification (from SearchableDropdown)
+  if (name === 'specialization' || name === 'qualification') {
+    setDoctorData(prev => ({
+      ...prev,
+      [name]: value // value is already an array from SearchableDropdown
+    }));
+    return;
   }
   
   // Convert numeric fields to actual numbers
@@ -203,6 +259,17 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validate required multi-select fields
+    if (!doctorData.specialization || doctorData.specialization.length === 0) {
+      alert('Please select at least one specialization');
+      return;
+    }
+    
+    if (!doctorData.qualification || doctorData.qualification.length === 0) {
+      alert('Please select at least one qualification');
+      return;
+    }
+    
     // Prevent submission if no changes in edit mode and no file selected
     if (isEditMode && !hasDataChanged() && !selectedFile) {
       console.log('No changes detected, not submitting');
@@ -248,10 +315,25 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
       // Ensure numeric fields are properly typed before submitting
       // Remove id field from doctorData before creating formattedData
       const { id, ...doctorDataWithoutId } = doctorData;
+      
+      // Convert specialization array to labels and join as string
+      const specializationLabels = doctorData.specialization.map(value => {
+        const obj = MEDICAL_SPECIALIZATIONS.find(s => s.value === value);
+        return obj ? obj.label : value;
+      });
+      
+      // Convert qualification array to labels and join as string
+      const qualificationLabels = doctorData.qualification.map(value => {
+        const obj = MEDICAL_QUALIFICATIONS.find(q => q.value === value);
+        return obj ? obj.label : value;
+      });
+      
       const formattedData = {
         ...doctorDataWithoutId,
         photo: photoUrl, // Use the uploaded URL or existing photo
         doctor_id: id, // Add doctor_id from the existing id
+        specialization: specializationLabels.length > 0 ? specializationLabels.join(', ') : 'General Medicine', // Join as string
+        qualification: qualificationLabels.length > 0 ? qualificationLabels.join(', ') : 'MBBS', // Join as string
         experience: doctorData.experience === '' || doctorData.experience === null ? 0 : 
              typeof doctorData.experience === 'number' ? doctorData.experience : 
              parseInt(doctorData.experience, 10),
@@ -331,31 +413,6 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
             required
           />
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="specialization">Specialization</Label>
-          <Input
-            id="specialization"
-            name="specialization"
-            value={doctorData.specialization}
-            onChange={handleChange}
-            placeholder="Cardiology, Neurology, etc."
-            required
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="qualification">Qualification</Label>
-          <Input
-            id="qualification"
-            name="qualification"
-            value={doctorData.qualification}
-            onChange={handleChange}
-            placeholder="MD, MBBS, etc."
-            required
-          />
-        </div>
-        
           
         <div className="space-y-2">
           <Label htmlFor="age">Age</Label>
@@ -402,6 +459,37 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
             pattern="[0-9]{12}"
             title="Aadhar number must be exactly 12 digits"
             maxLength={12}
+          />
+        </div>
+
+          
+        <div className="space-y-2">
+          <Label htmlFor="specialization">Specialization</Label>
+          <SearchableDropdown
+            id="specialization"
+            name="specialization"
+            options={MEDICAL_SPECIALIZATIONS}
+            value={doctorData.specialization}
+            onChange={handleChange}
+            placeholder="Select or search specializations..."
+            multiSelect={true}
+            maxSelections={5}
+            required
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="qualification">Qualification</Label>
+          <SearchableDropdown
+            id="qualification"
+            name="qualification"
+            options={MEDICAL_QUALIFICATIONS}
+            value={doctorData.qualification}
+            onChange={handleChange}
+            placeholder="Select or search qualifications..."
+            multiSelect={true}
+            maxSelections={5}
+            required
           />
         </div>
         

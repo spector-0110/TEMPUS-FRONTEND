@@ -17,10 +17,10 @@ export const validateUpdateDoctorData=(data) => {
       }).min(2, "Name must be at least 2 characters").max(100, "Name must not exceed 100 characters").optional(),
       specialization: z.string({
         invalid_type_error: "Specialization must be a string"
-      }).min(2, "Specialization must be at least 2 characters").max(100, "Specialization must not exceed 100 characters").optional(),
+      }).min(2, "Specialization must be at least 2 characters").max(1000, "Specialization must not exceed 1000 characters").optional(),
       qualification: z.string({
         invalid_type_error: "Qualification must be a string"
-      }).min(2, "Qualification must be at least 2 characters").max(100, "Qualification must not exceed 100 characters").optional(),
+      }).min(2, "Qualification must be at least 2 characters").max(1000, "Qualification must not exceed 1000 characters").optional(),
       experience: z.union([
         z.number().int("Experience must be a whole number").min(0, "Experience cannot be negative"), 
         z.string().regex(/^\d+$/, "Experience must contain only digits").transform(Number)
