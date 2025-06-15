@@ -122,10 +122,10 @@ export function HospitalProvider({ children }) {
       }
     }
 
-    return () => {
-      // Cleanup function to reset initial fetch state
-      initialFetchDone.current = false;
-    }
+    // return () => {
+    //   // Cleanup function to reset initial fetch state
+    //   initialFetchDone.current = false;
+    // }
   }, [authLoading, user, fetchAndUpdateDetails]);
 
   //  Update hospital details function
