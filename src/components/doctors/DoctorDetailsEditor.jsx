@@ -8,10 +8,11 @@ import { DialogFooter } from '@/components/ui/dialog';
 import { uploadDoctorImage, deleteDoctorImage,  } from '@/lib/uploadDoctorImage';
 import SearchableDropdown from '@/components/ui/searchable-dropdown';
 import { MEDICAL_SPECIALIZATIONS, MEDICAL_QUALIFICATIONS } from '@/data/medical-data';
+import {useHospital} from "@/context/HospitalProvider"
 
 const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) => {
 
-
+  const { hospitalDetails:details } = useHospital();
   const isEditMode = doctor && doctor.id;
   const [hospitalDetails, setHospitalDetails] = useState(null);
   const [doctorData, setDoctorData] = useState({
@@ -42,13 +43,11 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
   }, [isLoading, isSubmitting]);
 
    useEffect(() => {
-    const storedDetails = localStorage.getItem('hospitalDetails');
-    if (storedDetails) {
+    if (details) {
       try {
-        const parsed = JSON.parse(storedDetails);
-        setHospitalDetails(parsed);
+        setHospitalDetails(details);
       } catch (error) {
-        console.error('Error parsing hospital details:', error);
+        console.error('Error getting hospital details:', error);
       }
     } else {
       console.warn('No hospital details found in localStorage');

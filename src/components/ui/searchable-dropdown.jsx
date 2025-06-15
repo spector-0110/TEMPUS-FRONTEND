@@ -191,7 +191,7 @@ const SearchableDropdown = ({
         />
         <div className="px-3 flex-shrink-0 flex items-center gap-2">
           {/* Clear all button for multi-select */}
-          {multiSelect && selectedValues.length > 0 && (
+          {/* {multiSelect && selectedValues.length > 0 && (
             <button
               type="button"
               onClick={(e) => {
@@ -203,7 +203,7 @@ const SearchableDropdown = ({
             >
               Clear
             </button>
-          )}
+          )} */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
