@@ -20,7 +20,7 @@ import { CreditCard, Calendar, TrendingUp, Clock, AlertTriangle, CheckCircle, Sh
 import { SubscriptionModal } from '@/components/subscription/SubscriptionModal';
 
 const SubscriptionPage = () => {
-  const { hospitalDashboardDetails, debouncedRefresh } = useHospital();
+  const { hospitalDashboardDetails, backgroundRefresh, } = useHospital();
   const isMobile = useIsMobile();
   
   const [activeTab, setActiveTab] = useState('current');
@@ -31,7 +31,7 @@ const SubscriptionPage = () => {
   // Format date to readable format
   const formatDate = (dateString) => {
     if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('en-IN', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -91,8 +91,8 @@ const SubscriptionPage = () => {
     });
     
     // Refresh hospital dashboard to get updated subscription data
-    if (debouncedRefresh) {
-      debouncedRefresh();
+    if (backgroundRefresh) {
+      backgroundRefresh();
     }
     
     // Switch to current tab to show updated subscription

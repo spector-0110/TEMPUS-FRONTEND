@@ -25,13 +25,13 @@ export function AuthProvider({ children }) {
         // Subscribe to auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
           async (event, session) => {
+            console.log('Auth state change:', event, !!session);
             
             if (event === 'SIGNED_OUT') {
+              console.log('User signed out, clearing state...');
               setUser(null);
-              // Use a timeout to ensure state is updated before navigation
-              setTimeout(() => {
-                router.push('/');
-              }, 1000);
+              // Navigate immediately without timeout
+              router.push('/');
               return;
             }
             
@@ -64,30 +64,38 @@ export function AuthProvider({ children }) {
     isAuthenticated: !!user,
     signOut: async () => {
       try {
+        console.log('Starting signOut process...');
         
         // Call Supabase signOut first to ensure server-side session is cleared
         await supabaseSignOut();
         
-        // Then clear local state
+        // Immediately clear local state
         setUser(null);
         
-        // // Navigate to home page
-        // router.push('/');
+        // Clear any additional auth-related localStorage items
+        if (typeof window !== 'undefined') {
+          try {
+            // Clear any remaining auth cache
+            localStorage.removeItem('supabase_client_cache');
+          } catch (e) {
+            console.warn('Error clearing additional cache:', e);
+          }
+        }
+        
+        console.log('SignOut completed, redirecting...');
+        
+        // Navigate to home page immediately (no timeout)
+        router.push('/');
         
         return true;
       } catch (error) {
         console.error('Error in context signOut:', error);
         
         // Even if there's an error, try to clean up the local state
-        try {
-          // Force a refresh of the user state
-          const currentUser = await getCurrentUser();
-          setUser(currentUser); 
-        } catch (secondError) {
-          // If even this fails, force null state
-          console.error('Failed to refresh user state:', secondError);
-          setUser(null);
-        }
+        setUser(null);
+        
+        // Still try to navigate away from protected routes
+        router.push('/');
         
         throw error;
       }

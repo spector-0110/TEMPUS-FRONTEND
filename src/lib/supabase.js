@@ -187,6 +187,37 @@ export function getCacheStatus() {
   };
 }
 
+/**
+ * Force clears all authentication and client caches (useful for sign out)
+ * @returns {void}
+ */
+export function clearAllAuthCache() {
+  console.log('Clearing all authentication caches...');
+  
+  // Clear client cache
+  clearClientCache();
+  
+  // Clear any additional auth-related localStorage
+  if (typeof window !== 'undefined') {
+    try {
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('sb-') || key === CLIENT_STORAGE_KEY)) {
+          keysToRemove.push(key);
+        }
+      }
+      
+      keysToRemove.forEach(key => {
+        localStorage.removeItem(key);
+        console.log('Cleared cache key:', key);
+      });
+    } catch (error) {
+      console.warn('Error clearing localStorage cache:', error);
+    }
+  }
+}
+
 // Create the default client using the cached method
 const supabase = getSupabaseClient();
 

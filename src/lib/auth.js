@@ -141,10 +141,28 @@ export async function resetPassword(email) {
  */
 export async function signOut() {
   try {
+    console.log('Signing out user...');
+    
+    // First, sign out from Supabase
     const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase signOut error:', error.message);
+      // Don't throw here, continue with cleanup even if Supabase fails
+    }
+    
+    // Clear all authentication caches using the centralized function
+    // clearAllAuthCache();
+
+    
+    console.log('Sign out completed successfully');
   } catch (error) {
     console.error('Error signing out:', error.message);
+    // Even on error, try to clear caches
+    try {
+      // clearAllAuthCache();
+    } catch (cacheError) {
+      console.error('Error clearing caches during failed signout:', cacheError);
+    }
     throw error;
   }
 }

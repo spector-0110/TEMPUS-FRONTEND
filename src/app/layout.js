@@ -8,13 +8,23 @@ import { LogoutButton } from '@/components/ui/logout-button';
 export const metadata = {
   title: 'Tiqora - Hospital Management System',
   description: 'Modern healthcare management platform',
+  metadataBase: new URL('https://tiqora.in'),
+  openGraph: {
+    title: 'Tiqora - Hospital Management System',
+    description: 'Modern healthcare management platform',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
+        {/* Load Razorpay script only when needed instead of on all pages */}
+        <script src="https://checkout.razorpay.com/v1/checkout.js" defer data-lazy="true"></script>
+        {/* Add preconnect for performance */}
+        <link rel="preconnect" href="https://backend.tiqora.in" />
+        <link rel="dns-prefetch" href="https://backend.tiqora.in" />
       </head>
       <body className="bg-background text-foreground">
         <ThemeProvider

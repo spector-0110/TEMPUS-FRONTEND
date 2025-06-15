@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import { createContext, useState, useContext, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from './AuthProvider';
 import { fetchHospitalDetails, updateHospitalDetailsAPI,getHospitalDashboard } from '@/lib/api';
 
@@ -25,8 +25,8 @@ export function HospitalProvider({ children }) {
   const [error, setError] = useState(null);
   const [isProfileComplete, setIsProfileComplete] = useState(false);
   const [hospitalDashboardDetails, setHospitalDashboardDetails] = useState(null);
+  const initialFetchDone = useRef(false);
 
-  // Stable, memoized fetch function
   const fetchAndUpdateDetails = useCallback(async () => {
     if (!navigator.onLine) {
       alert("You're offline. Connect to the internet to refresh.");
@@ -35,12 +35,9 @@ export function HospitalProvider({ children }) {
 
     setLoading(true);
     try {
-      // const details = await fetchHospitalDetails(); // Fetch hospital details
       const dashboardDetails = await getHospitalDashboard(); // Fetch dashboard details
-      console.log('Fetched hospital details:', dashboardDetails);
       setHospitalDashboardDetails(dashboardDetails);
       setHospitalDetails(dashboardDetails.hospitalInfo);
-      localStorage.setItem('hospitalDetails', JSON.stringify(dashboardDetails.hospitalInfo));
       setIsProfileComplete(true);
       setError(null);
     } catch (err) {
@@ -64,7 +61,6 @@ export function HospitalProvider({ children }) {
       const dashboardDetails = await getHospitalDashboard();
       setHospitalDashboardDetails(dashboardDetails);
       setHospitalDetails(dashboardDetails.hospitalInfo);
-      localStorage.setItem('hospitalDetails', JSON.stringify(dashboardDetails.hospitalInfo));
       setIsProfileComplete(true);
       setError(null);
     } catch (err) {
@@ -101,7 +97,6 @@ export function HospitalProvider({ children }) {
       
       setHospitalDashboardDetails(dashboardDetails);
       setHospitalDetails(dashboardDetails.hospitalInfo);
-      localStorage.setItem('hospitalDetails', JSON.stringify(dashboardDetails.hospitalInfo));
       setIsProfileComplete(true);
       setError(null);
     } catch (err) {
@@ -115,34 +110,25 @@ export function HospitalProvider({ children }) {
     }
   }, []);
 
-  // Load from localStorage and then background refresh after sign-in
   useEffect(() => {
-    // Initial loading from localStorage
-    const saved = localStorage.getItem('hospitalDetails');
-
     
     if (!authLoading) {
-      if (user) {
-        if (saved) {
-          // If we have cached data, show it immediately
-          setHospitalDetails(JSON.parse(saved));
-          setIsProfileComplete(true);
-          setLoading(false);
-          
-          // Then refresh in background without showing loading state
-          debouncedRefresh();
-        } else {
-          // No cached data available, we need to show loading state
-          fetchAndUpdateDetails();
-        }
-      } else {
+      if (user && !initialFetchDone.current) {
+        initialFetchDone.current = true;
+        fetchAndUpdateDetails();
+      } else if (!user) {
         // No user, reset states
         setLoading(false);
       }
     }
-  }, [authLoading, user, backgroundRefresh]);
 
-  //  Update hospital details in both state and localStorage
+    return () => {
+      // Cleanup function to reset initial fetch state
+      initialFetchDone.current = false;
+    }
+  }, [authLoading, user, fetchAndUpdateDetails]);
+
+  //  Update hospital details function
   const updateHospitalDetails = async (newDetails) => {
     try {
       // Update hospitalDetails with the new details
@@ -151,7 +137,6 @@ export function HospitalProvider({ children }) {
         ...newDetails
       };
       setHospitalDetails(updatedDetails);
-      localStorage.setItem('hospitalDetails', JSON.stringify(updatedDetails));
       setIsProfileComplete(true);
     } catch (err) {
       console.error('Error updating hospital details:', err);
