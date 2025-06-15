@@ -21,7 +21,38 @@ function createSupabaseClient() {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
-      detectSessionInUrl: true
+      detectSessionInUrl: true,
+      storage: {
+        getItem: (key) => {
+          try {
+            if (typeof window !== 'undefined') {
+              return localStorage.getItem(key);
+            }
+            return null;
+          } catch (error) {
+            console.warn('Error accessing localStorage:', error);
+            return null;
+          }
+        },
+        setItem: (key, value) => {
+          try {
+            if (typeof window !== 'undefined') {
+              localStorage.setItem(key, value);
+            }
+          } catch (error) {
+            console.warn('Error setting localStorage:', error);
+          }
+        },
+        removeItem: (key) => {
+          try {
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem(key);
+            }
+          } catch (error) {
+            console.warn('Error removing from localStorage:', error);
+          }
+        }
+      }
     },
     // Configure storage options with more generous timeouts
     global: {
@@ -55,7 +86,7 @@ function storeClientMetadata() {
         url: supabaseUrl,
         // Don't store the actual client or sensitive keys, just metadata
       };
-      localStorage.setItem(CLIENT_STORAGE_KEY, JSON.stringify(metadata));
+      window.localStorage.setItem(CLIENT_STORAGE_KEY, JSON.stringify(metadata));
     } catch (error) {
       console.warn('Failed to store client metadata:', error);
     }
@@ -68,7 +99,7 @@ function storeClientMetadata() {
 function getStoredClientMetadata() {
   if (typeof window !== 'undefined') {
     try {
-      const stored = localStorage.getItem(CLIENT_STORAGE_KEY);
+      const stored = window.localStorage.getItem(CLIENT_STORAGE_KEY);
       if (stored) {
         const metadata = JSON.parse(stored);
         // Check if stored metadata is still valid
@@ -77,11 +108,13 @@ function getStoredClientMetadata() {
           return metadata;
         }
         // Remove expired metadata
-        localStorage.removeItem(CLIENT_STORAGE_KEY);
+        window.localStorage.removeItem(CLIENT_STORAGE_KEY);
       }
     } catch (error) {
       console.warn('Failed to retrieve client metadata:', error);
-      localStorage.removeItem(CLIENT_STORAGE_KEY);
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem(CLIENT_STORAGE_KEY);
+      }
     }
   }
   return null;
@@ -100,7 +133,7 @@ function clearClientCache() {
   }
   
   if (typeof window !== 'undefined') {
-    localStorage.removeItem(CLIENT_STORAGE_KEY);
+    window.localStorage.removeItem(CLIENT_STORAGE_KEY);
   }
 }
 
@@ -141,6 +174,7 @@ export function getSupabaseClient() {
   // Create a new client
   console.log('Creating new Supabase client...');
   cachedClient = createSupabaseClient();
+  console.log('Supabase client created:', cachedClient);
   clientCacheTimestamp = Date.now();
   
   // Store metadata for persistence
@@ -201,15 +235,15 @@ export function clearAllAuthCache() {
   if (typeof window !== 'undefined') {
     try {
       const keysToRemove = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const key = window.localStorage.key(i);
         if (key && (key.startsWith('sb-') || key === CLIENT_STORAGE_KEY)) {
           keysToRemove.push(key);
         }
       }
       
       keysToRemove.forEach(key => {
-        localStorage.removeItem(key);
+        window.localStorage.removeItem(key);
         console.log('Cleared cache key:', key);
       });
     } catch (error) {
@@ -218,16 +252,22 @@ export function clearAllAuthCache() {
   }
 }
 
-// Create the default client using the cached method
-const supabase = getSupabaseClient();
+// Only create the client when imported on the client-side or create a per-request client on the server
+let supabase;
 
-// Clean up on page unload (browser environment only)
+// Initialize the client, but only in browser environment
 if (typeof window !== 'undefined') {
+  supabase = getSupabaseClient();
+  
+  // Clean up on page unload (browser environment only)
   window.addEventListener('beforeunload', () => {
     if (refreshTimer) {
       clearTimeout(refreshTimer);
     }
   });
+} else {
+  // For server-side rendering, create a new client each time (no caching needed)
+  supabase = createSupabaseClient();
 }
 
 export default supabase;
