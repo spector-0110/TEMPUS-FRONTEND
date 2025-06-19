@@ -1,7 +1,7 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/utils/utils";
+import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,7 +21,7 @@ export function UpdatePasswordForm({ className, ...props }) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
+  const handleForgotPassword = async (e) => {
     e.preventDefault();
     const supabase = createClient();
     setIsLoading(true);
@@ -32,7 +32,7 @@ export function UpdatePasswordForm({ className, ...props }) {
       if (error) throw error;
       // Update this route to redirect to an authenticated route. The user already has an active session.
       router.push("/protected");
-    } catch (error: unknown) {
+    } catch (error) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setIsLoading(false);
