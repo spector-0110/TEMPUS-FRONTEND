@@ -1,41 +1,43 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useAuth } from '@/context/AuthProvider';
-import { ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
-import { Button } from './button';
+import { authService } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import {
+  LogOutIcon,
+} from "lucide-react"
 
 export function LogoutButton() {
-  const { signOut, user, loading, isAuthenticated } = useAuth();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignOut = async () => {
-    if (isLoggingOut) return; // Prevent double clicks
+  const logout = async () => {
+    setIsLoading(true);
     
-    setIsLoggingOut(true);
     try {
-      await signOut();
+      const { error } = await authService.signOut();
+      
+      if (!error) {
+        // Force a hard navigation to ensure middleware processes the logout
+        window.location.href = "/";
+      } else {
+        console.error("Logout error:", error);
+      }
     } catch (error) {
-      console.error('Logout failed:', error);
-      // You might want to show a toast notification here
+      console.error("Logout error:", error);
     } finally {
-      setIsLoggingOut(false);
+      setIsLoading(false);
     }
   };
 
-  // Don't render anything while loading or if not authenticated
-  if (loading || !isAuthenticated) return null;
-
   return (
-    <Button
-      onClick={handleSignOut}
-      variant="iconPrimary"
-      size="icon"
-      className="fixed top-5 right-5"
-      aria-label="Logout"
-      disabled={isLoggingOut}
+    <div 
+      className="flex items-center w-full cursor-pointer"
+      onClick={logout}
     >
-      <ArrowRightOnRectangleIcon className={`w-5 h-5 ${isLoggingOut ? 'animate-spin' : ''}`} />
-    </Button>
+      <LogOutIcon className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+      {isLoading ? "Logging out..." : "Logout"}
+    </div>
   );
 }

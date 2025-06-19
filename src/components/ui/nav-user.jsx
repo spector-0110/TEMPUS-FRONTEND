@@ -10,7 +10,6 @@ import {
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/context/AuthProvider"
 
 import {
   Avatar,
@@ -32,13 +31,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import {LogoutButton} from "@/components/ui/logout-button"
 
 export function NavUser({
   user
 }) {
   
-  const { signOut } = useAuth();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const { isMobile, setOpenMobile } = useSidebar()
   const router = useRouter()
@@ -47,21 +45,6 @@ export function NavUser({
     // Close mobile sidebar when navigation item is clicked
     if (isMobile) {
       setOpenMobile(false);
-    }
-  };
-
-  const handleSignOut = async () => {
-    if (isLoggingOut) return;
-    
-    setIsLoggingOut(true);
-    handleNavItemClick();
-    
-    try {
-      await signOut();
-    } catch (error) {
-      console.error('Logout failed:', error);
-    } finally {
-      setIsLoggingOut(false);
     }
   };
 
@@ -129,9 +112,8 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut} disabled={isLoggingOut}>
-              <LogOutIcon className={isLoggingOut ? 'animate-spin' : ''} />
-              {isLoggingOut ? 'Logging out...' : 'Log out'}
+            <DropdownMenuItem onClick={handleNavItemClick}>
+              <LogoutButton/>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -1,6 +1,7 @@
-import supabase from './supabase';
 import CryptoJS from 'crypto-js';
 import { ServerConnectionError } from './errors';
+import { createClient } from "@/utils/supabase/client";
+
 
 // Constants for API configuration
 const API_TIMEOUT = 25000; // 25 seconds timeout
@@ -35,24 +36,25 @@ async function getAuthToken() {
   let accessToken = null;
 
   try {
-    // First try to get from localStorage directly if available in browser context
-    if (typeof window !== 'undefined' && window.localStorage) {
-      const supabaseKey = Object.keys(localStorage).find(key => key.startsWith('sb-'));
+    // // First try to get from localStorage directly if available in browser context
+    // if (typeof window !== 'undefined' && window.localStorage) {
+    //   const supabaseKey = Object.keys(localStorage).find(key => key.startsWith('sb-'));
 
-      if (supabaseKey) {
-        try {
-          const storedAuth = JSON.parse(localStorage.getItem(supabaseKey));
-          if (storedAuth && storedAuth.access_token) {
-            accessToken = storedAuth.access_token;
-          }
-        } catch (e) {
-          console.error('getAuthToken - Error parsing localStorage auth:', e);
-        }
-      }
-    }
+    //   if (supabaseKey) {
+    //     try {
+    //       const storedAuth = JSON.parse(localStorage.getItem(supabaseKey));
+    //       if (storedAuth && storedAuth.access_token) {
+    //         accessToken = storedAuth.access_token;
+    //       }
+    //     } catch (e) {
+    //       console.error('getAuthToken - Error parsing localStorage auth:', e);
+    //     }
+    //   }
+    // }
 
     // If localStorage approach didn't work, try the Supabase API with timeout
     if (!accessToken) {
+      const supabase = createClient();
       const sessionPromise = supabase.auth.getSession();
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error('Supabase session retrieval timed out after 5s')), 5000)

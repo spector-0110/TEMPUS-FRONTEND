@@ -1,6 +1,9 @@
 import { Metadata } from "next/types";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { AuthProvider } from '@/context/AuthProvider';
+import { HospitalProvider } from '@/context/HospitalProvider';
+import {LogoutButton} from '@/components/ui/logout-button';
 import "@/styles/globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -31,7 +34,15 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+           <AuthProvider>
+            <HospitalProvider>
+              <main className="min-h-[calc(100vh-64px)]">
+                {children}
+              </main>
+              <LogoutButton/>
+            </HospitalProvider>
+          </AuthProvider>
+
         </ThemeProvider>
       </body>
     </html>

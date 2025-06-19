@@ -45,7 +45,7 @@ export class AuthService {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/protected`,
+          emailRedirectTo: `${window.location.origin}/dashboard`,
           ...options,
         },
       });
@@ -188,7 +188,7 @@ export class AuthService {
       const { error } = await this.supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/protected`,
+          redirectTo: `${window.location.origin}/dashboard`,
           ...options,
         },
       });

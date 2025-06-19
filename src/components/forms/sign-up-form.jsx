@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/utils/utils";
-import { authService, validateEmail } from "@/lib/auth";
+import { authService, validateEmail, validatePassword, validatePasswordMatch } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,15 +18,17 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export function LoginForm({ className, ...props }) {
+export function SignUpForm({ className, ...props }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [repeatPassword, setRepeatPassword] = useState("");
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
@@ -38,13 +40,27 @@ export function LoginForm({ className, ...props }) {
       return;
     }
 
+    // Validate password strength
+    if (!validatePassword(password)) {
+      setError("Password must be at least 6 characters long");
+      setIsLoading(false);
+      return;
+    }
+
+    // Validate password match
+    if (!validatePasswordMatch(password, repeatPassword)) {
+      setError("Passwords do not match");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const { user, error } = await authService.signIn(email, password);
+      const { user, error } = await authService.signUp(email, password);
       
       if (error) {
         setError(error);
       } else {
-        router.push("/dashboard");
+        router.push("/auth/sign-up-success");
       }
     } catch (error) {
       setError("An unexpected error occurred");
@@ -63,12 +79,12 @@ export function LoginForm({ className, ...props }) {
     >
       <Card className="w-full max-w-md shadow-2xl backdrop-blur-3xl bg-neutral-900/40 rounded-3xl border-neutral-800/50">
         <CardHeader className="text-center space-y-2">
-          <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Welcome back</h1>
-          <p className="text-sm text-muted-foreground">Sign in to continue to your dashboard</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Create account</h1>
+          <p className="text-sm text-muted-foreground">Enter your details to get started</p>
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleSignUp} className="space-y-6">
             {error && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -97,24 +113,16 @@ export function LoginForm({ className, ...props }) {
 
             {/* Password */}
             <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-sm font-medium">Password</Label>
-                <Link
-                  href="/auth/forgot-password"
-                  className="text-sm text-primary hover:underline transition-colors"
-                >
-                  Forgot?
-                </Link>
-              </div>
+              <Label htmlFor="password" className="text-sm font-medium">Password</Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
                   required
+                  minLength={6}
                   placeholder="••••••••"
                   className="h-11 pr-12 focus-visible:ring-2 focus-visible:ring-primary transition-all duration-200 bg-background/50 backdrop-blur-sm border-neutral-300 dark:border-neutral-700"
                 />
@@ -131,6 +139,37 @@ export function LoginForm({ className, ...props }) {
                   )}
                 </button>
               </div>
+              <p className="text-xs text-muted-foreground">Min. 6 characters</p>
+            </div>
+
+            {/* Repeat Password */}
+            <div className="space-y-1">
+              <Label htmlFor="repeat-password" className="text-sm font-medium">Confirm Password</Label>
+              <div className="relative">
+                <Input
+                  id="repeat-password"
+                  type={showRepeatPassword ? "text" : "password"}
+                  value={repeatPassword}
+                  onChange={(e) => setRepeatPassword(e.target.value)}
+                  disabled={isLoading}
+                  required
+                  minLength={6}
+                  placeholder="••••••••"
+                  className="h-11 pr-12 focus-visible:ring-2 focus-visible:ring-primary transition-all duration-200 bg-background/50 backdrop-blur-sm border-neutral-300 dark:border-neutral-700"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowRepeatPassword(!showRepeatPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label={showRepeatPassword ? "Hide password" : "Show password"}
+                >
+                  {showRepeatPassword ? (
+                    <EyeSlashIcon className="w-5 h-5" />
+                  ) : (
+                    <EyeIcon className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Submit Button */}
@@ -140,7 +179,7 @@ export function LoginForm({ className, ...props }) {
               className="w-full h-11 font-semibold transition-all duration-200 hover:scale-[1.02] bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary"
             >
               {isLoading && <Spinner className="mr-2 h-4 w-4" />}
-              Sign in
+              Create account
             </Button>
 
             {/* Divider */}
@@ -153,7 +192,7 @@ export function LoginForm({ className, ...props }) {
               </div>
             </div>
 
-            {/* Google Sign-in */}
+            {/* Google Sign-up */}
             <Button
               type="button"
               variant="outline"
@@ -185,12 +224,12 @@ export function LoginForm({ className, ...props }) {
 
         <CardFooter className="text-center">
           <p className="text-sm text-muted-foreground w-full">
-            Don&apos;t have an account?{" "}
+            Already have an account?{" "}
             <Link
-              href="/auth/sign-up"
+              href="/auth/login"
               className="text-primary font-medium hover:underline transition-colors"
             >
-              Sign up
+              Sign in
             </Link>
           </p>
         </CardFooter>

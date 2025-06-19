@@ -1,5 +1,5 @@
 // uploadDoctorImage.js
-import supabase from './supabase';
+import { createClient } from "@/utils/supabase/client";
 
 /**
  * Upload an image to Supabase Storage
@@ -10,6 +10,7 @@ import supabase from './supabase';
  */
 export async function uploadDoctorImage(file, hospitalName, doctorName) {
   if (!file) throw new Error('No file provided');
+  const supabase = createClient();
 
   try{
 
@@ -33,6 +34,7 @@ export async function uploadDoctorImage(file, hospitalName, doctorName) {
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `${cleanHospitalName}/doctor-image/${doctorName}/${fileName}`;
+
 
     // Add timeout to upload operation
     const uploadPromise = supabase.storage
@@ -76,6 +78,8 @@ export async function uploadDoctorImage(file, hospitalName, doctorName) {
  */
 export async function deleteDoctorImage(publicUrl) {
   if (!publicUrl) return;
+  const supabase = createClient();
+
 
   try {
     const urlParts = publicUrl.split('/doctor-pics/');

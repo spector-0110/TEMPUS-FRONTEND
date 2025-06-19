@@ -1,3 +1,4 @@
+'use client';
 import { useState, useEffect, useContext, createContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService } from '../lib/auth';
@@ -45,6 +46,7 @@ export function AuthProvider({ children }) {
     user,
     session,
     loading,
+    isAuthenticated: !!user,
     signIn: authService.signIn.bind(authService),
     signUp: authService.signUp.bind(authService),
     signOut: authService.signOut.bind(authService),

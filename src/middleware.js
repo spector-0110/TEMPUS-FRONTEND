@@ -7,12 +7,12 @@ export async function middleware(request) {
   const { user } = response;
   const { pathname } = request.nextUrl;
 
-  const isProtectedRoute = pathname.startsWith('/protected');
+  const isProtectedRoute = pathname.startsWith('/dashboard') || pathname.startsWith('/onboarding');
 
   // If user is logged in and tries to access any route outside /protected, redirect to /protected
   if (user && !isProtectedRoute) {
     const url = request.nextUrl.clone();
-    url.pathname = '/protected';
+    url.pathname = '/dashboard';
     return NextResponse.redirect(url);
   }
 
