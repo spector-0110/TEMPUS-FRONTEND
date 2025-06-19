@@ -16,7 +16,7 @@ const statusConfig = {
     label: "Booked", 
     variant: "default", 
     icon: Calendar,
-    color: "text-blue-600 bg-blue-50 border-blue-200"
+    color: "text-primary bg-blue-50 border-primary/20"
   },
   completed: { 
     label: "Completed", 
@@ -28,7 +28,7 @@ const statusConfig = {
     label: "Cancelled", 
     variant: "destructive", 
     icon: XCircle,
-    color: "text-red-600 bg-red-50 border-red-200"
+    color: "text-red-600 bg-red-50 border-destructive/20"
   },
   missed: { 
     label: "Missed", 
@@ -43,13 +43,13 @@ const paymentStatusConfig = {
     label: "Paid",
     variant: "secondary",
     icon: CheckCircle,
-    color: "text-green-600 bg-green-50 border-green-200"
+    color: "text-green-600 bg-green-50 border-success/20"
   },
   unpaid: {
     label: "Unpaid",
     variant: "outline",
     icon: CreditCard,
-    color: "text-gray-600 bg-gray-50 border-gray-200"
+    color: "text-muted-foreground bg-gray-50 border-border"
   }
 };
 
@@ -62,7 +62,7 @@ const paymentMethodConfig = {
   upi: {
     label: "UPI",
     icon: Smartphone,
-    color: "text-blue-600"
+    color: "text-primary"
   },
   card: {
     label: "Card",
@@ -333,7 +333,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
-            <Calendar className="h-5 w-5 text-blue-600" />
+            <Calendar className="h-5 w-5 text-primary" />
             Appointment Details
           </DialogTitle>
         </DialogHeader>
@@ -379,28 +379,28 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-blue-600" />
+                  <Calendar className="h-5 w-5 text-primary" />
                   Date & Time
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-gray-500" />
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
                   <span className="font-medium">{formatAppointmentDate(appointment.appointmentDate)}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-gray-500" />
+                  <Clock className="h-4 w-4 text-muted-foreground" />
                   <span>{formatAppointmentTime(appointment.startTime)}</span>
                 </div>
                 {appointment.endTime && (
-                  <div className="text-sm text-gray-400">
+                  <div className="text-sm text-muted-foreground">
                     Duration: {Math.round((new Date(appointment.endTime) - new Date(appointment.startTime)) / (1000 * 60))} minutes
                   </div>
                 )}
                 {appointment.createdAt && (
                   <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100">
-                    <Calendar className="h-3.5 w-3.5 text-gray-400" />
-                    <span className="text-xs text-gray-500">
+                    <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">
                       Created on: {formatCreationDate(appointment.createdAt)}
                     </span>
                   </div>
@@ -424,25 +424,25 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
                       <img 
                         src={appointment.doctor.photo} 
                         alt={`Dr. ${appointment.doctor.name}`}
-                        className="w-16 h-16 rounded-xl object-cover border border-gray-200"
+                        className="w-16 h-16 rounded-xl object-cover border border-border"
                       />
                     ) : (
                       <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
-                        <User className="h-8 w-8 text-gray-400" />
+                        <User className="h-8 w-8 text-muted-foreground" />
                       </div>
                     )}
                   </div>
                   {/* Doctor Details on the right */}
                   <div className="flex-grow space-y-2">
                     <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-gray-500" />
+                      <User className="h-4 w-4 text-muted-foreground" />
                       <span className="font-medium">Dr. {appointment.doctor?.name}</span>
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-muted-foreground">
                       {appointment.doctor?.specialization}
                     </div>
                     {appointment.doctor?.department && (
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-muted-foreground">
                         {appointment.doctor.department}
                       </div>
                     )}
@@ -463,16 +463,16 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
             <CardContent className="grid md:grid-cols-2 gap-4">
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-gray-500" />
+                  <User className="h-4 w-4 text-muted-foreground" />
                   <span className="font-medium">{appointment.patient?.name}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-gray-500" />
+                  <Phone className="h-4 w-4 text-muted-foreground" />
                   <span>{appointment.patient?.mobile}</span>
                 </div>
                 {appointment.patient?.email && (
                   <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-gray-500" />
+                    <Mail className="h-4 w-4 text-muted-foreground" />
                     <span>{appointment.patient.email}</span>
                   </div>
                 )}
@@ -480,17 +480,17 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
               <div className="space-y-3">
                 {appointment.patient?.age && (
                   <div className="text-sm">
-                    <span className="text-gray-500">Age:</span> {appointment.patient.age} years
+                    <span className="text-muted-foreground">Age:</span> {appointment.patient.age} years
                   </div>
                 )}
                 {appointment.patient?.gender && (
                   <div className="text-sm">
-                    <span className="text-gray-500">Gender:</span> {appointment.patient.gender}
+                    <span className="text-muted-foreground">Gender:</span> {appointment.patient.gender}
                   </div>
                 )}
                 {appointment.patient?.address && (
                   <div className="flex items-start gap-2">
-                    <MapPin className="h-4 w-4 text-gray-500 mt-0.5" />
+                    <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
                     <span className="text-sm">{appointment.patient.address}</span>
                   </div>
                 )}
@@ -507,14 +507,14 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
               <CardContent className="space-y-3">
                 {appointment.reason && (
                   <div>
-                    <span className="text-sm font-medium text-gray-700">Reason for Visit:</span>
-                    <p className="text-sm text-gray-600 mt-1">{appointment.reason}</p>
+                    <span className="text-sm font-medium text-foreground">Reason for Visit:</span>
+                    <p className="text-sm text-muted-foreground mt-1">{appointment.reason}</p>
                   </div>
                 )}
                 {appointment.notes && (
                   <div>
-                    <span className="text-sm font-medium text-gray-700">Notes:</span>
-                    <p className="text-sm text-gray-600 mt-1">{appointment.notes}</p>
+                    <span className="text-sm font-medium text-foreground">Notes:</span>
+                    <p className="text-sm text-muted-foreground mt-1">{appointment.notes}</p>
                   </div>
                 )}
               </CardContent>
@@ -527,7 +527,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-blue-600" />
+                    <Calendar className="h-5 w-5 text-primary" />
                     Update Appointment Status
                   </CardTitle>
                 </CardHeader>
@@ -637,7 +637,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
                               <polyline points="14 2 14 8 20 8"></polyline>
                             </svg>
                           ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
                               <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
                               <polyline points="14 2 14 8 20 8"></polyline>
                             </svg>
@@ -647,11 +647,11 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
                         <button 
                           onClick={() => downloadFile(doc, fileName)}
                           disabled={downloadingFiles[fileName]}
-                          className="flex items-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md px-2 py-1 transition-colors disabled:opacity-50"
+                          className="flex items-center gap-1 text-xs font-medium text-primary bg-blue-50 hover:bg-primary/10 rounded-md px-2 py-1 transition-colors disabled:opacity-50"
                         >
                           {downloadingFiles[fileName] ? (
                             <>
-                              <svg className="animate-spin -ml-1 mr-2 h-3 w-3 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <svg className="animate-spin -ml-1 mr-2 h-3 w-3 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                               </svg>

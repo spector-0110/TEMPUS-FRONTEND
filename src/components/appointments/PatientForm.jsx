@@ -49,11 +49,11 @@ const PatientForm = ({
     <div className="w-full max-w-2xl mx-auto">
       <Card>
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-            <User className="h-6 w-6 text-blue-600" />
+          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+            <User className="h-6 w-6 text-primary" />
           </div>
           <CardTitle className="text-xl font-semibold">Patient Details</CardTitle>
-          <p className="text-sm text-gray-600 mt-2">
+          <p className="text-sm text-muted-foreground mt-2">
             Please provide patient information to book the appointment
           </p>
         </CardHeader>
@@ -73,7 +73,7 @@ const PatientForm = ({
               className={`h-11 transition-colors ${
                 validationErrors.name 
                   ? 'border-red-500 focus:border-red-500' 
-                  : 'focus:border-blue-500'
+                  : 'focus:border-primary'
               }`}
               aria-describedby={validationErrors.name ? 'name-error' : undefined}
             />
@@ -93,7 +93,7 @@ const PatientForm = ({
                 Age *
               </Label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="patient-age"
                   type="text"
@@ -104,7 +104,7 @@ const PatientForm = ({
                   className={`pl-10 h-11 transition-colors ${
                     validationErrors.age 
                       ? 'border-red-500 focus:border-red-500' 
-                      : 'focus:border-blue-500'
+                      : 'focus:border-primary'
                   }`}
                   aria-describedby={validationErrors.age ? 'age-error' : undefined}
                 />
@@ -123,7 +123,7 @@ const PatientForm = ({
                 Mobile Number *
               </Label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="patient-mobile"
                   type="tel"
@@ -134,7 +134,7 @@ const PatientForm = ({
                   className={`pl-10 h-11 transition-colors ${
                     validationErrors.mobile 
                       ? 'border-red-500 focus:border-red-500' 
-                      : 'focus:border-blue-500'
+                      : 'focus:border-primary'
                   }`}
                   aria-describedby={validationErrors.mobile ? 'mobile-error' : undefined}
                 />
@@ -150,7 +150,7 @@ const PatientForm = ({
 
           {/* Form Validation Summary */}
           {Object.keys(validationErrors).length > 0 && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div className="p-3 bg-red-50 border border-destructive/20 rounded-lg">
               <h4 className="text-sm font-medium text-red-800 mb-1">
                 Please fix the following errors:
               </h4>
@@ -163,7 +163,7 @@ const PatientForm = ({
           )}
 
           {/* Instructions */}
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <div className="bg-blue-50 p-4 rounded-lg border border-primary/20">
             <h4 className="text-sm font-medium text-blue-900 mb-2">Information Required</h4>
             <ul className="text-xs text-blue-800 space-y-1">
               <li>• Full name as per government ID</li>
@@ -174,8 +174,8 @@ const PatientForm = ({
 
           {/* Privacy Notice */}
           <div className="text-center">
-            <p className="text-xs text-gray-500">
-              <span className="inline-block w-3 h-3 bg-green-100 rounded-full mr-2"></span>
+            <p className="text-xs text-muted-foreground">
+              <span className="inline-block w-3 h-3 bg-success/10 rounded-full mr-2"></span>
               Your information is secure and will only be used for appointment booking and medical records.
             </p>
           </div>

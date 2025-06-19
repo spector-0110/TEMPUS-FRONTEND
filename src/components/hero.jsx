@@ -125,14 +125,14 @@ export function Hero() {
   };
 
   return (
-    <section className="relative overflow-hidden min-h-screen flex items-center py-12 px-6">
+    <section className="relative overflow-hidden min-h-screen flex items-center py-1 px-6">
       {/* Enhanced Background with exact gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-blue-50" />
+      <div className="absolute inset-0 bg-gradient-to-br from-surface via-background to-surface" />
       
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
         {/* Floating orbs */}
-        <div className="absolute top-1/4 left-1/6 w-72 h-72 bg-gradient-to-r from-blue-200/30 to-indigo-200/30 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-1/4 left-1/6 w-72 h-72 bg-gradient-to-r from-primary/30 to-primary-hover/30 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/3 right-1/6 w-96 h-96 bg-gradient-to-r from-purple-200/20 to-pink-200/20 rounded-full blur-3xl animate-pulse delay-1000" />
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-indigo-100/20 to-blue-100/20 rounded-full blur-3xl animate-pulse delay-500" />
         
@@ -162,7 +162,7 @@ export function Hero() {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="inline-flex items-center"
               >
-                <Badge variant="outline" className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-blue-50 to-purple-50 text-blue-800 border-blue-200 rounded-full shadow-sm">
+                <Badge variant="outline" className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-primary/5 to-accent/5 text-primary border-primary/20 rounded-full shadow-sm">
                   ✨ Transforming Healthcare Scheduling
                 </Badge>
             </motion.div>
@@ -176,12 +176,12 @@ export function Hero() {
                 className="relative mx-auto w-full max-w-md mb-8"
               >
                 {/* Floating background elements */}
-                <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-indigo-400/20 rounded-3xl blur-xl animate-pulse" />
+                <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 via-accent/20 to-primary-hover/20 rounded-3xl blur-xl animate-pulse" />
                 <div className="absolute -inset-2 bg-gradient-to-r from-white/40 to-white/20 rounded-3xl" />
                 
-                <div className="relative bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-white/60 group hover:shadow-3xl transition-all duration-500">
+                <div className="relative bg-card/90 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden border border-border group hover:shadow-3xl transition-all duration-500">
                   {/* Animated border */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-sm" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-sm" />
                   
                   <div className="relative aspect-[16/10] overflow-hidden">
                     <Image
@@ -194,20 +194,20 @@ export function Hero() {
                     />
                     
                     {/* Enhanced overlay gradients */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-white/10" />
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-purple-500/10" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/30 via-transparent to-surface/10" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10" />
                     
                     {/* Floating badge */}
-                    <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg border border-white/50">
-                      <span className="text-xs font-semibold text-gray-700 flex items-center gap-1">
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                    <div className="absolute top-4 left-4 bg-card/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg border border-border">
+                      <span className="text-xs font-semibold text-card-foreground flex items-center gap-1">
+                        <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
                         Live Platform
                       </span>
                     </div>
                     
                     {/* Bottom info overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-                      <div className="text-white">
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background/60 to-transparent p-4">
+                      <div className="text-card-foreground">
                         <div className="text-sm font-semibold mb-1">Smart Healthcare Management</div>
                         <div className="text-xs opacity-90">Streamlining operations for better patient care</div>
                       </div>
@@ -226,12 +226,12 @@ export function Hero() {
                 className="relative mx-auto w-full max-w-lg mb-8 block lg:hidden"
               >
                 {/* Floating background elements */}
-                <div className="absolute -inset-6 bg-gradient-to-r from-blue-400/25 via-purple-400/25 to-indigo-400/25 rounded-3xl blur-2xl animate-pulse" />
+                <div className="absolute -inset-6 bg-gradient-to-r from-primary/25 via-accent/25 to-primary-hover/25 rounded-3xl blur-2xl animate-pulse" />
                 <div className="absolute -inset-3 bg-gradient-to-r from-white/30 to-white/15 rounded-3xl" />
                 
-                <div className="relative bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden border border-white/60 group hover:shadow-3xl transition-all duration-500">
+                <div className="relative bg-card/90 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden border border-border group hover:shadow-3xl transition-all duration-500">
                   {/* Animated border */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-sm" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-sm" />
                   
                   <div className="relative aspect-[16/9] overflow-hidden">
                     <Image
@@ -244,28 +244,28 @@ export function Hero() {
                     />
                     
                     {/* Enhanced overlay gradients */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-white/10" />
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/15 via-transparent to-purple-500/10" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/25 via-transparent to-surface/10" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-transparent to-accent/10" />
                     
                     {/* Enhanced floating badge for tablets */}
-                    <div className="absolute top-5 left-5 bg-white/95 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg border border-white/50">
-                      <span className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                        <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse" />
+                    <div className="absolute top-5 left-5 bg-card/95 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg border border-border">
+                      <span className="text-sm font-semibold text-card-foreground flex items-center gap-2">
+                        <div className="w-2.5 h-2.5 bg-success rounded-full animate-pulse" />
                         Live Healthcare Platform
                       </span>
                     </div>
                     
                     {/* Enhanced bottom info overlay for tablets */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-5">
-                      <div className="text-white">
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background/70 via-background/20 to-transparent p-5">
+                      <div className="text-card-foreground">
                         <div className="text-base font-semibold mb-2">Smart Healthcare Management</div>
                         <div className="text-sm opacity-90">Advanced platform streamlining operations for better patient care</div>
                       </div>
                     </div>
                     
                     {/* Interactive corner elements */}
-                    <div className="absolute top-5 right-5 bg-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-lg border border-white/50 group-hover:scale-110 transition-transform">
-                      <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse" />
+                    <div className="absolute top-5 right-5 bg-card/90 backdrop-blur-sm rounded-full p-2.5 shadow-lg border border-border group-hover:scale-110 transition-transform">
+                      <div className="w-3 h-3 bg-gradient-to-r from-success to-success-hover rounded-full animate-pulse" />
                     </div>
                   </div>
                 </div>
@@ -279,13 +279,13 @@ export function Hero() {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="space-y-4"
             >
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight">
                 Transform Your{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary-hover to-accent">
                   Healthcare
                 </span>
               </h1>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-700">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-muted-foreground">
                 Operations Today
               </h2>
             </motion.div>
@@ -295,7 +295,7 @@ export function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="text-xl md:text-2xl text-gray-600 leading-relaxed max-w-2xl lg:max-w-none"
+              className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-2xl lg:max-w-none"
             >
               Streamline appointments, manage doctors, analyze performance, and deliver exceptional patient care—all from one intelligent, modern platform.
             </motion.p>
@@ -309,7 +309,6 @@ export function Hero() {
             >
               {[
                 "Smart Scheduling",
-                "Real-time Analytics", 
                 "Patient Management",
                 "HIPAA Compliant"
               ].map((feature, index) => (
@@ -318,10 +317,10 @@ export function Hero() {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.3, delay: 0.8 + index * 0.1 }}
-                  className="flex items-center gap-2 bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full border border-white/50 shadow-sm hover:shadow-md transition-shadow"
+                  className="flex items-center gap-2 bg-card/70 backdrop-blur-sm px-4 py-2 rounded-full border border-border shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <CheckCircleIcon className="w-4 h-4 text-green-500" />
-                  <span className="text-sm font-medium text-gray-700">{feature}</span>
+                  <CheckCircleIcon className="w-4 h-4 text-success" />
+                  <span className="text-sm font-medium text-card-foreground">{feature}</span>
                 </motion.div>
               ))}
             </motion.div>
@@ -334,22 +333,22 @@ export function Hero() {
               className="grid grid-cols-3 gap-6 pt-8"
             >
               <div className="text-center group">
-                <div className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mb-2 group-hover:scale-110 transition-transform">
+                <div className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-hover mb-2 group-hover:scale-110 transition-transform">
                   50K+
                 </div>
-                <div className="text-sm md:text-base text-gray-600 font-medium">Appointments</div>
+                <div className="text-sm md:text-base text-muted-foreground font-medium">Appointments</div>
               </div>
               <div className="text-center group">
-                <div className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600 mb-2 group-hover:scale-110 transition-transform">
+                <div className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-success to-success-hover mb-2 group-hover:scale-110 transition-transform">
                   1,200+
                 </div>
-                <div className="text-sm md:text-base text-gray-600 font-medium">Doctors</div>
+                <div className="text-sm md:text-base text-muted-foreground font-medium">Doctors</div>
               </div>
               <div className="text-center group">
-                <div className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-2 group-hover:scale-110 transition-transform">
+                <div className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent to-accent-hover mb-2 group-hover:scale-110 transition-transform">
                   99.9%
                 </div>
-                <div className="text-sm md:text-base text-gray-600 font-medium">Uptime</div>
+                <div className="text-sm md:text-base text-muted-foreground font-medium">Uptime</div>
               </div>
             </motion.div>
           </motion.div>
@@ -370,11 +369,11 @@ export function Hero() {
                 className="absolute -top-12 -left-12 w-80 h-64 z-0 group"
               >
                 {/* Floating background glow */}
-                <div className="absolute -inset-6 bg-gradient-to-r from-blue-400/30 via-purple-400/30 to-indigo-400/30 rounded-3xl blur-2xl opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+                <div className="absolute -inset-6 bg-gradient-to-r from-primary/30 via-accent/30 to-primary-hover/30 rounded-3xl blur-2xl opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
                 
-                <div className="relative bg-white/85 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden border border-white/60 group-hover:shadow-3xl transition-all duration-500 hover:rotate-1 hover:scale-105">
+                <div className="relative bg-card/85 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden border border-border group-hover:shadow-3xl transition-all duration-500 hover:rotate-1 hover:scale-105">
                   {/* Animated border effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-sm transform scale-105" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-sm transform scale-105" />
                   
                   <div className="relative aspect-[5/4] overflow-hidden">
                     <Image
@@ -386,17 +385,17 @@ export function Hero() {
                     />
                     
                     {/* Multi-layered overlays */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-white/10" />
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/15 via-transparent to-purple-500/10" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/20 via-transparent to-surface/10" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-transparent to-accent/10" />
                     
                     {/* Interactive floating elements */}
-                    <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-full p-2 shadow-lg border border-white/50 group-hover:scale-110 transition-transform">
-                      <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse" />
+                    <div className="absolute top-3 right-3 bg-card/95 backdrop-blur-sm rounded-full p-2 shadow-lg border border-border group-hover:scale-110 transition-transform">
+                      <div className="w-3 h-3 bg-gradient-to-r from-success to-success-hover rounded-full animate-pulse" />
                     </div>
                     
                     {/* Bottom overlay with tech info */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-3">
-                      <div className="text-white">
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background/70 via-background/20 to-transparent p-3">
+                      <div className="text-card-foreground">
                         <div className="text-xs font-semibold opacity-95">AI-Powered Healthcare</div>
                         <div className="text-[10px] opacity-75 mt-0.5">Next-gen medical management</div>
                       </div>
@@ -404,9 +403,9 @@ export function Hero() {
                     
                     {/* Subtle animation dots */}
                     <div className="absolute top-4 left-4 flex space-x-1">
-                      <div className="w-1.5 h-1.5 bg-white/60 rounded-full animate-bounce" />
-                      <div className="w-1.5 h-1.5 bg-white/60 rounded-full animate-bounce delay-100" />
-                      <div className="w-1.5 h-1.5 bg-white/60 rounded-full animate-bounce delay-200" />
+                      <div className="w-1.5 h-1.5 bg-card-foreground/60 rounded-full animate-bounce" />
+                      <div className="w-1.5 h-1.5 bg-card-foreground/60 rounded-full animate-bounce delay-100" />
+                      <div className="w-1.5 h-1.5 bg-card-foreground/60 rounded-full animate-bounce delay-200" />
                     </div>
                   </div>
                 </div>
@@ -414,48 +413,48 @@ export function Hero() {
             </div>
             
             {/* Floating decorations */}
-            <div className="absolute -top-6 -right-6 w-32 h-32 bg-gradient-to-br from-blue-200/30 to-indigo-200/30 rounded-full blur-2xl animate-pulse delay-300" />
-            <div className="absolute -bottom-6 -left-6 w-40 h-40 bg-gradient-to-br from-purple-200/20 to-pink-200/20 rounded-full blur-2xl animate-pulse delay-700" />
+            <div className="absolute -top-6 -right-6 w-32 h-32 bg-gradient-to-br from-primary/30 to-primary-hover/30 rounded-full blur-2xl animate-pulse delay-300" />
+            <div className="absolute -bottom-6 -left-6 w-40 h-40 bg-gradient-to-br from-accent/20 to-accent-hover/20 rounded-full blur-2xl animate-pulse delay-700" />
             
             {/* Additional floating tech elements */}
-            <div className="absolute top-1/4 right-0 w-16 h-16 bg-gradient-to-br from-emerald-200/40 to-teal-200/40 rounded-full blur-xl animate-pulse delay-1000" />
-            <div className="absolute bottom-1/3 left-0 w-24 h-24 bg-gradient-to-br from-indigo-200/30 to-blue-200/30 rounded-full blur-xl animate-pulse delay-500" />
+            <div className="absolute top-1/4 right-0 w-16 h-16 bg-gradient-to-br from-success/40 to-success-hover/40 rounded-full blur-xl animate-pulse delay-1000" />
+            <div className="absolute bottom-1/3 left-0 w-24 h-24 bg-gradient-to-br from-primary/30 to-primary-hover/30 rounded-full blur-xl animate-pulse delay-500" />
             
             {/* Subtle grid pattern overlay */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.05)_0%,transparent_50%)] pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,hsl(var(--primary)_/_0.05)_0%,transparent_50%)] pointer-events-none" />
             
             {/* Main Authentication Card */}
-            <Card className="relative w-full max-w-lg mx-auto backdrop-blur-xl bg-white/95 shadow-2xl border border-white/60 rounded-3xl overflow-hidden z-10">
+            <Card className="relative w-full max-w-lg mx-auto backdrop-blur-xl bg-card/95 shadow-2xl border border-border rounded-3xl overflow-hidden z-10">
               {/* Header gradient */}
-              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary via-primary-hover to-accent" />
               
               <CardHeader className="text-center space-y-6 pt-10 pb-4">
                 <motion.div
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ duration: 0.6, delay: 0.8, type: "spring" }}
-                  className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl flex items-center justify-center shadow-xl shadow-blue-500/25"
+                  className="w-20 h-20 mx-auto bg-gradient-to-br from-primary to-primary-hover rounded-3xl flex items-center justify-center shadow-xl shadow-primary/25"
                 >
-                  <SparklesIcon className="w-10 h-10 text-white" />
+                  <SparklesIcon className="w-10 h-10 text-primary-foreground" />
                 </motion.div>
                 <div>
-                  <h2 className="text-3xl md:text-4xl font-bold text-gray-900">Welcome to Tiqora</h2>
-                  <p className="text-gray-600 mt-3 text-lg">Your healthcare management journey starts here</p>
+                  <h2 className="text-3xl md:text-4xl font-bold text-card-foreground">Welcome to Tiqora</h2>
+                  <p className="text-muted-foreground mt-3 text-lg">Your healthcare management journey starts here</p>
                 </div>
               </CardHeader>
 
               <CardContent className="px-8 pb-8">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 mb-8 bg-gray-100/80 backdrop-blur-sm h-12">
+                  <TabsList className="grid w-full grid-cols-2 mb-8 bg-muted/80 backdrop-blur-sm h-12">
                     <TabsTrigger 
                       value="login" 
-                      className="data-[state=active]:bg-white data-[state=active]:shadow-sm font-semibold text-base h-10"
+                      className="data-[state=active]:bg-card data-[state=active]:shadow-sm font-semibold text-base h-10"
                     >
                       Sign In
                     </TabsTrigger>
                     <TabsTrigger 
                       value="signup"
-                      className="data-[state=active]:bg-white data-[state=active]:shadow-sm font-semibold text-base h-10"
+                      className="data-[state=active]:bg-card data-[state=active]:shadow-sm font-semibold text-base h-10"
                     >
                       Sign Up
                     </TabsTrigger>
@@ -467,10 +466,10 @@ export function Hero() {
                         initial={{ opacity: 0, scale: 0.95, y: -10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                        className="bg-red-50/80 border border-red-200 text-red-700 p-4 rounded-xl text-sm mb-6 flex items-center gap-3"
+                        className="bg-destructive/10 border border-destructive/20 text-destructive p-4 rounded-xl text-sm mb-6 flex items-center gap-3"
                       >
-                        <div className="w-5 h-5 bg-red-200 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-red-600 text-xs font-bold">!</span>
+                        <div className="w-5 h-5 bg-destructive/20 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-destructive text-xs font-bold">!</span>
                         </div>
                         {error}
                       </motion.div>
@@ -481,9 +480,9 @@ export function Hero() {
                         initial={{ opacity: 0, scale: 0.95, y: -10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                        className="bg-green-50/80 border border-green-200 text-green-700 p-4 rounded-xl text-sm mb-6 flex items-center gap-3"
+                        className="bg-success/10 border border-success/20 text-success p-4 rounded-xl text-sm mb-6 flex items-center gap-3"
                       >
-                        <CheckCircleIcon className="w-5 h-5 text-green-600 flex-shrink-0" />
+                        <CheckCircleIcon className="w-5 h-5 text-success flex-shrink-0" />
                         <div>
                           <div className="font-semibold">Email sent!</div>
                           <div>Check your inbox for password reset instructions.</div>
@@ -517,7 +516,7 @@ export function Hero() {
                           onChange={(e) => setResetEmail(e.target.value)}
                           disabled={isLoading}
                           required
-                          className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl bg-white/80 backdrop-blur-sm"
+                          className="h-12 border-border focus:border-primary focus:ring-primary/20 rounded-xl bg-card/80 backdrop-blur-sm"
                         />
                       </div>
 
@@ -537,7 +536,7 @@ export function Hero() {
                         <Button
                           type="submit"
                           disabled={isLoading}
-                          className="flex-1 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                          className="flex-1 h-12 bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary-active text-primary-foreground font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                         >
                           {isLoading ? (
                             <>
@@ -572,7 +571,7 @@ export function Hero() {
                               onChange={(e) => setLoginData({...loginData, email: e.target.value})}
                               disabled={isLoading}
                               required
-                              className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl bg-white/80 backdrop-blur-sm"
+                              className="h-12 border-border focus:border-primary focus:ring-primary/20 rounded-xl bg-card/80 backdrop-blur-sm"
                             />
                           </div>
 
@@ -601,7 +600,7 @@ export function Hero() {
                                 onChange={(e) => setLoginData({...loginData, password: e.target.value})}
                                 disabled={isLoading}
                                 required
-                                className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl pr-12 bg-white/80 backdrop-blur-sm"
+                                className="h-12 border-border focus:border-primary focus:ring-primary/20 rounded-xl pr-12 bg-card/80 backdrop-blur-sm"
                               />
                               <button
                                 type="button"
@@ -657,7 +656,7 @@ export function Hero() {
                               onChange={(e) => setSignupData({...signupData, email: e.target.value})}
                               disabled={isLoading}
                               required
-                              className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl bg-white/80 backdrop-blur-sm"
+                              className="h-12 border-border focus:border-primary focus:ring-primary/20 rounded-xl bg-card/80 backdrop-blur-sm"
                             />
                           </div>
 
@@ -674,7 +673,7 @@ export function Hero() {
                                 onChange={(e) => setSignupData({...signupData, password: e.target.value})}
                                 disabled={isLoading}
                                 required
-                                className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl pr-12 bg-white/80 backdrop-blur-sm"
+                                className="h-12 border-border focus:border-primary focus:ring-primary/20 rounded-xl pr-12 bg-card/80 backdrop-blur-sm"
                               />
                               <button
                                 type="button"
@@ -703,7 +702,7 @@ export function Hero() {
                                 onChange={(e) => setSignupData({...signupData, repeatPassword: e.target.value})}
                                 disabled={isLoading}
                                 required
-                                className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl pr-12 bg-white/80 backdrop-blur-sm"
+                                className="h-12 border-border focus:border-primary focus:ring-primary/20 rounded-xl pr-12 bg-card/80 backdrop-blur-sm"
                               />
                               <button
                                 type="button"
@@ -745,7 +744,7 @@ export function Hero() {
                 {/* Divider */}
                 <div className="relative my-8">
                   <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-gray-200" />
+                    <span className="w-full border-t border-border" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
                     <span className="bg-white px-4 text-gray-500 font-medium">Or continue with</span>
@@ -756,7 +755,7 @@ export function Hero() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-12 font-semibold border-gray-200 hover:bg-gray-50 rounded-xl transition-colors text-base"
+                  className="w-full h-12 font-semibold border-border hover:bg-gray-50 rounded-xl transition-colors text-base"
                   disabled={isLoading}
                   onClick={() => authService.signInWithOAuth('google')}
                 >

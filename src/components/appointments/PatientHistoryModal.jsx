@@ -76,12 +76,12 @@ export default function PatientHistoryModal({
   // Helper functions for formatting and styling
   const getStatusColor = (status) => {
     switch (status) {
-      case 'booked': return 'bg-blue-100 text-blue-800';
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'missed': return 'bg-red-100 text-red-800';
-      case 'cancelled': return 'bg-gray-100 text-gray-800';
-      case 'confirmed': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'booked': return 'bg-primary/10 text-primary';
+      case 'completed': return 'bg-success/10 text-success';
+      case 'missed': return 'bg-destructive/10 text-destructive';
+      case 'cancelled': return 'bg-muted text-foreground';
+      case 'confirmed': return 'bg-accent/10 text-accent';
+      default: return 'bg-muted text-foreground';
     }
   };
 
@@ -98,9 +98,9 @@ export default function PatientHistoryModal({
 
   const getPaymentStatusColor = (paymentStatus) => {
     switch (paymentStatus) {
-      case 'paid': return 'bg-emerald-100 text-emerald-800';
-      case 'unpaid': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'paid': return 'bg-success/10 text-success';
+      case 'unpaid': return 'bg-warning/10 text-warning';
+      default: return 'bg-muted text-foreground';
     }
   };
 
@@ -181,7 +181,7 @@ export default function PatientHistoryModal({
         </DialogHeader>
         
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+          <div className="bg-red-50 border border-destructive/20 text-red-700 px-4 py-3 rounded-md">
             <p>{error}</p>
           </div>
         )}
@@ -192,9 +192,9 @@ export default function PatientHistoryModal({
           </div>
         ) : patientHistory.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <History className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-500">No previous appointments found</h3>
-            <p className="text-sm text-gray-500 mt-2">This patient has no appointment history</p>
+            <History className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium text-muted-foreground">No previous appointments found</h3>
+            <p className="text-sm text-muted-foreground mt-2">This patient has no appointment history</p>
           </div>
         ) : (
           <div className="space-y-6 my-4">

@@ -52,7 +52,7 @@ export default function OperationalMetrics({ data }) {
       title: 'Overall Utilization',
       value: `${overallUtilization}%`,
       icon: TrendingUp,
-      color: 'from-blue-500 to-blue-600',
+      color: 'from-primary to-primary-hover',
       description: `${totalBooked}/${totalSlots} slots`,
       status: overallUtilization > 70 ? 'good' : overallUtilization > 40 ? 'warning' : 'poor'
     },
@@ -84,10 +84,10 @@ export default function OperationalMetrics({ data }) {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'good': return 'text-green-600 dark:text-green-400';
-      case 'warning': return 'text-yellow-600 dark:text-yellow-400';
-      case 'poor': return 'text-red-600 dark:text-red-400';
-      default: return 'text-slate-600 dark:text-slate-400';
+      case 'good': return 'text-success';
+      case 'warning': return 'text-warning';
+      case 'poor': return 'text-destructive';
+      default: return 'text-muted-foreground';
     }
   };
 
@@ -101,10 +101,10 @@ export default function OperationalMetrics({ data }) {
         transition={{ duration: 0.6 }}
         className="text-center"
       >
-        <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-200 mb-2">
+        <h2 className="text-3xl font-bold text-foreground mb-2">
           Operational Metrics
         </h2>
-        <p className="text-slate-600 dark:text-slate-400">
+        <p className="text-muted-foreground">
           Efficiency analysis and operational performance indicators
         </p>
       </motion.div>
@@ -121,13 +121,13 @@ export default function OperationalMetrics({ data }) {
             <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-300">
               <div className={`absolute inset-0 bg-gradient-to-br ${metric.color} opacity-5 group-hover:opacity-10 transition-opacity`} />
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                   {metric.title}
                 </CardTitle>
-                <metric.icon className={`h-5 w-5 bg-gradient-to-br ${metric.color} text-white rounded p-1`} />
+                <metric.icon className={`h-5 w-5 bg-gradient-to-br ${metric.color} text-card-foreground rounded p-1`} />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-1">
+                <div className="text-2xl font-bold text-foreground mb-1">
                   {metric.value}
                 </div>
                 <div className={`text-xs ${getStatusColor(metric.status)}`}>
@@ -147,7 +147,7 @@ export default function OperationalMetrics({ data }) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-blue-500" />
@@ -183,7 +183,7 @@ export default function OperationalMetrics({ data }) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-green-500" />
@@ -193,11 +193,11 @@ export default function OperationalMetrics({ data }) {
             <CardContent>
               {patientDemographics.total === 0 ? (
                 <div className="text-center py-12">
-                  <Users className="h-12 w-12 text-slate-400 dark:text-slate-500 mx-auto mb-4" />
-                  <div className="text-slate-500 dark:text-slate-400 mb-2">
+                  <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <div className="text-muted-foreground mb-2">
                     No patient demographic data available yet
                   </div>
-                  <div className="text-xs text-slate-400 dark:text-slate-500">
+                  <div className="text-xs text-muted-foreground">
                     Data will appear as patients visit
                   </div>
                 </div>
@@ -233,7 +233,7 @@ export default function OperationalMetrics({ data }) {
           transition={{ duration: 0.6, delay: 0.5 }}
           className="lg:col-span-2"
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Settings className="h-5 w-5 text-orange-500" />
@@ -243,9 +243,9 @@ export default function OperationalMetrics({ data }) {
             <CardContent>
               <div className="space-y-6">
                 {Object.entries(scheduleEfficiency || {}).map(([doctorId, efficiency]) => (
-                  <div key={doctorId} className="border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+                  <div key={doctorId} className="border border-border rounded-lg p-4">
                     <div className="flex items-center justify-between mb-4">
-                      <h4 className="font-semibold text-slate-800 dark:text-slate-200">
+                      <h4 className="font-semibold text-foreground">
                         Dr. {efficiency.doctor.name}
                       </h4>
                       <Badge variant="outline">
@@ -256,13 +256,13 @@ export default function OperationalMetrics({ data }) {
                     {efficiency.recommendations && efficiency.recommendations.length > 0 ? (
                       <div className="space-y-3">
                         {efficiency.recommendations.slice(0, 3).map((rec, index) => (
-                          <div key={index} className="flex items-start gap-3 p-3 bg-orange-50 dark:bg-orange-950 rounded-lg">
-                            <AlertTriangle className="h-4 w-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                          <div key={index} className="flex items-start gap-3 p-3 bg-warning/10 rounded-lg">
+                            <AlertTriangle className="h-4 w-4 text-warning mt-0.5 flex-shrink-0" />
                             <div className="text-sm">
-                              <div className="font-medium text-orange-800 dark:text-orange-200">
+                              <div className="font-medium text-warning">
                                 {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][rec.day]} at {rec.startTime}
                               </div>
-                              <div className="text-orange-700 dark:text-orange-300 text-xs mt-1">
+                              <div className="text-warning/80 text-xs mt-1">
                                 {rec.suggestion}
                               </div>
                             </div>
@@ -277,8 +277,8 @@ export default function OperationalMetrics({ data }) {
                         )}
                       </div>
                     ) : (
-                      <div className="text-center py-4 text-slate-500 dark:text-slate-400">
-                        <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                      <div className="text-center py-4 text-muted-foreground">
+                        <CheckCircle className="h-8 w-8 text-success mx-auto mb-2" />
                         <div className="text-sm">Schedule is optimized</div>
                       </div>
                     )}
@@ -296,7 +296,7 @@ export default function OperationalMetrics({ data }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.6 }}
       >
-        <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+        <Card className="bg-card-elevated/60 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5 text-purple-500" />
@@ -306,9 +306,9 @@ export default function OperationalMetrics({ data }) {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {utilizationData.map((doctor, index) => (
-                <div key={doctor.name} className="space-y-3 p-4 border border-slate-200 dark:border-slate-700 rounded-lg">
+                <div key={doctor.name} className="space-y-3 p-4 border border-border rounded-lg">
                   <div className="flex items-center justify-between">
-                    <h4 className="font-semibold text-slate-800 dark:text-slate-200">
+                    <h4 className="font-semibold text-foreground">
                       Dr. {doctor.name}
                     </h4>
                     <Badge variant={doctor.utilization > 50 ? 'default' : 'secondary'}>
@@ -318,7 +318,7 @@ export default function OperationalMetrics({ data }) {
                   
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-600 dark:text-slate-400">Utilization</span>
+                      <span className="text-muted-foreground">Utilization</span>
                       <span className="font-medium">{doctor.utilization}%</span>
                     </div>
                     <Progress value={doctor.utilization} className="h-2" />
@@ -326,12 +326,12 @@ export default function OperationalMetrics({ data }) {
                   
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <div className="text-slate-600 dark:text-slate-400">Booked Slots</div>
-                      <div className="font-semibold text-slate-800 dark:text-slate-200">{doctor.bookedSlots}</div>
+                      <div className="text-muted-foreground">Booked Slots</div>
+                      <div className="font-semibold text-foreground">{doctor.bookedSlots}</div>
                     </div>
                     <div>
-                      <div className="text-slate-600 dark:text-slate-400">Total Slots</div>
-                      <div className="font-semibold text-slate-800 dark:text-slate-200">{doctor.totalSlots}</div>
+                      <div className="text-muted-foreground">Total Slots</div>
+                      <div className="font-semibold text-foreground">{doctor.totalSlots}</div>
                     </div>
                   </div>
                 </div>

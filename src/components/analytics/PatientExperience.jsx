@@ -145,7 +145,7 @@ export default function PatientExperience({ data }) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Clock className="h-5 w-5 text-blue-500" />
@@ -191,7 +191,7 @@ export default function PatientExperience({ data }) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <RotateCcw className="h-5 w-5 text-green-500" />
@@ -228,7 +228,7 @@ export default function PatientExperience({ data }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Star className="h-5 w-5 text-purple-500" />
@@ -265,7 +265,7 @@ export default function PatientExperience({ data }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Heart className="h-5 w-5 text-red-500" />
@@ -312,7 +312,7 @@ export default function PatientExperience({ data }) {
                 </div>
 
                 {/* Quick Stats */}
-                <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+                <div className="grid grid-cols-2 gap-3 pt-4 border-t border-border">
                   <div className="text-center">
                     <div className="text-lg font-bold text-slate-800 dark:text-slate-200">
                       {retention.totalPatients}

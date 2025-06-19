@@ -21,7 +21,7 @@ export default function HospitalOverview({ data }) {
       title: 'Hospital Name',
       value: hospitalInfo?.name || 'N/A',
       icon: Building2,
-      color: 'from-blue-500 to-blue-600',
+      color: 'from-primary to-primary-hover',
       description: hospitalInfo?.establishedDate ? `Est. ${establishedDate.getFullYear()}` : 'Not specified'
     },
     {
@@ -55,10 +55,10 @@ export default function HospitalOverview({ data }) {
         transition={{ duration: 0.6 }}
         className="text-center"
       >
-        <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-200 mb-2">
+        <h2 className="text-3xl font-bold text-foreground mb-2">
           Hospital Overview
         </h2>
-        <p className="text-slate-600 dark:text-slate-400">
+        <p className="text-muted-foreground">
           Essential information and key metrics for your hospital
         </p>
       </motion.div>
@@ -74,16 +74,16 @@ export default function HospitalOverview({ data }) {
             <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-300">
               <div className={`absolute inset-0 bg-gradient-to-br ${card.color} opacity-5 group-hover:opacity-10 transition-opacity`} />
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                   {card.title}
                 </CardTitle>
-                <card.icon className={`h-5 w-5 bg-gradient-to-br ${card.color} text-white rounded p-1`} />
+                <card.icon className={`h-5 w-5 bg-gradient-to-br ${card.color} text-card-foreground rounded p-1`} />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-1">
+                <div className="text-2xl font-bold text-foreground mb-1">
                   {card.value}
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-muted-foreground">
                   {card.description}
                 </p>
               </CardContent>
@@ -98,9 +98,9 @@ export default function HospitalOverview({ data }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.5 }}
       >
-        <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm border-slate-200 dark:border-slate-700">
+        <Card className="bg-card-elevated/60 backdrop-blur-sm border-border">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold text-slate-800 dark:text-slate-200">
+            <CardTitle className="text-xl font-semibold text-foreground">
               Hospital Details
             </CardTitle>
           </CardHeader>
@@ -108,25 +108,25 @@ export default function HospitalOverview({ data }) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Contact Information */}
               <div className="space-y-3">
-                <h3 className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <h3 className="font-semibold text-foreground flex items-center gap-2">
                   <Phone className="h-4 w-4" />
                   Contact Information
                 </h3>
                 <div className="space-y-2 text-sm">
                   <div>
-                    <span className="text-slate-500 dark:text-slate-400">Phone: </span>
-                    <span className="text-slate-700 dark:text-slate-300">{hospitalInfo.contactInfo.phone}</span>
+                    <span className="text-muted-foreground">Phone: </span>
+                    <span className="text-foreground">{hospitalInfo.contactInfo.phone}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 dark:text-slate-400">Email: </span>
-                    <span className="text-slate-700 dark:text-slate-300">{hospitalInfo.adminEmail}</span>
+                    <span className="text-muted-foreground">Email: </span>
+                    <span className="text-foreground">{hospitalInfo.adminEmail}</span>
                   </div>
                   {hospitalInfo.contactInfo.website && (
                     <div>
-                      <span className="text-slate-500 dark:text-slate-400">Website: </span>
+                      <span className="text-muted-foreground">Website: </span>
                       <a 
                         href={hospitalInfo.contactInfo.website}
-                        className="text-blue-600 dark:text-blue-400 hover:underline"
+                        className="text-primary hover:text-primary/80 hover:underline transition-colors"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -139,11 +139,11 @@ export default function HospitalOverview({ data }) {
 
               {/* Address */}
               <div className="space-y-3">
-                <h3 className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <h3 className="font-semibold text-foreground flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
                   Address
                 </h3>
-                <div className="text-sm text-slate-600 dark:text-slate-400">
+                <div className="text-sm text-muted-foreground">
                   <div>{hospitalInfo.address.street}</div>
                   <div>{hospitalInfo.address.city}, {hospitalInfo.address.district}</div>
                   <div>{hospitalInfo.address.state} - {hospitalInfo.address.pincode}</div>
@@ -153,27 +153,27 @@ export default function HospitalOverview({ data }) {
 
               {/* Additional Info */}
               <div className="space-y-3">
-                <h3 className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <h3 className="font-semibold text-foreground flex items-center gap-2">
                   <Globe className="h-4 w-4" />
                   Additional Information
                 </h3>
                 <div className="space-y-2 text-sm">
                   <div>
-                    <span className="text-slate-500 dark:text-slate-400">Subdomain: </span>
+                    <span className="text-muted-foreground">Subdomain: </span>
                     <Badge variant="secondary">{hospitalInfo.subdomain}</Badge>
                   </div>
                   <div>
-                    <span className="text-slate-500 dark:text-slate-400">GSTIN: </span>
-                    <span className="text-slate-700 dark:text-slate-300 font-mono">{hospitalInfo.gstin}</span>
+                    <span className="text-muted-foreground">GSTIN: </span>
+                    <span className="text-foreground font-mono">{hospitalInfo.gstin}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 dark:text-slate-400">Theme Color: </span>
+                    <span className="text-muted-foreground">Theme Color: </span>
                     <div className="inline-flex items-center gap-2">
                       <div 
-                        className="w-4 h-4 rounded border border-slate-300 dark:border-slate-600"
+                        className="w-4 h-4 rounded border border-border"
                         style={{ backgroundColor: hospitalInfo.themeColor }}
                       />
-                      <span className="text-slate-700 dark:text-slate-300 font-mono">{hospitalInfo.themeColor}</span>
+                      <span className="text-foreground font-mono">{hospitalInfo.themeColor}</span>
                     </div>
                   </div>
                 </div>

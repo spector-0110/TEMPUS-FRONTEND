@@ -83,7 +83,7 @@ export function UpdatePasswordForm({ className, ...props }) {
               className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center"
             >
               <svg
-                className="w-8 h-8 text-green-600"
+                className="w-8 h-8 text-success"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -128,7 +128,7 @@ export function UpdatePasswordForm({ className, ...props }) {
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-red-100 border border-red-300 text-red-800 p-3 rounded-lg text-sm"
+                className="bg-destructive/10 border border-destructive/20 text-destructive-foreground p-3 rounded-lg text-sm"
               >
                 {error}
               </motion.div>

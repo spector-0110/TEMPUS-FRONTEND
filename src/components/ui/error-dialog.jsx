@@ -53,9 +53,9 @@ const ErrorDialog = ({
   const getErrorColorClass = () => {
     switch (errorType) {
       case 'api':
-        return 'text-red-600 dark:text-red-400';
+        return 'text-destructive';
       case 'validation':
-        return 'text-amber-600 dark:text-amber-400';
+        return 'text-warning';
       default:
         return 'text-destructive';
     }
@@ -80,23 +80,23 @@ const ErrorDialog = ({
         </DialogHeader>
         
         <div className="py-3">
-          <p className="text-sm text-gray-100">{message}</p>
+          <p className="text-sm text-foreground">{message}</p>
           
           {details && details.length > 0 && (
-            <div className="mt-3 max-h-60 overflow-auto border rounded-md p-3 bg-gray-900">
+            <div className="mt-3 max-h-60 overflow-auto border rounded-md p-3 bg-muted">
               <ul className="list-disc pl-5 text-sm space-y-2">
                 {details.map((detail, index) => {
                   // Handle different detail formats
                   if (typeof detail === 'string') {
                     // For simple string errors
-                    return <li key={index} className="text-gray-300">{detail}</li>;
+                    return <li key={index} className="text-muted-foreground">{detail}</li>;
                   } else if (typeof detail === 'object' && detail !== null) {
                     // For field-specific validation errors
                     const fieldName = detail.field || 'Unknown field';
                     const errorMessage = detail.message || 'Invalid value';
                     
                     return (
-                      <li key={index} className="text-gray-700 dark:text-gray-300">
+                      <li key={index} className="text-foreground">
                         <span className="font-medium">{fieldName}:</span> {errorMessage}
                       </li>
                     );

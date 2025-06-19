@@ -275,7 +275,7 @@ const AppointmentCreationFlow = ({ onSuccess }) => {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-8 border-r-gray-900">
         <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-        <p className="mt-4 text-gray-600">Loading...</p>
+        <p className="mt-4 text-muted-foreground">Loading...</p>
       </div>
     );
   }
@@ -308,7 +308,7 @@ const AppointmentCreationFlow = ({ onSuccess }) => {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold">Create New Appointment</h2>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-muted-foreground">
             Step {currentStep} of {steps.length}
           </span>
         </div>
@@ -324,7 +324,7 @@ const AppointmentCreationFlow = ({ onSuccess }) => {
                     ? 'bg-green-600 text-white'
                     : currentStep === step.number
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-600'
+                    : 'bg-gray-200 text-muted-foreground'
                 }`}
               >
                 {currentStep > step.number ? (
@@ -335,7 +335,7 @@ const AppointmentCreationFlow = ({ onSuccess }) => {
               </div>
               <div className="hidden sm:block">
                 <p className="text-sm font-medium">{step.title}</p>
-                <p className="text-xs text-gray-500">{step.description}</p>
+                <p className="text-xs text-muted-foreground">{step.description}</p>
               </div>
             </div>
           ))}
@@ -344,17 +344,17 @@ const AppointmentCreationFlow = ({ onSuccess }) => {
 
       {/* Error Display */}
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div className="mb-6 p-4 bg-red-50 border border-destructive/20 rounded-lg">
           <p className="text-red-700 text-sm">{error}</p>
         </div>
       )}
 
       {/* Success Display */}
       {isSuccess && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+        <div className="mb-6 p-4 bg-green-50 border border-success/20 rounded-lg">
           <div className="flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-green-600" />
-            <p className="text-green-700 text-sm font-medium">Appointment Created Successfully!</p>
+            <p className="text-success text-sm font-medium">Appointment Created Successfully!</p>
           </div>
           <p className="text-green-600 text-sm mt-1">Your appointment details have been saved and you will be redirected shortly.</p>
         </div>

@@ -13,11 +13,11 @@ export default function HelpPage() {
 
       <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {/* Phone Support */}
-        <Card className="p-8 h-full flex flex-col justify-between rounded-2xl border border-gray-200 dark:border-gray-700 transition-shadow duration-300 hover:shadow-xl dark:hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]">
+        <Card className="p-8 h-full flex flex-col justify-between rounded-2xl border border-border transition-shadow duration-300 hover:shadow-xl">
           <div className="space-y-4">
             <PhoneIcon className="h-10 w-10" />
             <h3 className="text-2xl font-semibold">Contact Support</h3>
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-muted-foreground">
               Need immediate assistance? Our support team is here to help.
             </p>
           </div>
@@ -34,7 +34,7 @@ export default function HelpPage() {
           <div className="space-y-4">
             <MailIcon className="h-10 w-10" />
             <h3 className="text-2xl font-semibold">Email Support</h3>
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-muted-foreground">
               Send us an email and we'll get back to you within 24 hours.
             </p>
           </div>
@@ -51,7 +51,7 @@ export default function HelpPage() {
           <div className="space-y-4">
             <BookIcon className="h-10 w-10" />
             <h3 className="text-2xl font-semibold">Documentation</h3>
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-muted-foreground">
               Browse our comprehensive documentation and guides.
             </p>
           </div>

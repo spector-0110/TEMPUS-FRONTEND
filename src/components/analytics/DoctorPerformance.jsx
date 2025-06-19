@@ -75,7 +75,7 @@ export default function DoctorPerformance({ doctors, appointmentData, operationa
         transition={{ duration: 0.6 }}
         className="text-center"
       >
-        <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-200 mb-2">
+        <h2 className="text-3xl font-bold text-foreground mb-2">
           Doctor Performance
         </h2>
         <p className="text-slate-600 dark:text-slate-400">
@@ -131,19 +131,19 @@ export default function DoctorPerformance({ doctors, appointmentData, operationa
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
-                      <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    <div className="text-center p-3 bg-primary/10 rounded-lg">
+                      <div className="text-2xl font-bold text-primary">
                         {performance.total || 0}
                       </div>
-                      <div className="text-xs text-blue-500 dark:text-blue-300">
+                      <div className="text-xs text-primary/70">
                         Total Appointments
                       </div>
                     </div>
-                    <div className="text-center p-3 bg-green-50 dark:bg-green-950 rounded-lg">
-                      <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    <div className="text-center p-3 bg-success/10 rounded-lg">
+                      <div className="text-2xl font-bold text-success">
                         {Math.round(utilization.utilization || 0)}%
                       </div>
-                      <div className="text-xs text-green-500 dark:text-green-300">
+                      <div className="text-xs text-success/70">
                         Utilization
                       </div>
                     </div>
@@ -164,7 +164,7 @@ export default function DoctorPerformance({ doctors, appointmentData, operationa
                     </div>
                   </div>
                   
-                  <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+                  <div className="pt-2 border-t border-border">
                     <div className="text-xs text-slate-500 dark:text-slate-400">
                       Qualifications: {doctor.qualification}
                     </div>
@@ -184,10 +184,10 @@ export default function DoctorPerformance({ doctors, appointmentData, operationa
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5 text-blue-500" />
+                <Activity className="h-5 w-5 text-primary" />
                 Doctor Performance Comparison
               </CardTitle>
             </CardHeader>
@@ -225,10 +225,10 @@ export default function DoctorPerformance({ doctors, appointmentData, operationa
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Star className="h-5 w-5 text-yellow-500" />
+                <Star className="h-5 w-5 text-warning" />
                 Doctor Utilization
               </CardTitle>
             </CardHeader>
@@ -261,10 +261,10 @@ export default function DoctorPerformance({ doctors, appointmentData, operationa
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5 text-green-500" />
+                <User className="h-5 w-5 text-success" />
                 Doctor Status
               </CardTitle>
             </CardHeader>
@@ -298,10 +298,10 @@ export default function DoctorPerformance({ doctors, appointmentData, operationa
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-purple-500" />
+                <Calendar className="h-5 w-5 text-info" />
                 Specialization Distribution
               </CardTitle>
             </CardHeader>

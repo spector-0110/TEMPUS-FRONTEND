@@ -73,7 +73,7 @@ export function LoginForm({ className, ...props }) {
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-red-100 border border-red-300 text-red-800 p-3 rounded-lg text-sm"
+                className="bg-destructive/10 border border-destructive/20 text-destructive-foreground p-3 rounded-lg text-sm"
               >
                 {error}
               </motion.div>

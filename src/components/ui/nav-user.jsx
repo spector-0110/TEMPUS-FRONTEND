@@ -32,6 +32,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import {LogoutButton} from "@/components/ui/logout-button"
+import { ThemeSwitcher } from "@/components/theme-switcher";
 
 export function NavUser({
   user
@@ -112,6 +113,9 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleNavItemClick}>
+              <ThemeSwitcher variant="expanded"/>
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={handleNavItemClick}>
               <LogoutButton/>
             </DropdownMenuItem>

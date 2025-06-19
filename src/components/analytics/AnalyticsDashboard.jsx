@@ -95,7 +95,7 @@ export default function AnalyticsDashboard({ data }) {
         ? Object.values(appointment.statusDistribution).reduce((sum, count) => sum + count, 0) 
         : 0,
       icon: Calendar,
-      color: 'from-blue-500 to-blue-600',
+      color: 'from-primary to-primary-hover',
       change: '+12%',
       trend: 'up'
     },
@@ -167,15 +167,15 @@ export default function AnalyticsDashboard({ data }) {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-8 dark:bg-slate-950/70 rounded-xl p-2 backdrop-blur-md"
+      className="space-y-8 bg-surface/70 rounded-xl p-2 backdrop-blur-md"
     >
       {/* Dashboard Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4">
         <motion.div variants={itemVariants}>
-          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent">
             Hospital Analytics
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-muted-foreground mt-1">
             Comprehensive insights for {hospitalInfo.name || 'Your Hospital'}
           </p>
         </motion.div>

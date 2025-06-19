@@ -31,15 +31,15 @@ export const LineChartCustom = ({
   const areaPath = `${linePath} L ${points[points.length - 1].x} ${height - padding} L ${padding} ${height - padding} Z`;
 
   return (
-    <div ref={ref} className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6">
-      <h3 className="text-lg font-semibold text-white mb-6">{title}</h3>
+    <div ref={ref} className="bg-card-elevated/50 backdrop-blur-xl border border-border rounded-2xl p-6">
+      <h3 className="text-lg font-semibold text-foreground mb-6">{title}</h3>
       
       <div className="relative">
         <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
           {/* Grid lines */}
           <defs>
             <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(156, 163, 175, 0.1)" strokeWidth="1"/>
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="hsl(var(--border))" strokeWidth="1" opacity="0.3"/>
             </pattern>
             <linearGradient id={`area-gradient-${color.replace('#', '')}`} x1="0%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%" stopColor={color} stopOpacity="0.3"/>

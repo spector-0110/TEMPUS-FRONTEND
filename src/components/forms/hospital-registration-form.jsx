@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+
 import {
   Dialog,
   DialogContent,
@@ -20,6 +21,7 @@ import { CheckCircle, Building2, MapPin, Phone, Mail, User, FileText, AlertTrian
 import { fetchHospitalFormFields, submitHospitalDetails } from '@/lib/api';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ErrorDialog } from '@/components/ui/error-dialog';
+import { MobileNavigation } from '@/components/ui/mobile-navigation';
 
 const FORM_STORAGE_KEY = 'hospitalFormData';
 
@@ -306,46 +308,49 @@ export default function HospitalRegistrationForm() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="animate-spin w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full mx-auto"></div>
-          <p className="text-slate-300 font-medium">Loading registration form...</p>
+          <div className="animate-spin w-12 h-12 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+          <p className="text-muted-foreground font-medium">Loading registration form...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-neutral-950 via-gray-700 to-neutral-900">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <div className={`fixed top-0 left-0 right-0 z-[60] transition-all duration-300 ${
         isMobile ? 'w-[98%] mx-auto mt-2' : 'w-[95%] max-w-screen-xl mx-auto'
       }`}>
-        <div className="bg-gray-900 shadow-md rounded-full px-3 py-2.5 sm:px-4 sm:py-2">
+        <div className="bg-card border border-border shadow-lg rounded-full px-3 py-2.5 sm:px-4 sm:py-2 backdrop-blur-md">
           <div className="container mx-auto">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center space-x-2.5 sm:space-x-3">
-                <div className="p-2 sm:p-2 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg shadow-lg shrink-0">
-                  <Building2 className={`${isMobile ? 'w-5 h-5' : 'w-6 h-6'} text-white`} />
+                <div className="p-2 sm:p-2 bg-primary rounded-lg shadow-lg shrink-0">
+                  <Building2 className={`${isMobile ? 'w-5 h-5' : 'w-6 h-6'} text-primary-foreground`} />
                 </div>
                 <div className="min-w-0">
-                  <h1 className={`font-bold text-white truncate ${isMobile ? 'text-base sm:text-lg' : 'text-2xl'}`}>
+                  <h1 className={`font-bold text-foreground truncate ${isMobile ? 'text-base sm:text-lg' : 'text-2xl'}`}>
                     Hospital Registration
                   </h1>
                 </div>
               </div>
-              <div className="flex items-center shrink-0 ml-2">
+              <div className="flex items-center shrink-0 ml-2 gap-2">
+                {/* Progress bar - always show */}
                 <div className="flex items-center space-x-2">
-                  <div className={`${isMobile ? 'w-24 sm:w-28' : 'w-32'} bg-slate-700 rounded-full h-2`}>
+                  <div className={`${isMobile ? 'w-20 sm:w-24' : 'w-32'} bg-muted rounded-full h-2`}>
                     <div 
-                      className="bg-gradient-to-r from-cyan-400 to-blue-500 h-full rounded-full transition-all duration-300 shadow-lg"
+                      className="bg-primary h-full rounded-full transition-all duration-300 shadow-lg"
                       style={{ width: `${getCompletionPercentage()}%` }}
                     ></div>
                   </div>
-                  <span className={`font-semibold text-slate-200 ${isMobile ? 'text-xs sm:text-sm' : 'text-sm'} whitespace-nowrap`}>
+                  <span className={`font-semibold text-foreground ${isMobile ? 'text-xs sm:text-sm' : 'text-sm'} whitespace-nowrap`}>
                     {getCompletionPercentage()}%
                   </span>
                 </div>
+                 {/* Mobile Navigation or desktop theme switcher */}
+                <MobileNavigation variant="inline" />
               </div>
             </div>
           </div>
@@ -353,7 +358,7 @@ export default function HospitalRegistrationForm() {
       </div>
 
       {/* Add margin-top to account for fixed header */}
-      <div className={`${isMobile ? 'mt-7' : 'mt-11'}`}>
+      <div className={`${isMobile ? 'mt-12' : 'mt-11'}`}>
         {/* Form Content */}
         <form onSubmit={handleSubmit}>
           <div className="container mx-auto px-4 py-8">
@@ -368,27 +373,27 @@ export default function HospitalRegistrationForm() {
                   }).length;
 
                   return (
-                    <Card key={section.id} className="overflow-hidden shadow-2xl border border-slate-800/50 bg-slate-900/95 backdrop-blur-md">
+                    <Card key={section.id} className="overflow-hidden shadow-lg border border-border bg-card backdrop-blur-md">
                       {/* Section Header */}
-                      <div className="bg-gradient-to-r from-slate-800 to-slate-700 px-6 py-4 border-b border-slate-700/50">
+                      <div className="bg-muted/50 px-6 py-4 border-b border-border">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
-                            <div className="p-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
-                              <IconComponent className="w-5 h-5 text-cyan-300" />
+                            <div className="p-2 bg-primary/10 backdrop-blur-sm rounded-lg border border-border">
+                              <IconComponent className="w-5 h-5 text-primary" />
                             </div>
                             <div>
-                              <h2 className="text-xl font-semibold text-white">{section.title}</h2>
-                              <p className="text-slate-300 text-sm">
+                              <h2 className="text-xl font-semibold text-foreground">{section.title}</h2>
+                              <p className="text-muted-foreground text-sm">
                                 Step {sectionIndex + 1} of {formConfig.sections.length}
                               </p>
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="text-slate-300 text-sm">
+                            <div className="text-muted-foreground text-sm">
                               {sectionCompleted}/{section.fields.length} completed
                             </div>
                             {sectionErrors > 0 && (
-                              <div className="flex items-center text-red-400 text-sm mt-1">
+                              <div className="flex items-center text-destructive text-sm mt-1">
                                 <AlertTriangle className="w-4 h-4 mr-1" />
                                 {sectionErrors} error{sectionErrors > 1 ? 's' : ''}
                               </div>
@@ -398,13 +403,13 @@ export default function HospitalRegistrationForm() {
                       </div>
 
                       {/* Section Content */}
-                      <div className="p-6 bg-slate-900/50">
+                      <div className="p-6 bg-card">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           {section.fields.map(field => (
                             <div key={field.id} className="space-y-2">
-                              <Label htmlFor={field.id} className="text-sm font-medium text-slate-200 flex items-center">
+                              <Label htmlFor={field.id} className="text-sm font-medium text-foreground flex items-center">
                                 {field.label}
-                                {field.required && <span className="text-red-400 ml-1">*</span>}
+                                {field.required && <span className="text-destructive ml-1">*</span>}
                               </Label>
                               <div className="relative">
                                 <Input
@@ -412,13 +417,13 @@ export default function HospitalRegistrationForm() {
                                   type={field.type}
                                   value={formData[field.id] || ''}
                                   onChange={(e) => handleChange(field, e.target.value)}
-                                  className={`transition-all duration-200 bg-slate-800/90 border-slate-700 text-white placeholder-slate-500 focus:ring-2 ${
+                                  className={`transition-all duration-200 bg-input border-border text-foreground placeholder-muted-foreground focus:ring-2 ${
                                     errors[field.id] 
-                                      ? 'border-red-500 focus:border-red-400 focus:ring-red-500/20' 
-                                      : 'border-slate-600 focus:border-cyan-400 focus:ring-cyan-400/20'
+                                      ? 'border-destructive focus:border-destructive focus:ring-destructive/20' 
+                                      : 'border-border focus:border-primary focus:ring-primary/20'
                                   } ${
                                     formData[field.id] && !errors[field.id] 
-                                      ? 'border-emerald-400 bg-emerald-500/10' 
+                                      ? 'border-success bg-success/10' 
                                       : ''
                                   }`}
                                   min={field.validation?.min}
@@ -426,11 +431,11 @@ export default function HospitalRegistrationForm() {
                                   placeholder={`Enter ${field.label.toLowerCase()}`}
                                 />
                                 {formData[field.id] && !errors[field.id] && (
-                                  <CheckCircle className="absolute right-3 top-3 w-4 h-4 text-emerald-400" />
+                                  <CheckCircle className="absolute right-3 top-3 w-4 h-4 text-success" />
                                 )}
                               </div>
                               {errors[field.id] && (
-                                <div className="flex items-center space-x-1 text-sm text-red-400">
+                                <div className="flex items-center space-x-1 text-sm text-destructive">
                                   <AlertTriangle className="w-4 h-4" />
                                   <span>{errors[field.id]}</span>
                                 </div>
@@ -446,12 +451,12 @@ export default function HospitalRegistrationForm() {
 
               {/* Submit Section */}
               <div className="mt-8">
-                <Card className="bg-gradient-to-r from-slate-900/95 to-slate-800/95 backdrop-blur-md border border-slate-700/50 shadow-2xl">
+                <Card className="bg-card backdrop-blur-md border border-border shadow-lg">
                   <div className="p-6">
                     <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
                       <div className="text-center md:text-left">
-                        <h3 className="text-lg font-semibold text-white">Ready to Submit?</h3>
-                        <p className="text-slate-300 text-sm mt-1">
+                        <h3 className="text-lg font-semibold text-foreground">Ready to Submit?</h3>
+                        <p className="text-muted-foreground text-sm mt-1">
                           Please review all information before submitting your registration
                         </p>
                       </div>
@@ -459,11 +464,11 @@ export default function HospitalRegistrationForm() {
                         type="submit"
                         disabled={isSubmitting || hasRequiredEmptyFields}
                         size="lg"
-                        className="relative px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[200px] border-0"
+                        className="relative px-8 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[200px]"
                       >
                         {isSubmitting ? (
                           <div className="flex items-center space-x-2">
-                            <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                            <div className="animate-spin w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full"></div>
                             <span>Submitting...</span>
                           </div>
                         ) : (
@@ -498,22 +503,22 @@ export default function HospitalRegistrationForm() {
           open={showSuccessDialog} 
           onOpenChange={setShowSuccessDialog}
         >
-          <DialogContent className="sm:max-w-md bg-slate-900 border-slate-800 text-white">
+          <DialogContent className="sm:max-w-md bg-card border-border text-foreground">
             <DialogHeader className="text-center">
-              <div className="mx-auto mb-4 w-16 h-16 bg-emerald-500/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-emerald-400/30">
-                <CheckCircle className="w-8 h-8 text-emerald-400" />
+              <div className="mx-auto mb-4 w-16 h-16 bg-success/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-success/30">
+                <CheckCircle className="w-8 h-8 text-success" />
               </div>
-              <DialogTitle className="text-xl font-semibold text-white">
+              <DialogTitle className="text-xl font-semibold text-foreground">
                 Registration Successful!
               </DialogTitle>
-              <DialogDescription className="text-slate-300 mt-2">
+              <DialogDescription className="text-muted-foreground mt-2">
                 Your hospital has been successfully registered in our system. You can now access your dashboard to manage your hospital details and start using our services.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-6">
               <Button
                 onClick={() => handleSuccessDialogAction('dashboard')}
-                className="w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white border-0"
+                className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 Go to Dashboard
               </Button>

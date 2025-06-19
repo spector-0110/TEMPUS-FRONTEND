@@ -98,7 +98,7 @@ const DoctorCard = ({ doctor, onUpdateDoctor, onUpdateSchedule }) => {
           </div>
           <div className="mt-3 text-xs">
             <span className="text-muted-foreground">Status: </span>
-            <span className={doctor.status === 'active' ? 'text-green-500' : 'text-red-500'}>
+            <span className={doctor.status === 'active' ? 'text-success' : 'text-destructive'}>
               {doctor.status}
             </span>
           </div>

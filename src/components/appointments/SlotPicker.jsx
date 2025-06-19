@@ -125,11 +125,11 @@ const SlotPicker = ({
     return (
       <Card className="w-full max-w-4xl mx-auto">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-            <Clock className="h-6 w-6 text-blue-600" />
+          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+            <Clock className="h-6 w-6 text-primary" />
           </div>
           <CardTitle className="text-xl font-semibold">Loading Available Slots</CardTitle>
-          <p className="text-sm text-gray-400 mt-2">
+          <p className="text-sm text-muted-foreground mt-2">
             Fetching available appointment times for Dr. {selectedDoctor?.name}
           </p>
         </CardHeader>
@@ -154,21 +154,21 @@ const SlotPicker = ({
       <Card className="w-full max-w-4xl mx-auto">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
-            <Calendar className="h-6 w-6 text-gray-400" />
+            <Calendar className="h-6 w-6 text-muted-foreground" />
           </div>
-          <CardTitle className="text-xl font-semibold text-gray-600">
+          <CardTitle className="text-xl font-semibold text-muted-foreground">
             No Available Slots
           </CardTitle>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-muted-foreground mt-2">
             Dr. {selectedDoctor?.name} has no available appointment slots.
           </p>
         </CardHeader>
         <CardContent className="text-center">
           <div className="space-y-4">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               This could be because:
             </p>
-            <ul className="text-left text-sm text-gray-600 space-y-1 max-w-md mx-auto">
+            <ul className="text-left text-sm text-muted-foreground space-y-1 max-w-md mx-auto">
               <li>• All slots are currently booked</li>
               <li>• The doctor's schedule hasn't been set up</li>
               <li>• The doctor is not available during this period</li>
@@ -190,7 +190,7 @@ const SlotPicker = ({
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Available Dates</CardTitle>
-          <p className="text-sm text-gray-400 mt-2">
+          <p className="text-sm text-muted-foreground mt-2">
             Choose an available Date and Time slot for consulting with Dr. {selectedDoctor?.name}
           </p>
         </CardHeader>
@@ -206,7 +206,7 @@ const SlotPicker = ({
                 <span className="text-xs font-medium">
                   {formatDate(date)}
                 </span>
-                <span className="text-lg font-bold text-gray-500">
+                <span className="text-lg font-bold text-muted-foreground">
                   {new Date(date).getDate()} {new Date(date).toLocaleDateString('en-IN', { month: 'short' })}
                 </span>
                 <Badge variant="secondary" className="text-xs px-1">
@@ -229,7 +229,7 @@ const SlotPicker = ({
               <p className="text-sm text-gray-300">
                 {groupedSlots[selectedDate].filter(slots => slots.available).length} slots available
               </p>
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 text-xs text-gray-500">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 text-xs text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 border border-gray-300 rounded"></div>
                   <span>Available</span>
@@ -319,7 +319,7 @@ const SlotPicker = ({
             </div>
 
             {selectedSlot && (
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-primary/20">
                 <h4 className="font-medium text-blue-900 mb-2">Selected Appointment</h4>
                 <div className="text-blue-800 text-sm space-y-1">
                   <p><span className="font-medium">Date:</span> {formatDateFull(selectedSlot.date)}</p>
@@ -341,7 +341,7 @@ const SlotPicker = ({
       <Card className="bg-gray-50">
         <CardContent className="pt-6">
           <h4 className="font-medium text-gray-900 mb-3">Booking Instructions</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-400">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground">
             <div>
               <ul className="space-y-2">
                 <li className="flex items-start gap-2">

@@ -441,7 +441,7 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
             required
           />
           {doctorData.age && (
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               Maximum: {doctorData.age - 18} years (based on current age)
             </p>
           )}
@@ -503,13 +503,13 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
               onChange={handleFileChange}
             />
             {isUploading && (
-              <div className="text-sm text-blue-600">
+              <div className="text-sm text-primary">
                 Processing image...
               </div>
             )}
             {/* Image Preview */}
             <div className="mt-2">
-              <div className="w-20 h-20 border border-gray-300 rounded-lg overflow-hidden bg-gray-50">
+              <div className="w-20 h-20 border border-border rounded-lg overflow-hidden bg-muted">
                 <img
                   src={previewUrl || doctorData.photo || '/doctor.png'}
                   alt="Doctor preview"
@@ -519,7 +519,7 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
                   }}
                 />
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Max file size: 5MB. Supported formats: JPEG, PNG, WebP
               </p>
             </div>
@@ -554,7 +554,7 @@ const DoctorDetailsEditor = ({ doctor, onSave, onCancel, isLoading = false }) =>
       
       {/* Show message when image is uploading
       {isUploading && (
-        <div className="text-sm text-blue-600 text-center py-2">
+        <div className="text-sm text-primary text-center py-2">
           Please wait while the image is being uploaded...
         </div>
       )}

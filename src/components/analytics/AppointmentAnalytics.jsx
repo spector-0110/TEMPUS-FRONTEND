@@ -47,7 +47,7 @@ export default function AppointmentAnalytics({ data }) {
       title: 'Total Appointments',
       value: Object.values(statusDistribution || {}).reduce((sum, count) => sum + count, 0),
       icon: Calendar,
-      color: 'from-blue-500 to-blue-600',
+      color: 'from-primary to-primary-hover',
       change: '+12%',
       changeType: 'positive'
     },
@@ -136,7 +136,7 @@ export default function AppointmentAnalytics({ data }) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Activity className="h-5 w-5 text-blue-500" />
@@ -182,7 +182,7 @@ export default function AppointmentAnalytics({ data }) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-green-500" />
@@ -219,7 +219,7 @@ export default function AppointmentAnalytics({ data }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-purple-500" />
@@ -255,7 +255,7 @@ export default function AppointmentAnalytics({ data }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-orange-500" />
@@ -265,21 +265,21 @@ export default function AppointmentAnalytics({ data }) {
             <CardContent>
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  <div className="text-center p-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg">
+                    <div className="text-2xl font-bold text-primary">
                       {patientFlow.new}
                     </div>
-                    <div className="text-sm text-blue-500 dark:text-blue-300">New Patients</div>
+                    <div className="text-sm text-primary/80">New Patients</div>
                   </div>
-                  <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  <div className="text-center p-4 bg-gradient-to-br from-success/5 to-success/10 rounded-lg">
+                    <div className="text-2xl font-bold text-success">
                       {patientFlow.returning}
                     </div>
-                    <div className="text-sm text-green-500 dark:text-green-300">Returning</div>
+                    <div className="text-sm text-success/80">Returning</div>
                   </div>
                 </div>
                 
-                <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+                <div className="pt-4 border-t border-border">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-slate-600 dark:text-slate-400">Total Patients</span>
                     <span className="text-lg font-semibold text-slate-800 dark:text-slate-200">

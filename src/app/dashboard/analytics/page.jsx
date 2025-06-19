@@ -54,17 +54,17 @@ export default function AnalyticsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-950 to-rose-950 flex items-center justify-center">
-        <div className="bg-slate-900/80 backdrop-blur-md border border-red-900 rounded-xl p-8 max-w-md text-center">
-          <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-red-900/20 mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-500 h-8 w-8">
+      <div className="min-h-screen bg-gradient-to-br from-destructive/20 to-destructive/30 flex items-center justify-center">
+        <div className="bg-card/80 backdrop-blur-md border border-destructive rounded-xl p-8 max-w-md text-center">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-destructive/20 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-destructive h-8 w-8">
               <circle cx="12" cy="12" r="10" />
               <line x1="12" x2="12" y1="8" y2="12" />
               <line x1="12" x2="12.01" y1="16" y2="16" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-red-400 mb-4">Error Loading Analytics</h1>
-          <p className="text-slate-400">{error}</p>
+          <h1 className="text-3xl font-bold text-destructive mb-4">Error Loading Analytics</h1>
+          <p className="text-muted-foreground">{error}</p>
         </div>
       </div>
     );
@@ -72,17 +72,17 @@ export default function AnalyticsPage() {
 
   if (!hospitalDashboardDetails) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 to-blue-950 flex items-center justify-center">
-        <div className="bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-xl p-8 max-w-md text-center">
-          <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-blue-900/20 mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500 h-8 w-8">
+      <div className="min-h-screen bg-gradient-to-br from-muted/20 to-primary/30 flex items-center justify-center">
+        <div className="bg-card/80 backdrop-blur-md border border-border rounded-xl p-8 max-w-md text-center">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/20 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary h-8 w-8">
               <circle cx="12" cy="12" r="10" />
               <line x1="12" x2="12" y1="8" y2="12" />
               <line x1="12" x2="12.01" y1="16" y2="16" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-slate-300 mb-4">No Data Available</h1>
-          <p className="text-slate-400">Please ensure you have proper data access.</p>
+          <h1 className="text-3xl font-bold text-foreground mb-4">No Data Available</h1>
+          <p className="text-muted-foreground">Please ensure you have proper data access.</p>
         </div>
       </div>
     );

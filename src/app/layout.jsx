@@ -1,19 +1,38 @@
 import { Metadata } from "next/types";
 import { Geist } from "next/font/google";
-import { ThemeProvider } from "next-themes";
+import { EnhancedThemeProvider } from '@/context/ThemeProvider';
 import { AuthProvider } from '@/context/AuthProvider';
 import { HospitalProvider } from '@/context/HospitalProvider';
 import {LogoutButton} from '@/components/ui/logout-button';
 import "@/styles/globals.css";
 
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
+const defaultUrl = process.env.NEXT_PUBLIC_SITE_URL
+  ? process.env.NEXT_PUBLIC_SITE_URL
   : "http://localhost:3000";
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Next.js and Supabase Starter Kit",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  title: "Tiqora - Healthcare Management Platform",
+  description: "Modern healthcare management platform with seamless appointment scheduling and analytics",
+  keywords: ["healthcare", "appointments", "hospital management", "medical"],
+  authors: [{ name: "Tiqora Team" }],
+  creator: "Tiqora",
+  publisher: "Tiqora",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  icons: {
+    icon: "/tiqora.ico",
+    shortcut: "/tiqora.ico",
+    apple: "/tiqora.ico",
+  },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+  },
 };
 
 const geistSans = Geist({
@@ -28,22 +47,21 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
-        <ThemeProvider
+        <EnhancedThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
-          disableTransitionOnChange
+          disableTransitionOnChange={false}
         >
            <AuthProvider>
             <HospitalProvider>
               <main className="min-h-[calc(100vh-64px)]">
                 {children}
               </main>
-              <LogoutButton/>
+              {/* <LogoutButton/> */}
             </HospitalProvider>
           </AuthProvider>
-
-        </ThemeProvider>
+        </EnhancedThemeProvider>
       </body>
     </html>
   );

@@ -25,7 +25,7 @@ const DoctorScheduleViewer = ({ schedules }) => {
             ))}
           </div>
           <div className="mt-2 text-xs text-muted-foreground">
-            Status: <span className={schedule.status === 'active' ? 'text-green-500' : 'text-red-500'}>
+            Status: <span className={schedule.status === 'active' ? 'text-success' : 'text-destructive'}>
               {schedule.status}
             </span>
           </div>

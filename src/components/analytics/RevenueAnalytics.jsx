@@ -57,7 +57,7 @@ export default function RevenueAnalytics({ data }) {
       title: 'Payment Rate',
       value: `${Math.round(paymentRate)}%`,
       icon: TrendingUp,
-      color: 'from-blue-500 to-blue-600',
+      color: 'from-primary to-primary-hover',
       change: totalAppointments > 0 ? `${totalPaid}/${totalAppointments}` : 'No appointments',
       changeType: paymentRate > 80 ? 'positive' : paymentRate > 50 ? 'neutral' : 'negative'
     },
@@ -87,10 +87,10 @@ export default function RevenueAnalytics({ data }) {
         transition={{ duration: 0.6 }}
         className="text-center"
       >
-        <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-200 mb-2">
+        <h2 className="text-3xl font-bold text-foreground mb-2">
           Revenue Analytics
         </h2>
-        <p className="text-slate-600 dark:text-slate-400">
+        <p className="text-muted-foreground">
           Financial performance and payment analysis
         </p>
       </motion.div>
@@ -107,13 +107,13 @@ export default function RevenueAnalytics({ data }) {
             <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-300">
               <div className={`absolute inset-0 bg-gradient-to-br ${metric.color} opacity-5 group-hover:opacity-10 transition-opacity`} />
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                   {metric.title}
                 </CardTitle>
                 <metric.icon className={`h-5 w-5 bg-gradient-to-br ${metric.color} text-white rounded p-1`} />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-1">
+                <div className="text-2xl font-bold text-foreground mb-1">
                   {metric.value}
                 </div>
                 <div className="flex items-center gap-1">
@@ -141,7 +141,7 @@ export default function RevenueAnalytics({ data }) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <PieChartIcon className="h-5 w-5 text-green-500" />
@@ -183,7 +183,7 @@ export default function RevenueAnalytics({ data }) {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-blue-500" />
@@ -230,7 +230,7 @@ export default function RevenueAnalytics({ data }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CreditCard className="h-5 w-5 text-purple-500" />
@@ -241,30 +241,30 @@ export default function RevenueAnalytics({ data }) {
               <div className="space-y-4">
                 {Object.keys(paymentMethods).length === 0 ? (
                   <div className="text-center py-8">
-                    <div className="text-slate-400 dark:text-slate-500 mb-2">
+                    <div className="text-muted-foreground mb-2">
                       No payment method data available yet
                     </div>
                     <div className="grid grid-cols-3 gap-3">
-                      <div className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-lg text-center">
-                        <div className="text-lg font-semibold text-blue-600 dark:text-blue-400">Cash</div>
-                        <div className="text-xs text-blue-500 dark:text-blue-300">Ready to track</div>
+                      <div className="p-3 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg text-center">
+                        <div className="text-lg font-semibold text-primary">Cash</div>
+                        <div className="text-xs text-primary/80">Ready to track</div>
                       </div>
-                      <div className="p-3 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 rounded-lg text-center">
-                        <div className="text-lg font-semibold text-green-600 dark:text-green-400">UPI</div>
-                        <div className="text-xs text-green-500 dark:text-green-300">Ready to track</div>
+                      <div className="p-3 bg-gradient-to-br from-success/5 to-success/10 rounded-lg text-center">
+                        <div className="text-lg font-semibold text-success">UPI</div>
+                        <div className="text-xs text-success/80">Ready to track</div>
                       </div>
-                      <div className="p-3 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 rounded-lg text-center">
-                        <div className="text-lg font-semibold text-purple-600 dark:text-purple-400">Card</div>
-                        <div className="text-xs text-purple-500 dark:text-purple-300">Ready to track</div>
+                      <div className="p-3 bg-gradient-to-br from-accent/5 to-accent/10 rounded-lg text-center">
+                        <div className="text-lg font-semibold text-accent">Card</div>
+                        <div className="text-xs text-accent/80">Ready to track</div>
                       </div>
                     </div>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {Object.entries(paymentMethods).map(([method, amount]) => (
-                      <div key={method} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                        <span className="font-medium text-slate-700 dark:text-slate-300 capitalize">{method}</span>
-                        <span className="font-bold text-slate-800 dark:text-slate-200">₹{amount}</span>
+                      <div key={method} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                        <span className="font-medium text-foreground capitalize">{method}</span>
+                        <span className="font-bold text-foreground">₹{amount}</span>
                       </div>
                     ))}
                   </div>
@@ -280,7 +280,7 @@ export default function RevenueAnalytics({ data }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
         >
-          <Card className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-orange-500" />
@@ -290,34 +290,34 @@ export default function RevenueAnalytics({ data }) {
             <CardContent>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  <div className="text-center p-4 bg-gradient-to-br from-success/5 to-success/10 rounded-lg">
+                    <div className="text-2xl font-bold text-success">
                       ₹{totalRevenue}
                     </div>
-                    <div className="text-sm text-green-500 dark:text-green-300">Collected</div>
+                    <div className="text-sm text-success/80">Collected</div>
                   </div>
-                  <div className="text-center p-4 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950 dark:to-red-900 rounded-lg">
-                    <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+                  <div className="text-center p-4 bg-gradient-to-br from-destructive/5 to-destructive/10 rounded-lg">
+                    <div className="text-2xl font-bold text-destructive">
                       ₹{paymentStatus.unpaid?.amount || 0}
                     </div>
-                    <div className="text-sm text-red-500 dark:text-red-300">Pending</div>
+                    <div className="text-sm text-destructive/80">Pending</div>
                   </div>
                 </div>
                 
-                <div className="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+                <div className="space-y-3 pt-4 border-t border-border">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600 dark:text-slate-400">Collection Rate</span>
+                    <span className="text-sm text-muted-foreground">Collection Rate</span>
                     <Badge variant="outline">{Math.round(paymentRate)}%</Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600 dark:text-slate-400">Avg Revenue/Day</span>
-                    <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                    <span className="text-sm text-muted-foreground">Avg Revenue/Day</span>
+                    <span className="text-sm font-semibold text-foreground">
                       ₹{Math.round(totalRevenue / 3)}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600 dark:text-slate-400">Total Transactions</span>
-                    <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                    <span className="text-sm text-muted-foreground">Total Transactions</span>
+                    <span className="text-sm font-semibold text-foreground">
                       {totalAppointments}
                     </span>
                   </div>

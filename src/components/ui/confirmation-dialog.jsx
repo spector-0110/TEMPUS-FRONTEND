@@ -53,11 +53,11 @@ const ConfirmationDialog = ({
   const getIconColorClass = () => {
     switch (variant) {
       case 'destructive':
-        return 'text-red-600 dark:text-red-400';
+        return 'text-destructive';
       case 'warning':
-        return 'text-amber-600 dark:text-amber-400';
+        return 'text-warning';
       default:
-        return 'text-blue-600 dark:text-blue-400';
+        return 'text-info';
     }
   };
 

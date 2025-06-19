@@ -7,10 +7,10 @@ const StatusMessage = ({ type, message }) => {
   if (!message) return null;
   
   const styles = {
-    success: 'bg-green-50 text-green-700 border border-green-200',
-    error: 'bg-red-50 text-red-700 border border-red-200',
-    info: 'bg-blue-50 text-blue-700 border border-blue-200',
-    warning: 'bg-yellow-50 text-yellow-700 border border-yellow-200'
+    success: 'bg-success/10 text-success border border-success/20',
+    error: 'bg-destructive/10 text-destructive border border-destructive/20',
+    info: 'bg-info/10 text-info border border-info/20',
+    warning: 'bg-warning/10 text-warning border border-warning/20'
   };
   
   return (

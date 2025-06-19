@@ -29,13 +29,13 @@ export default function AccountPage() {
       <div className="min-h-screen p-6 flex items-center justify-center">
         <Card className="max-w-2xl w-full border-red-200 shadow-lg">
           <CardHeader className="bg-red-50 border-b border-red-100">
-            <CardTitle className="flex items-center text-red-700 gap-2">
+            <CardTitle className="flex items-center text-destructive gap-2">
               <AlertCircle className="h-5 w-5" />
               Error Loading Hospital Details
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
-            <p className="text-red-600">{error.message}</p>
+            <p className="text-destructive">{error.message}</p>
             <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>
               Retry
             </Button>
@@ -76,24 +76,24 @@ export default function AccountPage() {
               <Card className="border shadow-sm">
                 <CardHeader className=" border-b py-4">
                   <CardTitle className="flex items-center gap-2">
-                    <Building2 className="h-5 w-5 text-blue-600" />
+                    <Building2 className="h-5 w-5 text-primary" />
                     Hospital Information
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <Info 
-                      icon={<Building2 className="h-5 w-5 text-blue-600" />}
+                      icon={<Building2 className="h-5 w-5 text-primary" />}
                       label="Hospital Name" 
                       value={hospitalDetails?.name} 
                     />
                     <Info 
-                      icon={<FileText className="h-5 w-5 text-blue-600" />}
+                      icon={<FileText className="h-5 w-5 text-primary" />}
                       label="GSTIN" 
                       value={hospitalDetails?.gstin || '-'} 
                     />
                     <Info
-                      icon={<Calendar className="h-5 w-5 text-blue-600" />}
+                      icon={<Calendar className="h-5 w-5 text-primary" />}
                       label="Established Date"
                       value={
                         hospitalDetails?.establishedDate
@@ -109,39 +109,39 @@ export default function AccountPage() {
               <Card className="border shadow-sm">
                 <CardHeader className="border-b  py-4">
                   <CardTitle className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-blue-600" />
+                    <MapPin className="h-5 w-5 text-primary" />
                     Address Information
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <Info 
-                      icon={<MapPin className="h-5 w-5 text-blue-600" />}
+                      icon={<MapPin className="h-5 w-5 text-primary" />}
                       label="Street Address" 
                       value={hospitalDetails?.address?.street || '-'} 
                     />
                     <Info 
-                      icon={<Building2 className="h-5 w-5 text-blue-600" />}
+                      icon={<Building2 className="h-5 w-5 text-primary" />}
                       label="City" 
                       value={hospitalDetails?.address?.city || '-'} 
                     />
                     <Info 
-                      icon={<MapPin className="h-5 w-5 text-blue-600" />}
+                      icon={<MapPin className="h-5 w-5 text-primary" />}
                       label="District" 
                       value={hospitalDetails?.address?.district || '-'} 
                     />
                     <Info 
-                      icon={<MapPin className="h-5 w-5 text-blue-600" />}
+                      icon={<MapPin className="h-5 w-5 text-primary" />}
                       label="State" 
                       value={hospitalDetails?.address?.state || '-'} 
                     />
                     <Info 
-                      icon={<Hash className="h-5 w-5 text-blue-600" />}
+                      icon={<Hash className="h-5 w-5 text-primary" />}
                       label="PIN Code" 
                       value={hospitalDetails?.address?.pincode || '-'} 
                     />
                     <Info 
-                      icon={<Globe className="h-5 w-5 text-blue-600" />}
+                      icon={<Globe className="h-5 w-5 text-primary" />}
                       label="Country" 
                       value={hospitalDetails?.address?.country || 'India'} 
                     />
@@ -153,19 +153,19 @@ export default function AccountPage() {
               <Card className="border shadow-sm">
                 <CardHeader className=" border-b   py-4">
                   <CardTitle className="flex items-center gap-2">
-                    <Phone className="h-5 w-5 text-blue-600" />
+                    <Phone className="h-5 w-5 text-primary" />
                     Contact Information
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Info 
-                      icon={<Phone className="h-5 w-5 text-blue-600" />}
+                      icon={<Phone className="h-5 w-5 text-primary" />}
                       label="Phone Number" 
                       value={hospitalDetails?.contactInfo?.phone || '-'} 
                     />
                     <Info
-                      icon={<Globe className="h-5 w-5 text-blue-600" />}
+                      icon={<Globe className="h-5 w-5 text-primary" />}
                       label="Website"
                       value={
                         hospitalDetails?.contactInfo?.website ? (
@@ -173,7 +173,7 @@ export default function AccountPage() {
                             href={hospitalDetails.contactInfo.website}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline"
+                            className="text-primary hover:underline"
                           >
                             {hospitalDetails.contactInfo.website}
                           </a>
