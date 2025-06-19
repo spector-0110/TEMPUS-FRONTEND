@@ -1,8 +1,30 @@
 import { updateSession } from "@/utils/supabase/middleware";
-import {  NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 export async function middleware(request) {
-  return await updateSession(request);
+  // Update session and get user
+  const response = await updateSession(request);
+  const { user } = response;
+  const { pathname } = request.nextUrl;
+
+  const isProtectedRoute = pathname.startsWith('/protected');
+
+  // If user is logged in and tries to access any route outside /protected, redirect to /protected
+  if (user && !isProtectedRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/protected';
+    return NextResponse.redirect(url);
+  }
+
+  // If user is not logged in and tries to access protected, redirect to /auth/login
+  if (!user && isProtectedRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/';
+    return NextResponse.redirect(url);
+  }
+
+  // Otherwise, continue as normal
+  return response.supabaseResponse || response;
 }
 
 export const config = {

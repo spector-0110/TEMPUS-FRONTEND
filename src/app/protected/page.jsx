@@ -1,16 +1,11 @@
-import { redirect } from "next/navigation";
-
 import { createClient } from "@/utils/supabase/server";
 import { InfoIcon } from "lucide-react";
 import { FetchDataSteps } from "@/components/tutorial/fetch-data-steps";
 
 export default async function ProtectedPage() {
   const supabase = await createClient();
-
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data?.user) {
-    redirect("/auth/login");
-  }
+  const { data } = await supabase.auth.getUser();
+  // No need to redirect here, middleware handles protection
 
   return (
     <div className="flex-1 w-full flex flex-col gap-12">
