@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/utils/utils";
-import { createClient } from "@/utils/supabase/client";
+import { authService, validateEmail } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,19 +23,26 @@ export function ForgotPasswordForm({ className, ...props }) {
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
-    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
+    // Validate email format
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      // The url which will be included in the email. This URL needs to be configured in your redirect URLs in the Supabase dashboard at https://supabase.com/dashboard/project/_/auth/url-configuration
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/update-password`,
-      });
-      if (error) throw error;
-      setSuccess(true);
+      const { success, error } = await authService.resetPassword(email);
+      
+      if (error) {
+        setError(error);
+      } else {
+        setSuccess(true);
+      }
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError("An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }

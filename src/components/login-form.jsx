@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/utils/utils";
-import { createClient } from "@/utils/supabase/client";
+import { authService, validateEmail } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,20 +25,27 @@ export function LoginForm({ className, ...props }) {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
+    // Validate email format
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
-      router.push("/protected");
+      const { user, error } = await authService.signIn(email, password);
+      
+      if (error) {
+        setError(error);
+      } else {
+        // Update this route to redirect to an authenticated route. The user already has an active session.
+        router.push("/protected");
+      }
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError("An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }

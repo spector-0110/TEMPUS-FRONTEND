@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/utils/utils";
-import { createClient } from "@/utils/supabase/client";
+import { authService, validateEmail, validatePassword, validatePasswordMatch } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,28 +26,40 @@ export function SignUpForm({ className, ...props }) {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
-    if (password !== repeatPassword) {
+    // Validate email format
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address");
+      setIsLoading(false);
+      return;
+    }
+
+    // Validate password strength
+    if (!validatePassword(password)) {
+      setError("Password must be at least 6 characters long");
+      setIsLoading(false);
+      return;
+    }
+
+    // Validate password match
+    if (!validatePasswordMatch(password, repeatPassword)) {
       setError("Passwords do not match");
       setIsLoading(false);
       return;
     }
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/protected`,
-        },
-      });
-      if (error) throw error;
-      router.push("/auth/sign-up-success");
+      const { user, error } = await authService.signUp(email, password);
+      
+      if (error) {
+        setError(error);
+      } else {
+        router.push("/auth/sign-up-success");
+      }
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError("An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
