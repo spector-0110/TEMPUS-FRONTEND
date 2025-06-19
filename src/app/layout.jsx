@@ -45,8 +45,8 @@ export default function RootLayout({
   children,
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.className} antialiased`}>
+    <html lang="en" suppressHydrationWarning className="cursor-safe">
+      <body className={`${geistSans.className} antialiased cursor-safe`}>
         <EnhancedThemeProvider
           attribute="class"
           defaultTheme="system"

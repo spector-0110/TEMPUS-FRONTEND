@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useHospital } from '@/context/HospitalProvider';
+import { AuthRefresh } from '@/components/auth/AuthRefresh';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -416,6 +417,7 @@ export default function AppointmentsPage() {
 
   return (
     <div className="container mx-auto p-4 space-y-6">
+      <AuthRefresh />
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>

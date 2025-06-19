@@ -69,6 +69,26 @@ export function SignUpForm({ className, ...props }) {
     }
   };
 
+  const handleGoogleSignUp = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const { error } = await authService.signInWithOAuth('google', {
+        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`
+      });
+      
+      if (error) {
+        setError(error);
+        setIsLoading(false);
+      }
+      // Don't set loading to false here as the page will redirect
+    } catch (error) {
+      setError("Failed to sign up with Google");
+      setIsLoading(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -198,6 +218,7 @@ export function SignUpForm({ className, ...props }) {
               variant="outline"
               className="w-full h-11 font-medium bg-background/50 backdrop-blur-sm border-neutral-300 dark:border-neutral-700 hover:bg-background/80 transition-all duration-200"
               disabled={isLoading}
+              onClick={handleGoogleSignUp}
             >
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path

@@ -299,6 +299,9 @@
   body {
     @apply bg-background text-foreground transition-colors;
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* Ensure cursor remains active during theme transitions */
+    cursor: auto !important;
+    pointer-events: auto !important;
   }
   
   /* Enhanced scrollbar styling */
@@ -408,4 +411,41 @@
   50% {
     background-position: 100% 50%;
   }
+}
+
+/* Cursor preservation utilities */
+@layer utilities {
+  .preserve-cursor * {
+    cursor: auto !important;
+    pointer-events: auto !important;
+  }
+  
+  .cursor-safe {
+    cursor: auto !important;
+    pointer-events: auto !important;
+  }
+  
+  /* Theme transition safe */
+  .theme-transitioning {
+    cursor: auto !important;
+    pointer-events: auto !important;
+  }
+}
+
+/* Global cursor preservation during theme changes */
+html[style*="color-scheme"] {
+  cursor: auto !important;
+}
+
+html[style*="color-scheme"] * {
+  cursor: inherit !important;
+}
+
+/* Ensure all interactive elements maintain cursor */
+button, a, [role="button"], [role="link"], input, textarea, select {
+  cursor: pointer !important;
+}
+
+input[type="text"], input[type="email"], input[type="password"], textarea {
+  cursor: text !important;
 }

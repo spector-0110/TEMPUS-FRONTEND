@@ -20,6 +20,25 @@ const ThemeSwitcher = ({ variant = "default", showLabel = false, size = "sm" }) 
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
 
+  // Enhanced theme setter that preserves cursor functionality
+  const setThemeWithCursorFix = (newTheme) => {
+    // Ensure cursor remains active during theme change
+    if (typeof document !== 'undefined') {
+      document.body.style.cursor = 'auto';
+      document.body.style.pointerEvents = 'auto';
+    }
+    
+    setTheme(newTheme);
+    
+    // Ensure cursor stays active after theme change
+    setTimeout(() => {
+      if (typeof document !== 'undefined') {
+        document.body.style.cursor = 'auto';
+        document.body.style.pointerEvents = 'auto';
+      }
+    }, 100);
+  };
+
   // useEffect only runs on the client, so now we can safely show the UI
   useEffect(() => {
     setMounted(true);
@@ -114,7 +133,7 @@ const ThemeSwitcher = ({ variant = "default", showLabel = false, size = "sm" }) 
         
         <DropdownMenuRadioGroup
           value={theme}
-          onValueChange={(value) => setTheme(value)}
+          onValueChange={(value) => setThemeWithCursorFix(value)}
         >
           {themeOptions.map((option) => {
             const Icon = option.icon;

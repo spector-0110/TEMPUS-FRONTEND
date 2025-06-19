@@ -13,16 +13,22 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+    
     // Get initial session
     const getInitialSession = async () => {
       try {
         const { user, session } = await authService.getSession();
-        setUser(user);
-        setSession(session);
+        if (mounted) {
+          setUser(user);
+          setSession(session);
+        }
       } catch (error) {
         console.error('Error getting initial session:', error);
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -31,13 +37,22 @@ export function AuthProvider({ children }) {
     // Listen for auth changes
     const { data: { subscription } } = authService.onAuthStateChange(
       async (event, session) => {
-        setSession(session);
-        setUser(session?.user || null);
-        setLoading(false);
+        if (mounted) {
+          console.log('Auth state changed:', event, session?.user?.id);
+          setSession(session);
+          setUser(session?.user || null);
+          setLoading(false);
+          
+          // Force a small delay to ensure state is synchronized
+          if (event === 'SIGNED_IN' && session?.user) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+        }
       }
     );
 
     return () => {
+      mounted = false;
       subscription?.unsubscribe();
     };
   }, []);

@@ -57,6 +57,10 @@ export function EnhancedThemeProvider({ children, ...props }) {
          color ${themeConfig.transitions.duration} ${themeConfig.transitions.easing},
          border-color ${themeConfig.transitions.duration} ${themeConfig.transitions.easing}`
       );
+      
+      // Ensure cursor remains functional during theme transitions
+      document.documentElement.style.setProperty('cursor', 'auto');
+      document.body.style.pointerEvents = 'auto';
     };
 
     // Apply transitions after a short delay to prevent flash
@@ -92,6 +96,21 @@ export const useThemeManager = () => {
   const { theme, setTheme, resolvedTheme, systemTheme } = useContext(NextThemesProvider);
   const { mounted, themeConfig } = useThemeContext();
 
+  // Enhanced setTheme that ensures cursor remains functional
+  const setThemeWithCursorFix = (newTheme) => {
+    // Temporarily ensure cursor remains active
+    document.body.style.cursor = 'auto';
+    document.body.style.pointerEvents = 'auto';
+    
+    setTheme(newTheme);
+    
+    // Ensure cursor stays active after theme change
+    setTimeout(() => {
+      document.body.style.cursor = 'auto';
+      document.body.style.pointerEvents = 'auto';
+    }, 50);
+  };
+
   const getThemeInfo = (themeName) => {
     return themeConfig.colorSchemes[themeName] || null;
   };
@@ -99,7 +118,7 @@ export const useThemeManager = () => {
   const toggleTheme = () => {
     const currentIndex = themeConfig.themes.indexOf(theme);
     const nextIndex = (currentIndex + 1) % themeConfig.themes.length;
-    setTheme(themeConfig.themes[nextIndex]);
+    setThemeWithCursorFix(themeConfig.themes[nextIndex]);
   };
 
   const isThemeActive = (themeName) => {
@@ -111,7 +130,7 @@ export const useThemeManager = () => {
 
   return {
     theme,
-    setTheme,
+    setTheme: setThemeWithCursorFix,
     resolvedTheme,
     systemTheme,
     mounted,

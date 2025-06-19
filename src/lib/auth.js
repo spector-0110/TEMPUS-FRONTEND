@@ -188,7 +188,7 @@ export class AuthService {
       const { error } = await this.supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
           ...options,
         },
       });
@@ -197,8 +197,9 @@ export class AuthService {
       
       return { error: null };
     } catch (error) {
+      console.error('OAuth sign-in error:', error);
       return { 
-        error: error instanceof Error ? error.message : "An error occurred" 
+        error: error instanceof Error ? error.message : "An error occurred during sign-in" 
       };
     }
   }
@@ -226,6 +227,34 @@ export class AuthService {
       };
     }
   }
+
+  /**
+   * Force refresh user session - useful after OAuth callbacks
+   * @returns {Promise<{user: object, session: object, error: object}>}
+   */
+  async forceRefreshSession() {
+    try {
+      // First try to refresh the session
+      await this.supabase.auth.refreshSession();
+      
+      // Then get the updated session
+      const { data: { session }, error } = await this.supabase.auth.getSession();
+      
+      if (error) throw error;
+      
+      return { 
+        user: session?.user || null, 
+        session, 
+        error: null 
+      };
+    } catch (error) {
+      return { 
+        user: null, 
+        session: null, 
+        error: error instanceof Error ? error.message : "An error occurred" 
+      };
+    }
+  }
 }
 
 // Create and export a singleton instance
@@ -243,6 +272,7 @@ export const {
   onAuthStateChange,
   signInWithOAuth,
   refreshSession,
+  forceRefreshSession,
 } = authService;
 
 // Custom hook for React components (optional)
