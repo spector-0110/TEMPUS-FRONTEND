@@ -385,7 +385,7 @@ export default function EditHospitalDetailsForm({ onSuccess = () => {} }) {
 
   if (error) {
     return (
-      <Card className="p-6 bg-red-50">
+      <Card className="p-6 bg-destructive/10">
         <h2 className="text-xl font-semibold text-destructive">Error Loading Hospital Details</h2>
         <p className="mt-2 text-destructive">{error?.message || 'Failed to load hospital details'}</p>
       </Card>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { CheckCircle, ArrowLeft, ArrowRight } from 'lucide-react';
+import { CheckCircle, ArrowLeft, ArrowRight, RefreshCw, User, Calendar } from 'lucide-react';
 import PatientForm from './PatientForm';
 import DoctorSelector from './DoctorSelector';
 import SlotPicker from './SlotPicker';
@@ -273,9 +273,13 @@ const AppointmentCreationFlow = ({ onSuccess }) => {
     // Show loading while fetching hospital details or checking appointments
   if (loading || isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-8 border-r-gray-900">
-        <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-        <p className="mt-4 text-muted-foreground">Loading...</p>
+      <div className="flex flex-col items-center justify-center min-h-screen p-8 bg-background">
+        <div className="relative">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <div className="absolute inset-0 w-12 h-12 border-4 border-primary/20 rounded-full"></div>
+        </div>
+        <p className="mt-6 text-foreground font-medium">Loading appointment flow...</p>
+        <p className="mt-2 text-muted-foreground dark:text-muted-foreground text-sm">Please wait while we prepare everything</p>
       </div>
     );
   }
@@ -283,59 +287,73 @@ const AppointmentCreationFlow = ({ onSuccess }) => {
   // Show error/no data message if hospital data is not found
   if ( !details || !isReady) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-8">
+      <div className="flex flex-col items-center justify-center min-h-screen p-8 bg-background">
         <div className="text-center max-w-md">
-          <div className="mx-auto mb-6 h-16 w-16 rounded-full bg-red-100 flex items-center justify-center">
-            <svg className="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="mx-auto mb-6 h-16 w-16 rounded-full bg-destructive/10 border-2 border-destructive/20 flex items-center justify-center">
+            <svg className="h-8 w-8 text-destructive" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-300 mb-4">Hospital Not Found</h1>
-          <button 
+          <h1 className="text-2xl font-bold text-foreground mb-4">Hospital Not Found</h1>
+          <p className="text-muted-foreground dark:text-muted-foreground mb-6">Unable to load hospital information. Please try refreshing the page.</p>
+          <Button 
             onClick={() => window.location.reload()}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="gap-2"
           >
+            <RefreshCw className="w-4 h-4" />
             Try Again
-          </button>
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6">
+    <div className="w-full max-w-4xl mx-auto p-6 bg-background min-h-screen transition-colors duration-300">
       {/* Progress Header */}
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold">Create New Appointment</h2>
-          <span className="text-sm text-muted-foreground">
-            Step {currentStep} of {steps.length}
-          </span>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-3xl font-bold text-foreground transition-colors duration-300">Create New Appointment</h2>
+            <p className="text-muted-foreground dark:text-muted-foreground mt-1 transition-colors duration-300">Follow the steps to book an appointment</p>
+          </div>
+          <div className="text-right">
+            <span className="text-sm font-medium text-muted-foreground dark:text-muted-foreground transition-colors duration-300">
+              Step {currentStep} of {steps.length}
+            </span>
+            <div className="text-xs text-muted-foreground dark:text-muted-foreground mt-1 transition-colors duration-300">
+              {steps[currentStep - 1]?.title}
+            </div>
+          </div>
         </div>
         
-        <Progress value={progressPercentage} className="mb-4" />
+        <Progress value={progressPercentage} className="mb-6 h-2 bg-muted dark:bg-muted/50" />
         
-        <div className="flex justify-between">
+        <div className="grid grid-cols-4 gap-4">
           {steps.map((step) => (
             <div key={step.number} className="flex flex-col items-center text-center">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium mb-2 ${
+                className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium mb-3 transition-all duration-300 ${
                   currentStep > step.number
-                    ? 'bg-green-600 text-white'
+                    ? 'bg-success text-success-foreground shadow-lg shadow-success/20 dark:shadow-success/10'
                     : currentStep === step.number
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-muted-foreground'
+                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 dark:shadow-primary/10 ring-2 ring-primary/20 dark:ring-primary/30'
+                    : 'bg-muted text-muted-foreground border-2 border-border hover:border-primary/50 dark:bg-muted/70 dark:border-border/70 dark:hover:border-primary/40'
                 }`}
               >
                 {currentStep > step.number ? (
-                  <CheckCircle className="w-4 h-4" />
+                  <CheckCircle className="w-5 h-5" />
                 ) : (
                   step.number
                 )}
               </div>
               <div className="hidden sm:block">
-                <p className="text-sm font-medium">{step.title}</p>
-                <p className="text-xs text-muted-foreground">{step.description}</p>
+                <p className={`text-sm font-medium transition-colors duration-300 ${
+                  currentStep >= step.number ? 'text-foreground' : 'text-muted-foreground'
+                }`}>
+                  {step.title}
+                </p>
+                <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1 transition-colors duration-300">{step.description}</p>
               </div>
             </div>
           ))}
@@ -344,19 +362,29 @@ const AppointmentCreationFlow = ({ onSuccess }) => {
 
       {/* Error Display */}
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-destructive/20 rounded-lg">
-          <p className="text-red-700 text-sm">{error}</p>
+        <div className="mb-6 p-4 bg-destructive/10 dark:bg-destructive/5 border border-destructive/20 dark:border-destructive/30 rounded-lg backdrop-blur-sm transition-colors duration-300">
+          <div className="flex items-start gap-3">
+            <div className="w-5 h-5 rounded-full bg-destructive/20 dark:bg-destructive/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="text-destructive dark:text-destructive text-xs">!</span>
+            </div>
+            <div>
+              <p className="text-destructive dark:text-destructive font-medium text-sm">Error</p>
+              <p className="text-destructive/80 dark:text-destructive/90 text-sm mt-1">{error}</p>
+            </div>
+          </div>
         </div>
       )}
 
       {/* Success Display */}
       {isSuccess && (
-        <div className="mb-6 p-4 bg-green-50 border border-success/20 rounded-lg">
-          <div className="flex items-center gap-2">
-            <CheckCircle className="w-5 h-5 text-green-600" />
-            <p className="text-success text-sm font-medium">Appointment Created Successfully!</p>
+        <div className="mb-6 p-4 bg-success/10 dark:bg-success/5 border border-success/20 dark:border-success/30 rounded-lg backdrop-blur-sm transition-colors duration-300">
+          <div className="flex items-start gap-3">
+            <CheckCircle className="w-5 h-5 text-success dark:text-success flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-success dark:text-success font-medium text-sm">Appointment Created Successfully!</p>
+              <p className="text-success/80 dark:text-success/90 text-sm mt-1">Your appointment details have been saved and you will be redirected shortly.</p>
+            </div>
           </div>
-          <p className="text-green-600 text-sm mt-1">Your appointment details have been saved and you will be redirected shortly.</p>
         </div>
       )}
 
@@ -391,38 +419,82 @@ const AppointmentCreationFlow = ({ onSuccess }) => {
         )}
 
         {currentStep === 4 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl">Confirm Appointment Details</CardTitle>
+          <Card className="bg-card dark:bg-card border-border dark:border-border shadow-lg dark:shadow-xl transition-all duration-300">
+            <CardHeader className="border-b border-border/50 dark:border-border/30">
+              <CardTitle className="text-xl text-foreground dark:text-foreground flex items-center gap-2 transition-colors duration-300">
+                <CheckCircle className="w-6 h-6 text-success dark:text-success" />
+                Confirm Appointment Details
+              </CardTitle>
+              <p className="text-muted-foreground dark:text-muted-foreground transition-colors duration-300">Please review the information before confirming</p>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 pt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-semibold text-lg mb-3">Patient Information</h3>
-                  <div className="space-y-2">
-                    <p><span className="font-medium">Name:</span> {patientData.name}</p>
-                    <p><span className="font-medium">Age:</span> {patientData.age} years</p>
-                    <p><span className="font-medium">Mobile:</span> {patientData.mobile}</p>
+                <div className="p-4 bg-muted/30 dark:bg-muted/20 rounded-lg border border-border/50 dark:border-border/30 transition-colors duration-300">
+                  <h3 className="font-semibold text-lg mb-4 text-foreground dark:text-foreground flex items-center gap-2 transition-colors duration-300">
+                    <User className="w-5 h-5 text-primary dark:text-primary" />
+                    Patient Information
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="font-medium text-muted-foreground dark:text-muted-foreground transition-colors duration-300">Name:</span> 
+                      <span className="text-foreground dark:text-foreground transition-colors duration-300">{patientData.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium text-muted-foreground dark:text-muted-foreground transition-colors duration-300">Age:</span> 
+                      <span className="text-foreground dark:text-foreground transition-colors duration-300">{patientData.age} years</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium text-muted-foreground dark:text-muted-foreground transition-colors duration-300">Mobile:</span> 
+                      <span className="text-foreground dark:text-foreground transition-colors duration-300">{patientData.mobile}</span>
+                    </div>
                   </div>
                 </div>
                 
-                <div>
-                  <h3 className="font-semibold text-lg mb-3">Appointment Details</h3>
-                  <div className="space-y-2">
-                    <p><span className="font-medium">Doctor:</span> Dr. {selectedDoctor?.name}</p>
-                    <p><span className="font-medium">Specialization:</span> {selectedDoctor?.specialization}</p>
-                    <p><span className="font-medium">Date:</span> {formatDate(selectedSlot?.date)}</p>
-                    <p><span className="font-medium">Time:</span> {selectedSlot?.timeDisplay || `${formatTime(selectedSlot?.start)} - ${formatTime(selectedSlot?.end)}`}</p>
+                <div className="p-4 bg-muted/30 dark:bg-muted/20 rounded-lg border border-border/50 dark:border-border/30 transition-colors duration-300">
+                  <h3 className="font-semibold text-lg mb-4 text-foreground dark:text-foreground flex items-center gap-2 transition-colors duration-300">
+                    <Calendar className="w-5 h-5 text-primary dark:text-primary" />
+                    Appointment Details
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="font-medium text-muted-foreground dark:text-muted-foreground transition-colors duration-300">Doctor:</span> 
+                      <span className="text-foreground dark:text-foreground transition-colors duration-300">Dr. {selectedDoctor?.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium text-muted-foreground dark:text-muted-foreground transition-colors duration-300">Specialization:</span> 
+                      <span className="text-foreground dark:text-foreground transition-colors duration-300">{selectedDoctor?.specialization}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium text-muted-foreground dark:text-muted-foreground transition-colors duration-300">Date:</span> 
+                      <span className="text-foreground dark:text-foreground transition-colors duration-300">{formatDate(selectedSlot?.date)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium text-muted-foreground dark:text-muted-foreground transition-colors duration-300">Time:</span> 
+                      <span className="text-foreground dark:text-foreground transition-colors duration-300">{selectedSlot?.timeDisplay || `${formatTime(selectedSlot?.start)} - ${formatTime(selectedSlot?.end)}`}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-              
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-medium text-blue-900 mb-2">Important Notes:</h4>
-                <ul className="text-blue-800 text-sm space-y-1">
-                  <li>• Please arrive 30 minutes before your appointment</li>
-                  <li>• Bring a valid ID and any relevant medical documents</li>
-                  <li>• The appointment confirmation will be sent to the mobile number provided</li>
+              <div className="bg-info/10 dark:bg-info/5 border border-info/20 dark:border-info/30 p-6 rounded-lg transition-colors duration-300">
+                <h4 className="font-medium text-info dark:text-info mb-3 flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Important Notes
+                </h4>
+                <ul className="text-info/80 dark:text-info/90 text-sm space-y-2 transition-colors duration-300">
+                  <li className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-info dark:bg-info mt-2 flex-shrink-0"></div>
+                    <span>Please arrive 30 minutes before your appointment</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-info dark:bg-info mt-2 flex-shrink-0"></div>
+                    <span>Bring a valid ID and any relevant medical documents</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-info dark:bg-info mt-2 flex-shrink-0"></div>
+                    <span>The appointment confirmation will be sent to the mobile number provided</span>
+                  </li>
                 </ul>
               </div>
             </CardContent>
@@ -431,14 +503,14 @@ const AppointmentCreationFlow = ({ onSuccess }) => {
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between">
+      <div className="flex justify-between items-center pt-6 border-t border-border/50 dark:border-border/30 transition-colors duration-300">
         <div>
           {currentStep > 1 && (
             <Button
               variant="outline"
               onClick={handleBack}
               disabled={isLoading || isSubmitting || isSuccess}
-              className="gap-2"
+              className="gap-2 min-w-24 border-border dark:border-border hover:bg-accent dark:hover:bg-accent hover:text-accent-foreground dark:hover:text-accent-foreground transition-all duration-300"
             >
               <ArrowLeft className="w-4 h-4" />
               Back
@@ -446,34 +518,53 @@ const AppointmentCreationFlow = ({ onSuccess }) => {
           )}
         </div>
 
-        
-
         <div className="flex gap-3">
-          {/* <Button
-            variant="outline"
-            onClick={onCancel}
-            disabled={isLoading || isSubmitting}
-          >
-            Cancel
-          </Button> */}
-          
           {currentStep < 4 ? (
             <Button
               onClick={handleNext}
               disabled={isNextDisabled() || isLoading}
-              className="gap-2"
+              className="gap-2 min-w-32 bg-primary dark:bg-primary hover:bg-primary-hover dark:hover:bg-primary-hover text-primary-foreground dark:text-primary-foreground transition-all duration-300 shadow-lg hover:shadow-xl"
             >
-              {isLoading ? 'Loading...' : 'Next'}
-              <ArrowRight className="w-4 h-4" />
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-primary-foreground dark:border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  Next
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </Button>
           ) : (
             <Button
               onClick={handleSubmitAppointment}
               disabled={isSubmitting || isSuccess}
-              className={`gap-2 ${(isSubmitting || isSuccess) ? 'cursor-not-allowed opacity-50' : 'bg-green-600 hover:bg-green-700'}`}
+              className={`gap-2 min-w-44 transition-all duration-300 ${
+                isSuccess 
+                  ? 'bg-success dark:bg-success hover:bg-success dark:hover:bg-success text-success-foreground dark:text-success-foreground' 
+                  : isSubmitting 
+                  ? 'cursor-not-allowed opacity-75' 
+                  : 'bg-success dark:bg-success hover:bg-success-hover dark:hover:bg-success-hover text-success-foreground dark:text-success-foreground shadow-lg hover:shadow-xl'
+              }`}
             >
-              {isSuccess ? 'Appointment Created!' : isSubmitting ? 'Creating Appointment...' : 'Create Appointment'}
-              <CheckCircle className="w-4 h-4" />
+              {isSuccess ? (
+                <>
+                  <CheckCircle className="w-4 h-4" />
+                  Appointment Created!
+                </>
+              ) : isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-success-foreground border-t-transparent rounded-full animate-spin" />
+                  Creating Appointment...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="w-4 h-4" />
+                  Create Appointment
+                </>
+              )}
             </Button>
           )}
         </div>

@@ -71,7 +71,7 @@ const Documentation = () => {
                         </ul>
                     </div>
                     
-                    <div className=" p-4 border-l-4 border-yellow-400 my-4">
+                    <div className=" p-4 border-l-4 border-warning my-4">
                         <p className="font-semibold">Important:</p>
                         <p>All 7 days of the week must be included in the schedule, even if the doctor is inactive on certain days.</p>
                     </div>

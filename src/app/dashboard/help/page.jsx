@@ -30,7 +30,7 @@ export default function HelpPage() {
         </Card>
 
         {/* Email Support */}
-        <Card className="p-8 h-full flex flex-col justify-between rounded-2xl border border-gray-200 dark:border-gray-700 transition-shadow duration-300 hover:shadow-xl dark:hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]">
+        <Card className="p-8 h-full flex flex-col justify-between rounded-2xl border border-border transition-shadow duration-300 hover:shadow-xl dark:hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]">
           <div className="space-y-4">
             <MailIcon className="h-10 w-10" />
             <h3 className="text-2xl font-semibold">Email Support</h3>
@@ -47,7 +47,7 @@ export default function HelpPage() {
         </Card>
 
         {/* Documentation */}
-        <Card className="p-8 h-full flex flex-col justify-between rounded-2xl border border-gray-200 dark:border-gray-700 transition-shadow duration-300 hover:shadow-xl dark:hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]">
+        <Card className="p-8 h-full flex flex-col justify-between rounded-2xl border border-border transition-shadow duration-300 hover:shadow-xl dark:hover:shadow-[0_0_25px_rgba(255,255,255,0.1)]">
           <div className="space-y-4">
             <BookIcon className="h-10 w-10" />
             <h3 className="text-2xl font-semibold">Documentation</h3>

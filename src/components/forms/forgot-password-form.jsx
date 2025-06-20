@@ -64,7 +64,7 @@ export function ForgotPasswordForm({ className, ...props }) {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-              className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center"
+              className="mx-auto w-16 h-16 bg-success/20 rounded-full flex items-center justify-center"
             >
               <svg
                 className="w-8 h-8 text-success"

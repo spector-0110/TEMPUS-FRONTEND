@@ -23,25 +23,25 @@
     --card-pressed: 215 25% 94%;
     
     /* Interactive Elements - Primary */
-    --primary: 221 83% 53%;
+    --primary: 221 39% 11%;
     --primary-foreground: 0 0% 98%;
-    --primary-hover: 221 83% 48%;
-    --primary-active: 221 83% 43%;
-    --primary-subtle: 221 83% 96%;
+    --primary-hover: 221 39% 15%;
+    --primary-active: 221 39% 19%;
+    --primary-subtle: 221 39% 96%;
     
     /* Interactive Elements - Secondary */
-    --secondary: 215 20% 95%;
+    --secondary: 215 16% 93%;
     --secondary-foreground: 215 27% 17%;
-    --secondary-hover: 215 20% 92%;
-    --secondary-active: 215 25% 88%;
+    --secondary-hover: 215 16% 87%;
+    --secondary-active: 215 16% 81%;
     --secondary-subtle: 215 30% 97%;
     
     /* Accent Colors */
-    --accent: 262 83% 58%;
+    --accent: 142 76% 36%;
     --accent-foreground: 0 0% 98%;
-    --accent-hover: 262 83% 53%;
-    --accent-active: 262 83% 48%;
-    --accent-subtle: 262 83% 96%;
+    --accent-hover: 142 76% 32%;
+    --accent-active: 142 76% 28%;
+    --accent-subtle: 142 76% 96%;
     
     /* Status Colors - Success */
     --success: 142 71% 45%;
@@ -297,7 +297,7 @@
   }
   
   body {
-    @apply bg-background text-foreground transition-colors;
+    @apply bg-background text-foreground transition-colors duration-200;
     font-feature-settings: "rlig" 1, "calt" 1;
     /* Ensure cursor remains active during theme transitions */
     cursor: auto !important;
@@ -346,6 +346,27 @@
   
   .gradient-surface {
     background: linear-gradient(135deg, hsl(var(--surface)) 0%, hsl(var(--surface-variant)) 100%);
+  }
+  
+  /* Enhanced theme-aware shadows */
+  .shadow-theme-sm {
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .shadow-theme {
+    box-shadow: var(--shadow);
+  }
+  
+  .shadow-theme-md {
+    box-shadow: var(--shadow-md);
+  }
+  
+  .shadow-theme-lg {
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .shadow-theme-xl {
+    box-shadow: var(--shadow-xl);
   }
   
   /* Animation classes */

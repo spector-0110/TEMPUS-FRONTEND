@@ -78,7 +78,7 @@ export default function DoctorPerformance({ doctors, appointmentData, operationa
         <h2 className="text-3xl font-bold text-foreground mb-2">
           Doctor Performance
         </h2>
-        <p className="text-slate-600 dark:text-slate-400">
+        <p className="text-muted-foreground">
           Comprehensive analysis of doctor performance and utilization
         </p>
       </motion.div>
@@ -108,10 +108,10 @@ export default function DoctorPerformance({ doctors, appointmentData, operationa
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200">
+                        <h3 className="text-xl font-bold text-foreground">
                           Dr. {doctor.name}
                         </h3>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                        <p className="text-sm text-muted-foreground">
                           {doctor.specialization}
                         </p>
                         <div className="flex items-center gap-2 mt-1">
@@ -150,22 +150,22 @@ export default function DoctorPerformance({ doctors, appointmentData, operationa
                   </div>
                   
                   <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <Phone className="h-4 w-4" />
                       {doctor.phone}
                     </div>
-                    <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <Mail className="h-4 w-4" />
                       {doctor.email}
                     </div>
-                    <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <User className="h-4 w-4" />
                       Age: {doctor.age}
                     </div>
                   </div>
                   
                   <div className="pt-2 border-t border-border">
-                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                    <div className="text-xs text-muted-foreground">
                       Qualifications: {doctor.qualification}
                     </div>
                   </div>

@@ -76,12 +76,12 @@ export default function PatientHistoryModal({
   // Helper functions for formatting and styling
   const getStatusColor = (status) => {
     switch (status) {
-      case 'booked': return 'bg-primary/10 text-primary';
-      case 'completed': return 'bg-success/10 text-success';
-      case 'missed': return 'bg-destructive/10 text-destructive';
-      case 'cancelled': return 'bg-muted text-foreground';
-      case 'confirmed': return 'bg-accent/10 text-accent';
-      default: return 'bg-muted text-foreground';
+      case 'booked': return 'bg-primary/10 text-primary border-primary/20';
+      case 'completed': return 'bg-success/10 text-success border-success/20';
+      case 'missed': return 'bg-destructive/10 text-destructive border-destructive/20';
+      case 'cancelled': return 'bg-muted text-muted-foreground border-border';
+      case 'confirmed': return 'bg-accent/10 text-accent border-accent/20';
+      default: return 'bg-muted text-muted-foreground border-border';
     }
   };
 
@@ -98,9 +98,9 @@ export default function PatientHistoryModal({
 
   const getPaymentStatusColor = (paymentStatus) => {
     switch (paymentStatus) {
-      case 'paid': return 'bg-success/10 text-success';
-      case 'unpaid': return 'bg-warning/10 text-warning';
-      default: return 'bg-muted text-foreground';
+      case 'paid': return 'bg-success/10 text-success border-success/20';
+      case 'unpaid': return 'bg-warning/10 text-warning border-warning/20';
+      default: return 'bg-muted text-muted-foreground border-border';
     }
   };
 
@@ -163,16 +163,16 @@ export default function PatientHistoryModal({
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto bg-background dark:bg-background border-border dark:border-border transition-colors duration-300">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">
+          <DialogTitle className="text-xl font-bold text-foreground dark:text-foreground transition-colors duration-300">
             Patient Appointment History:
             {patientInfo && (
               <div className="mt-1">
                 <span className="block text-lg font-medium">
                   {patientInfo.patientName}
                 </span>
-                <span className="block text-sm text-muted-foreground">
+                <span className="block text-sm text-muted-foreground dark:text-muted-foreground transition-colors duration-300">
                   {patientInfo.mobileNumber}
                 </span>
               </div>
@@ -181,7 +181,7 @@ export default function PatientHistoryModal({
         </DialogHeader>
         
         {error && (
-          <div className="bg-red-50 border border-destructive/20 text-red-700 px-4 py-3 rounded-md">
+          <div className="bg-destructive/10 dark:bg-destructive/5 border border-destructive/20 dark:border-destructive/30 text-destructive dark:text-destructive px-4 py-3 rounded-md transition-colors duration-300">
             <p>{error}</p>
           </div>
         )}
@@ -192,22 +192,22 @@ export default function PatientHistoryModal({
           </div>
         ) : patientHistory.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <History className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium text-muted-foreground">No previous appointments found</h3>
-            <p className="text-sm text-muted-foreground mt-2">This patient has no appointment history</p>
+            <History className="mx-auto h-12 w-12 text-muted-foreground dark:text-muted-foreground mb-4 transition-colors duration-300" />
+            <h3 className="text-lg font-medium text-muted-foreground dark:text-muted-foreground transition-colors duration-300">No previous appointments found</h3>
+            <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-2 transition-colors duration-300">This patient has no appointment history</p>
           </div>
         ) : (
           <div className="space-y-6 my-4">
             <div className="flex flex-col gap-2 mb-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium">
+                <h3 className="text-lg font-medium text-foreground dark:text-foreground transition-colors duration-300">
                   All Appointments ({patientHistory.length})
                 </h3>
               </div>
               {patientInfo && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   {Object.entries(patientInfo.statusBreakdown || {}).map(([status, count]) => (
-                    <Badge key={status} className={`text-xs py-1.5 px-3 font-medium justify-center ${getStatusColor(status)}`}>
+                    <Badge key={status} className={`text-xs py-1.5 px-3 font-medium justify-center ${getStatusColor(status)} transition-colors duration-300`}>
                       {getStatusIcon(status)}
                       <span className="ml-1">{status.toUpperCase()}: {count}</span>
                     </Badge>
@@ -217,7 +217,7 @@ export default function PatientHistoryModal({
             </div>
             
             {patientHistory.map((apt) => (
-              <Card key={apt.id} className="overflow-hidden">
+              <Card key={apt.id} className="overflow-hidden bg-card dark:bg-card border-border dark:border-border transition-colors duration-300">
                 <CardContent className="p-5">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex-1">
@@ -251,7 +251,7 @@ export default function PatientHistoryModal({
                           {apt.documents && apt.documents.length > 0 && (
                           <div className="text-sm">
                             <span className="font-medium flex items-center gap-1">
-                              <FileText className="h-3.5 w-3.5 text-purple-600" />
+                              <FileText className="h-3.5 w-3.5 text-secondary" />
                               Documents:
                             </span> {apt.documents.length} file{apt.documents.length !== 1 ? 's' : ''}
                           </div>

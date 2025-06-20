@@ -16,25 +16,25 @@ const statusConfig = {
     label: "Booked", 
     variant: "default", 
     icon: Calendar,
-    color: "text-primary bg-blue-50 border-primary/20"
+    color: "text-primary bg-primary/10 border-primary/20"
   },
   completed: { 
     label: "Completed", 
     variant: "secondary", 
     icon: CheckCircle,
-    color: "text-emerald-600 bg-emerald-50 border-emerald-200"
+    color: "text-success bg-success/10 border-success/20"
   },
   cancelled: { 
     label: "Cancelled", 
     variant: "destructive", 
     icon: XCircle,
-    color: "text-red-600 bg-red-50 border-destructive/20"
+    color: "text-destructive bg-destructive/10 border-destructive/20"
   },
   missed: { 
     label: "Missed", 
     variant: "destructive", 
     icon: AlertCircle,
-    color: "text-orange-600 bg-orange-50 border-orange-200"
+    color: "text-warning bg-warning/10 border-warning/20"
   }
 };
 
@@ -43,13 +43,13 @@ const paymentStatusConfig = {
     label: "Paid",
     variant: "secondary",
     icon: CheckCircle,
-    color: "text-green-600 bg-green-50 border-success/20"
+    color: "text-success bg-success/10 border-success/20"
   },
   unpaid: {
     label: "Unpaid",
     variant: "outline",
     icon: CreditCard,
-    color: "text-muted-foreground bg-gray-50 border-border"
+    color: "text-muted-foreground bg-muted/50 border-border"
   }
 };
 
@@ -57,7 +57,7 @@ const paymentMethodConfig = {
   cash: {
     label: "Cash",
     icon: IndianRupee,
-    color: "text-green-600"
+    color: "text-success"
   },
   upi: {
     label: "UPI",
@@ -67,7 +67,7 @@ const paymentMethodConfig = {
   card: {
     label: "Card",
     icon: CreditCard,
-    color: "text-purple-600"
+    color: "text-accent"
   }
 };
 
@@ -330,10 +330,10 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background dark:bg-background border-border dark:border-border transition-colors duration-300">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3">
-            <Calendar className="h-5 w-5 text-primary" />
+          <DialogTitle className="flex items-center gap-3 text-foreground dark:text-foreground transition-colors duration-300">
+            <Calendar className="h-5 w-5 text-primary dark:text-primary" />
             Appointment Details
           </DialogTitle>
         </DialogHeader>
@@ -343,12 +343,12 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <Badge variant={statusInfo.variant} className={statusInfo.color}>
+                <Badge variant={statusInfo.variant} className={`${statusInfo.color} transition-colors duration-300`}>
                   {statusInfo.label}
                 </Badge>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant={paymentInfo.variant} className={paymentInfo.color}>
+                <Badge variant={paymentInfo.variant} className={`${paymentInfo.color} transition-colors duration-300`}>
                   {paymentInfo.label}
                 </Badge>
               </div>
@@ -398,7 +398,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
                   </div>
                 )}
                 {appointment.createdAt && (
-                  <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100">
+                  <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border">
                     <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">
                       Created on: {formatCreationDate(appointment.createdAt)}
@@ -412,7 +412,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Stethoscope className="h-5 w-5 text-green-600" />
+                  <Stethoscope className="h-5 w-5 text-success" />
                   Doctor
                 </CardTitle>
               </CardHeader>
@@ -427,7 +427,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
                         className="w-16 h-16 rounded-xl object-cover border border-border"
                       />
                     ) : (
-                      <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
                         <User className="h-8 w-8 text-muted-foreground" />
                       </div>
                     )}
@@ -456,7 +456,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
-                <User className="h-5 w-5 text-purple-600" />
+                <User className="h-5 w-5 text-primary" />
                 Patient Information
               </CardTitle>
             </CardHeader>
@@ -543,7 +543,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
                           size="sm"
                           onClick={() => handleStatusUpdate(status)}
                           disabled={isUpdatingStatus || isUpdatingPayment}
-                          className="flex items-center gap-2 hover:bg-neutral-900 hover:shadow-md cursor-pointer transition-colors"
+                          className="flex items-center gap-2 hover:bg-card-hover hover:shadow-md cursor-pointer transition-colors"
                         >
                           <StatusIcon className="h-4 w-4" />
                           Mark as {config.label}
@@ -563,7 +563,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <IndianRupee className="h-5 w-5 text-green-600" />
+                    <IndianRupee className="h-5 w-5 text-success" />
                     Update Payment Status
                   </CardTitle>
                 </CardHeader>
@@ -579,7 +579,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
                           size="sm"
                           onClick={() => handlePaymentStatusUpdate(paymentStatus)}
                           disabled={isUpdatingPayment || isUpdatingStatus}
-                          className="flex items-center gap-2 hover:bg-neutral-900 hover:shadow-md cursor-pointer transition-colors"
+                          className="flex items-center gap-2 hover:bg-card-hover hover:shadow-md cursor-pointer transition-colors"
                         >
                           <PaymentIcon className="h-4 w-4" />
                           Mark as {config.label}
@@ -611,7 +611,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-purple-600" />
+                  <FileText className="h-5 w-5 text-accent" />
                   Documents
                 </CardTitle>
               </CardHeader>
@@ -623,16 +623,16 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
                     const isPdf = /\.pdf$/i.test(fileName);
                     
                     return (
-                      <div key={index} className="flex items-center justify-between border rounded-md p-3 hover:bg-gray-900 transition-colors">
+                      <div key={index} className="flex items-center justify-between border rounded-md p-3 hover:bg-muted transition-colors">
                         <div className="flex items-center gap-3">
                           {isImage ? (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-info">
                               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                               <circle cx="8.5" cy="8.5" r="1.5"></circle>
                               <polyline points="21 15 16 10 5 21"></polyline>
                             </svg>
                           ) : isPdf ? (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-destructive">
                               <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
                               <polyline points="14 2 14 8 20 8"></polyline>
                             </svg>
@@ -647,7 +647,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
                         <button 
                           onClick={() => downloadFile(doc, fileName)}
                           disabled={downloadingFiles[fileName]}
-                          className="flex items-center gap-1 text-xs font-medium text-primary bg-blue-50 hover:bg-primary/10 rounded-md px-2 py-1 transition-colors disabled:opacity-50"
+                          className="flex items-center gap-1 text-xs font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-md px-2 py-1 transition-colors disabled:opacity-50"
                         >
                           {downloadingFiles[fileName] ? (
                             <>
@@ -699,7 +699,7 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <IndianRupee className="h-5 w-5 text-green-600" />
+              <IndianRupee className="h-5 w-5 text-success" />
               Select Payment Method
             </DialogTitle>
           </DialogHeader>

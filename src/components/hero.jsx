@@ -140,9 +140,9 @@ export function Hero() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:40px_40px]" />
         
         {/* Floating dots */}
-        <div className="absolute top-20 left-1/4 w-2 h-2 bg-blue-400/60 rounded-full animate-bounce" />
-        <div className="absolute top-1/3 right-1/4 w-1.5 h-1.5 bg-indigo-400/60 rounded-full animate-bounce delay-300" />
-        <div className="absolute bottom-1/4 left-1/3 w-1 h-1 bg-purple-400/60 rounded-full animate-bounce delay-700" />
+        <div className="absolute top-20 left-1/4 w-2 h-2 bg-primary/60 rounded-full animate-bounce" />
+        <div className="absolute top-1/3 right-1/4 w-1.5 h-1.5 bg-secondary/60 rounded-full animate-bounce delay-300" />
+        <div className="absolute bottom-1/4 left-1/3 w-1 h-1 bg-accent/60 rounded-full animate-bounce delay-700" />
       </div>
       
       <div className="relative max-w-7xl mx-auto w-full">
@@ -500,12 +500,12 @@ export function Hero() {
                       className="space-y-6"
                     >
                       <div className="text-center mb-6">
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2">Reset Password</h3>
-                        <p className="text-gray-600">Enter your email to receive reset instructions</p>
+                        <h3 className="text-xl font-semibold text-foreground dark:text-foreground mb-2">Reset Password</h3>
+                        <p className="text-muted-foreground dark:text-muted-foreground">Enter your email to receive reset instructions</p>
                       </div>
 
                       <div className="space-y-3">
-                        <Label htmlFor="reset-email" className="text-sm font-semibold text-gray-700">
+                        <Label htmlFor="reset-email" className="text-sm font-semibold text-foreground dark:text-foreground">
                           Email Address
                         </Label>
                         <Input
@@ -560,7 +560,7 @@ export function Hero() {
                           className="space-y-6"
                         >
                           <div className="space-y-3">
-                            <Label htmlFor="login-email" className="text-sm font-semibold text-gray-700">
+                            <Label htmlFor="login-email" className="text-sm font-semibold text-foreground dark:text-foreground">
                               Email Address
                             </Label>
                             <Input
@@ -577,7 +577,7 @@ export function Hero() {
 
                           <div className="space-y-3">
                             <div className="flex items-center justify-between">
-                              <Label htmlFor="login-password" className="text-sm font-semibold text-gray-700">
+                              <Label htmlFor="login-password" className="text-sm font-semibold text-foreground dark:text-foreground">
                                 Password
                               </Label>
                               <button
@@ -586,7 +586,7 @@ export function Hero() {
                                   setActiveTab("reset");
                                   setError(null);
                                 }}
-                                className="text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline"
+                                className="text-sm text-primary hover:text-primary/80 font-medium hover:underline"
                               >
                                 Forgot password?
                               </button>
@@ -605,7 +605,7 @@ export function Hero() {
                               <button
                                 type="button"
                                 onClick={() => setLoginData({...loginData, showPassword: !loginData.showPassword})}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                               >
                                 {loginData.showPassword ? (
                                   <EyeSlashIcon className="w-5 h-5" />
@@ -619,7 +619,7 @@ export function Hero() {
                           <Button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-base"
+                            className="w-full h-12 bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary-active text-primary-foreground font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-base"
                           >
                             {isLoading ? (
                               <>
@@ -645,7 +645,7 @@ export function Hero() {
                           className="space-y-6"
                         >
                           <div className="space-y-3">
-                            <Label htmlFor="signup-email" className="text-sm font-semibold text-gray-700">
+                            <Label htmlFor="signup-email" className="text-sm font-semibold text-foreground dark:text-foreground">
                               Email Address
                             </Label>
                             <Input
@@ -661,7 +661,7 @@ export function Hero() {
                           </div>
 
                           <div className="space-y-3">
-                            <Label htmlFor="signup-password" className="text-sm font-semibold text-gray-700">
+                            <Label htmlFor="signup-password" className="text-sm font-semibold text-foreground dark:text-foreground">
                               Password
                             </Label>
                             <div className="relative">
@@ -678,7 +678,7 @@ export function Hero() {
                               <button
                                 type="button"
                                 onClick={() => setSignupData({...signupData, showPassword: !signupData.showPassword})}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                               >
                                 {signupData.showPassword ? (
                                   <EyeSlashIcon className="w-5 h-5" />
@@ -690,7 +690,7 @@ export function Hero() {
                           </div>
 
                           <div className="space-y-3">
-                            <Label htmlFor="signup-repeat-password" className="text-sm font-semibold text-gray-700">
+                            <Label htmlFor="signup-repeat-password" className="text-sm font-semibold text-foreground dark:text-foreground">
                               Confirm Password
                             </Label>
                             <div className="relative">
@@ -707,7 +707,7 @@ export function Hero() {
                               <button
                                 type="button"
                                 onClick={() => setSignupData({...signupData, showRepeatPassword: !signupData.showRepeatPassword})}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                               >
                                 {signupData.showRepeatPassword ? (
                                   <EyeSlashIcon className="w-5 h-5" />
@@ -721,7 +721,7 @@ export function Hero() {
                           <Button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-base"
+                            className="w-full h-12 bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary-active text-primary-foreground font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-base"
                           >
                             {isLoading ? (
                               <>
@@ -755,7 +755,7 @@ export function Hero() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-12 font-semibold border-border hover:bg-gray-50 rounded-xl transition-colors text-base"
+                  className="w-full h-12 font-semibold border-border hover:bg-muted rounded-xl transition-colors text-base"
                   disabled={isLoading}
                   onClick={() => authService.signInWithOAuth('google')}
                 >

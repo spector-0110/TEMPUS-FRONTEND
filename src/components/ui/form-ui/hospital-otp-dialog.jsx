@@ -116,7 +116,7 @@ function HospitalOtpDialog({
               value={otpValue}
               onChange={(e) => setOtpValue(e.target.value)}
               placeholder="Enter OTP"
-              className={otpError ? 'border-red-500' : ''}
+              className={otpError ? 'border-destructive' : ''}
             />
             {otpError && <p className="text-sm text-red-500">{otpError}</p>}
           </div>

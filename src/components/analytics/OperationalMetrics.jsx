@@ -87,7 +87,7 @@ export default function OperationalMetrics({ data }) {
       case 'good': return 'text-success';
       case 'warning': return 'text-warning';
       case 'poor': return 'text-destructive';
-      default: return 'text-muted-foreground';
+      default: return 'text-muted-foreground dark:text-muted-foreground';
     }
   };
 
@@ -150,7 +150,7 @@ export default function OperationalMetrics({ data }) {
           <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-blue-500" />
+                <TrendingUp className="h-5 w-5 text-primary" />
                 Doctor Utilization Analysis
               </CardTitle>
             </CardHeader>
@@ -186,7 +186,7 @@ export default function OperationalMetrics({ data }) {
           <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-green-500" />
+                <Users className="h-5 w-5 text-success" />
                 Patient Age Distribution
               </CardTitle>
             </CardHeader>
@@ -236,7 +236,7 @@ export default function OperationalMetrics({ data }) {
           <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5 text-orange-500" />
+                <Settings className="h-5 w-5 text-chart-2" />
                 Schedule Efficiency Recommendations
               </CardTitle>
             </CardHeader>
@@ -299,7 +299,7 @@ export default function OperationalMetrics({ data }) {
         <Card className="bg-card-elevated/60 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-purple-500" />
+              <Clock className="h-5 w-5 text-secondary" />
               Detailed Utilization Breakdown
             </CardTitle>
           </CardHeader>

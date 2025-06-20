@@ -47,21 +47,21 @@ const PatientForm = ({
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <Card>
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <User className="h-6 w-6 text-primary" />
+      <Card className="bg-card dark:bg-card border-border dark:border-border shadow-lg dark:shadow-xl transition-all duration-300">
+        <CardHeader className="text-center border-b border-border/50 dark:border-border/30 transition-colors duration-300">
+          <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-primary/10 dark:bg-primary/15 border-2 border-primary/20 dark:border-primary/30 flex items-center justify-center transition-colors duration-300">
+            <User className="h-7 w-7 text-primary dark:text-primary" />
           </div>
-          <CardTitle className="text-xl font-semibold">Patient Details</CardTitle>
-          <p className="text-sm text-muted-foreground mt-2">
-            Please provide patient information to book the appointment
+          <CardTitle className="text-2xl font-semibold text-foreground dark:text-foreground transition-colors duration-300">Patient Details</CardTitle>
+          <p className="text-muted-foreground dark:text-muted-foreground mt-3 leading-relaxed transition-colors duration-300">
+            Please provide accurate patient information to book the appointment
           </p>
         </CardHeader>
         
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-6">
           {/* Name Field */}
           <div className="space-y-2">
-            <Label htmlFor="patient-name" className="text-sm font-medium">
+            <Label htmlFor="patient-name" className="text-sm font-medium text-foreground dark:text-foreground transition-colors duration-300">
               Full Name *
             </Label>
             <Input
@@ -70,16 +70,16 @@ const PatientForm = ({
               placeholder="Enter patient's full name"
               value={patientData.name || ''}
               onChange={(e) => handleInputChange('name', e.target.value)}
-              className={`h-11 transition-colors ${
+              className={`h-12 transition-all duration-200 bg-input-background dark:bg-input-background border-input dark:border-input focus:border-input-focus dark:focus:border-input-focus hover:border-input-hover dark:hover:border-input-hover ${
                 validationErrors.name 
-                  ? 'border-red-500 focus:border-red-500' 
-                  : 'focus:border-primary'
+                  ? 'border-destructive dark:border-destructive focus:border-destructive dark:focus:border-destructive ring-1 ring-destructive/20 dark:ring-destructive/30' 
+                  : 'focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/30'
               }`}
               aria-describedby={validationErrors.name ? 'name-error' : undefined}
             />
             {validationErrors.name && (
-              <p id="name-error" className="text-xs text-red-600 flex items-center gap-1">
-                <span className="text-red-500">⚠</span>
+              <p id="name-error" className="text-xs text-destructive dark:text-destructive flex items-center gap-2 transition-colors duration-300">
+                <span className="w-4 h-4 rounded-full bg-destructive/20 dark:bg-destructive/30 flex items-center justify-center text-xs">!</span>
                 {validationErrors.name}
               </p>
             )}
@@ -89,11 +89,11 @@ const PatientForm = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Age Field */}
             <div className="space-y-2">
-              <Label htmlFor="patient-age" className="text-sm font-medium">
+              <Label htmlFor="patient-age" className="text-sm font-medium text-foreground dark:text-foreground transition-colors duration-300">
                 Age *
               </Label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-muted-foreground pointer-events-none transition-colors duration-300" />
                 <Input
                   id="patient-age"
                   type="text"
@@ -101,17 +101,17 @@ const PatientForm = ({
                   value={patientData.age || ''}
                   onChange={(e) => handleInputChange('age', e.target.value)}
                   maxLength={3}
-                  className={`pl-10 h-11 transition-colors ${
+                  className={`pl-10 h-12 transition-all duration-200 bg-input-background dark:bg-input-background border-input dark:border-input focus:border-input-focus dark:focus:border-input-focus hover:border-input-hover dark:hover:border-input-hover ${
                     validationErrors.age 
-                      ? 'border-red-500 focus:border-red-500' 
-                      : 'focus:border-primary'
+                      ? 'border-destructive dark:border-destructive focus:border-destructive dark:focus:border-destructive ring-1 ring-destructive/20 dark:ring-destructive/30' 
+                      : 'focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/30'
                   }`}
                   aria-describedby={validationErrors.age ? 'age-error' : undefined}
                 />
               </div>
               {validationErrors.age && (
-                <p id="age-error" className="text-xs text-red-600 flex items-center gap-1">
-                  <span className="text-red-500">⚠</span>
+                <p id="age-error" className="text-xs text-destructive dark:text-destructive flex items-center gap-2 transition-colors duration-300">
+                  <span className="w-4 h-4 rounded-full bg-destructive/20 dark:bg-destructive/30 flex items-center justify-center text-xs">!</span>
                   {validationErrors.age}
                 </p>
               )}
@@ -119,11 +119,11 @@ const PatientForm = ({
 
             {/* Mobile Field */}
             <div className="space-y-2">
-              <Label htmlFor="patient-mobile" className="text-sm font-medium">
+              <Label htmlFor="patient-mobile" className="text-sm font-medium text-foreground dark:text-foreground transition-colors duration-300">
                 Mobile Number *
               </Label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-muted-foreground pointer-events-none transition-colors duration-300" />
                 <Input
                   id="patient-mobile"
                   type="tel"
@@ -131,17 +131,17 @@ const PatientForm = ({
                   value={patientData.mobile || ''}
                   onChange={(e) => handleInputChange('mobile', e.target.value)}
                   maxLength={10}
-                  className={`pl-10 h-11 transition-colors ${
+                  className={`pl-10 h-12 transition-all duration-200 bg-input-background dark:bg-input-background border-input dark:border-input focus:border-input-focus dark:focus:border-input-focus hover:border-input-hover dark:hover:border-input-hover ${
                     validationErrors.mobile 
-                      ? 'border-red-500 focus:border-red-500' 
-                      : 'focus:border-primary'
+                      ? 'border-destructive dark:border-destructive focus:border-destructive dark:focus:border-destructive ring-1 ring-destructive/20 dark:ring-destructive/30' 
+                      : 'focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/30'
                   }`}
                   aria-describedby={validationErrors.mobile ? 'mobile-error' : undefined}
                 />
               </div>
               {validationErrors.mobile && (
-                <p id="mobile-error" className="text-xs text-red-600 flex items-center gap-1">
-                  <span className="text-red-500">⚠</span>
+                <p id="mobile-error" className="text-xs text-destructive dark:text-destructive flex items-center gap-2 transition-colors duration-300">
+                  <span className="w-4 h-4 rounded-full bg-destructive/20 dark:bg-destructive/30 flex items-center justify-center text-xs">!</span>
                   {validationErrors.mobile}
                 </p>
               )}
@@ -150,34 +150,53 @@ const PatientForm = ({
 
           {/* Form Validation Summary */}
           {Object.keys(validationErrors).length > 0 && (
-            <div className="p-3 bg-red-50 border border-destructive/20 rounded-lg">
-              <h4 className="text-sm font-medium text-red-800 mb-1">
+            <div className="p-4 bg-destructive/5 dark:bg-destructive/10 border border-destructive/20 dark:border-destructive/30 rounded-lg transition-colors duration-300">
+              <h4 className="text-sm font-medium text-destructive dark:text-destructive mb-2 transition-colors duration-300">
                 Please fix the following errors:
               </h4>
-              <ul className="text-xs text-red-700 space-y-1">
+              <ul className="text-xs text-destructive/80 dark:text-destructive/90 space-y-1 transition-colors duration-300">
                 {Object.values(validationErrors).map((error, index) => (
-                  <li key={index}>• {error}</li>
+                  <li key={index} className="flex items-center gap-2">
+                    <div className="w-1 h-1 rounded-full bg-destructive dark:bg-destructive"></div>
+                    {error}
+                  </li>
                 ))}
               </ul>
             </div>
           )}
 
           {/* Instructions */}
-          <div className="bg-blue-50 p-4 rounded-lg border border-primary/20">
-            <h4 className="text-sm font-medium text-blue-900 mb-2">Information Required</h4>
-            <ul className="text-xs text-blue-800 space-y-1">
-              <li>• Full name as per government ID</li>
-              <li>• Current age of the patient</li>
-              <li>• Active mobile number for appointment confirmations</li>
+          <div className="bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/30 p-4 rounded-lg transition-colors duration-300">
+            <h4 className="text-sm font-medium text-primary dark:text-primary mb-3 flex items-center gap-2 transition-colors duration-300">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Information Required
+            </h4>
+            <ul className="text-xs text-primary/80 space-y-2">
+              <li className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0"></div>
+                <span>Full name as per government ID</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0"></div>
+                <span>Current age of the patient</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0"></div>
+                <span>Active mobile number for appointment confirmations</span>
+              </li>
             </ul>
           </div>
 
           {/* Privacy Notice */}
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground">
-              <span className="inline-block w-3 h-3 bg-success/10 rounded-full mr-2"></span>
-              Your information is secure and will only be used for appointment booking and medical records.
-            </p>
+          <div className="text-center pt-2">
+            <div className="inline-flex items-center gap-2 px-3 py-2 bg-success/10 border border-success/20 rounded-full">
+              <div className="w-2 h-2 bg-success rounded-full"></div>
+              <p className="text-xs text-success font-medium">
+                Your information is secure and confidential
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>

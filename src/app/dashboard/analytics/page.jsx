@@ -10,40 +10,40 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950/50 to-indigo-950/50">
+      <div className="min-h-screen bg-gradient-to-br from-background via-surface to-surface-variant">
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="space-y-8 dark:bg-slate-950/70 rounded-xl p-4 backdrop-blur-md">
+          <div className="space-y-8 bg-card/70 rounded-xl p-4 backdrop-blur-md border border-border/20">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4">
               <div>
-                <Skeleton className="h-10 w-64 bg-slate-800" />
-                <Skeleton className="h-4 w-48 mt-2 bg-slate-800" />
+                <Skeleton className="h-10 w-64 bg-muted" />
+                <Skeleton className="h-4 w-48 mt-2 bg-muted" />
               </div>
-              <Skeleton className="h-10 w-48 bg-slate-800" />
+              <Skeleton className="h-10 w-48 bg-muted" />
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="bg-slate-900 border border-slate-800 rounded-lg p-4">
+                <div key={i} className="bg-card border border-border rounded-lg p-4">
                   <div className="flex justify-between items-start">
-                    <Skeleton className="h-4 w-24 bg-slate-800" />
-                    <Skeleton className="h-8 w-8 rounded-full bg-slate-800" />
+                    <Skeleton className="h-4 w-24 bg-muted" />
+                    <Skeleton className="h-8 w-8 rounded-full bg-muted" />
                   </div>
-                  <Skeleton className="h-8 w-32 mt-3 bg-slate-800" />
-                  <Skeleton className="h-3 w-16 mt-2 bg-slate-800" />
+                  <Skeleton className="h-8 w-32 mt-3 bg-muted" />
+                  <Skeleton className="h-3 w-16 mt-2 bg-muted" />
                 </div>
               ))}
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="md:col-span-2 bg-slate-900 border border-slate-800 rounded-lg p-4">
-                <Skeleton className="h-6 w-48 bg-slate-800" />
-                <Skeleton className="h-4 w-64 mt-2 bg-slate-800" />
-                <Skeleton className="h-80 w-full mt-4 bg-slate-800" />
+              <div className="md:col-span-2 bg-card border border-border rounded-lg p-4">
+                <Skeleton className="h-6 w-48 bg-muted" />
+                <Skeleton className="h-4 w-64 mt-2 bg-muted" />
+                <Skeleton className="h-80 w-full mt-4 bg-muted" />
               </div>
-              <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
-                <Skeleton className="h-6 w-48 bg-slate-800" />
-                <Skeleton className="h-4 w-64 mt-2 bg-slate-800" />
-                <Skeleton className="h-64 w-full mt-4 rounded-full bg-slate-800" />
+              <div className="bg-card border border-border rounded-lg p-4">
+                <Skeleton className="h-6 w-48 bg-muted" />
+                <Skeleton className="h-4 w-64 mt-2 bg-muted" />
+                <Skeleton className="h-64 w-full mt-4 rounded-full bg-muted" />
               </div>
             </div>
           </div>
@@ -89,9 +89,9 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-950 via-slate-950/50 to-neutral-950/50">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <AnalyticsDashboard data={sampleData} />
+        <AnalyticsDashboard data={hospitalDashboardDetails} />
       </div>
     </div>
   );

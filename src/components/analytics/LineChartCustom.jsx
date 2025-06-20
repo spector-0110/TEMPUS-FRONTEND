@@ -99,7 +99,7 @@ export const LineChartCustom = ({
         {/* X-axis labels */}
         <div className="flex justify-between mt-4 px-2">
           {data.map((point, index) => (
-            <span key={index} className="text-xs text-gray-400">
+            <span key={index} className="text-xs text-muted-foreground">
               {point.label}
             </span>
           ))}

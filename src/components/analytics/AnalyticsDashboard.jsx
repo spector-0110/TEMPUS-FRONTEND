@@ -183,7 +183,7 @@ export default function AnalyticsDashboard({ data }) {
         <div className="flex items-center gap-4">
           <motion.div variants={itemVariants}>
             <Tabs value={activeTimeRange} onValueChange={setActiveTimeRange} className="hidden md:block">
-              <TabsList className="bg-slate-800/50 border border-slate-700">
+              <TabsList className="bg-muted/50 border border-border">
                 <TabsTrigger value="7d">7 Days</TabsTrigger>
                 <TabsTrigger value="30d">30 Days</TabsTrigger>
                 <TabsTrigger value="90d">90 Days</TabsTrigger>
@@ -196,7 +196,7 @@ export default function AnalyticsDashboard({ data }) {
               onClick={handleRefresh} 
               variant="outline" 
               size="icon"
-              className="bg-slate-800 border-slate-700"
+              className="bg-muted border-border"
             >
               <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               <span className="sr-only">Refresh data</span>
@@ -208,7 +208,7 @@ export default function AnalyticsDashboard({ data }) {
       {/* Main Dashboard Tabs */}
       <motion.div variants={itemVariants}>
         <Tabs defaultValue="overview" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="mx-auto mb-6 bg-slate-800/50 border border-slate-700">
+          <TabsList className="mx-auto mb-6 bg-muted/50 border border-border">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="appointments">Appointments</TabsTrigger>
             <TabsTrigger value="doctors">Doctors</TabsTrigger>
@@ -224,30 +224,30 @@ export default function AnalyticsDashboard({ data }) {
                   variants={itemVariants}
                   custom={index}
                 >
-                  <Card className="bg-slate-900 border-slate-800 overflow-hidden relative">
+                  <Card className="bg-card border-border overflow-hidden relative">
                     <div className={`absolute inset-0 bg-gradient-to-br opacity-10 ${metric.color}`} />
                     <CardHeader className="pb-2">
                       <div className="flex justify-between items-start">
-                        <CardTitle className="text-sm font-medium text-slate-400">{metric.title}</CardTitle>
-                        <div className="h-8 w-8 rounded-full bg-slate-800 flex items-center justify-center">
-                          <metric.icon className="h-4 w-4 text-blue-400" />
+                        <CardTitle className="text-sm font-medium text-muted-foreground">{metric.title}</CardTitle>
+                        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                          <metric.icon className="h-4 w-4 text-primary" />
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold text-white">{metric.value}</div>
+                      <div className="text-2xl font-bold text-foreground">{metric.value}</div>
                       <div className="flex items-center mt-1">
                         <Badge 
                           className={`flex gap-1 items-center font-medium rounded-sm px-1.5 py-0.5 text-xs ${
                             metric.trend === 'up' 
-                              ? 'bg-green-900/30 text-green-400 border-green-800/50' 
-                              : 'bg-red-900/30 text-red-400 border-red-800/50'
+                              ? 'bg-success/20 text-success border-success/30' 
+                              : 'bg-destructive/20 text-destructive border-destructive/30'
                           }`}
                         >
                           {metric.trend === 'up' ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
                           {metric.change}
                         </Badge>
-                        <span className="text-xs ml-2 text-slate-500">vs. previous period</span>
+                        <span className="text-xs ml-2 text-muted-foreground">vs. previous period</span>
                       </div>
                     </CardContent>
                   </Card>
@@ -268,7 +268,7 @@ export default function AnalyticsDashboard({ data }) {
 
               {/* Appointment Status Pie Chart */}
               <motion.div variants={itemVariants}>
-                <Card className="bg-slate-900 border-slate-800 h-full">
+                <Card className="bg-card border-border h-full">
                   <CardHeader>
                     <CardTitle className="text-lg font-semibold">Appointment Status</CardTitle>
                     <CardDescription>Distribution by current status</CardDescription>
@@ -295,9 +295,9 @@ export default function AnalyticsDashboard({ data }) {
                           <Tooltip
                             formatter={(value, name) => [`${value} appointments`, name]}
                             contentStyle={{
-                              backgroundColor: '#1e293b',
-                              borderColor: '#475569',
-                              color: '#f8fafc'
+                              backgroundColor: 'hsl(var(--popover))',
+                              borderColor: 'hsl(var(--border))',
+                              color: 'hsl(var(--popover-foreground))'
                             }}
                           />
                         </PieChart>
@@ -310,7 +310,7 @@ export default function AnalyticsDashboard({ data }) {
                             className="w-3 h-3 rounded-full" 
                             style={{ backgroundColor: status.color }}
                           />
-                          <span className="text-xs text-slate-300">{status.name}</span>
+                          <span className="text-xs text-muted-foreground">{status.name}</span>
                         </div>
                       ))}
                     </div>
@@ -321,7 +321,7 @@ export default function AnalyticsDashboard({ data }) {
 
             {/* Doctor Performance Radar */}
             <motion.div variants={itemVariants} className="mt-6">
-              <Card className="bg-slate-900 border-slate-800">
+              <Card className="bg-card border-border">
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold">Doctor Performance Overview</CardTitle>
                   <CardDescription>Comparative analysis of top doctors</CardDescription>
@@ -389,9 +389,9 @@ export default function AnalyticsDashboard({ data }) {
           <TabsContent value="revenue" className="mt-0">
             {/* Revenue specific visualizations */}
             <RevenueAnalytics data={revenue} />
-              <BarChartIcon className="h-16 w-16 mx-auto text-green-500 opacity-50 mb-4" />
-              <h3 className="text-xl font-medium text-slate-300">Revenue Analytics</h3>
-              <p className="text-slate-500 mt-2 max-w-md mx-auto">
+              <BarChartIcon className="h-16 w-16 mx-auto text-success opacity-50 mb-4" />
+              <h3 className="text-xl font-medium text-muted-foreground">Revenue Analytics</h3>
+              <p className="text-muted-foreground mt-2 max-w-md mx-auto">
                 Click on the 'Overview' tab to see the current revenue metrics.
               </p>
           </TabsContent>

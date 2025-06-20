@@ -70,10 +70,10 @@ export default function PatientExperience({ data }) {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'good': return 'text-green-600 dark:text-green-400';
-      case 'warning': return 'text-yellow-600 dark:text-yellow-400';
-      case 'poor': return 'text-red-600 dark:text-red-400';
-      default: return 'text-slate-600 dark:text-slate-400';
+      case 'good': return 'text-success';
+      case 'warning': return 'text-warning';
+      case 'poor': return 'text-destructive';
+      default: return 'text-muted-foreground';
     }
   };
 
@@ -94,10 +94,10 @@ export default function PatientExperience({ data }) {
         transition={{ duration: 0.6 }}
         className="text-center"
       >
-        <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-200 mb-2">
+        <h2 className="text-3xl font-bold text-foreground mb-2">
           Patient Experience
         </h2>
-        <p className="text-slate-600 dark:text-slate-400">
+        <p className="text-muted-foreground">
           Patient satisfaction and experience metrics
         </p>
       </motion.div>
@@ -114,13 +114,13 @@ export default function PatientExperience({ data }) {
             <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-300">
               <div className={`absolute inset-0 bg-gradient-to-br ${metric.color} opacity-5 group-hover:opacity-10 transition-opacity`} />
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
                   {metric.title}
                 </CardTitle>
                 <metric.icon className={`h-5 w-5 bg-gradient-to-br ${metric.color} text-white rounded p-1`} />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-1">
+                <div className="text-2xl font-bold text-foreground mb-1">
                   {metric.value}
                 </div>
                 <div className="flex items-center justify-between">
@@ -148,18 +148,18 @@ export default function PatientExperience({ data }) {
           <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-blue-500" />
+                <Clock className="h-5 w-5 text-primary" />
                 Wait Time Distribution
               </CardTitle>
             </CardHeader>
             <CardContent>
               {waitTimeData.every(item => item.count === 0) ? (
                 <div className="text-center py-12">
-                  <Clock className="h-12 w-12 text-slate-400 dark:text-slate-500 mx-auto mb-4" />
-                  <div className="text-slate-500 dark:text-slate-400 mb-2">
+                  <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <div className="text-muted-foreground mb-2">
                     No wait time data available yet
                   </div>
-                  <div className="text-xs text-slate-400 dark:text-slate-500">
+                  <div className="text-xs text-muted-foreground">
                     Data will be tracked as appointments are processed
                   </div>
                 </div>
@@ -194,7 +194,7 @@ export default function PatientExperience({ data }) {
           <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <RotateCcw className="h-5 w-5 text-green-500" />
+                <RotateCcw className="h-5 w-5 text-success" />
                 Visit Frequency Analysis
               </CardTitle>
             </CardHeader>
@@ -231,7 +231,7 @@ export default function PatientExperience({ data }) {
           <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Star className="h-5 w-5 text-purple-500" />
+                <Star className="h-5 w-5 text-secondary" />
                 Appointment Completion
               </CardTitle>
             </CardHeader>
@@ -268,24 +268,24 @@ export default function PatientExperience({ data }) {
           <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Heart className="h-5 w-5 text-red-500" />
+                <Heart className="h-5 w-5 text-destructive" />
                 Experience Summary
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
                 {/* Overall Score */}
-                <div className="text-center p-6 bg-gradient-to-br from-pink-50 to-red-50 dark:from-pink-950 dark:to-red-950 rounded-lg">
-                  <div className="text-3xl font-bold text-red-600 dark:text-red-400 mb-2">
+                <div className="text-center p-6 bg-gradient-to-br from-destructive/5 to-destructive/10 rounded-lg">
+                  <div className="text-3xl font-bold text-destructive mb-2">
                     {Math.round((retention.returnRate + completionRates.completionRate + (100 - cancellationPatterns.rate)) / 3)}
                   </div>
-                  <div className="text-sm text-red-500 dark:text-red-300">Overall Experience Score</div>
+                  <div className="text-sm text-destructive/70">Overall Experience Score</div>
                 </div>
 
                 {/* Key Indicators */}
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600 dark:text-slate-400">Patient Retention</span>
+                    <span className="text-sm text-muted-foreground">Patient Retention</span>
                     <div className="flex items-center gap-2">
                       <Progress value={retention.returnRate} className="w-20 h-2" />
                       <span className="text-sm font-semibold">{retention.returnRate}%</span>
@@ -293,7 +293,7 @@ export default function PatientExperience({ data }) {
                   </div>
                   
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600 dark:text-slate-400">Completion Rate</span>
+                    <span className="text-sm text-muted-foreground">Completion Rate</span>
                     <div className="flex items-center gap-2">
                       <Progress value={completionRates.completionRate} className="w-20 h-2" />
                       <span className="text-sm font-semibold">{Math.round(completionRates.completionRate)}%</span>
@@ -301,7 +301,7 @@ export default function PatientExperience({ data }) {
                   </div>
                   
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600 dark:text-slate-400">On-time Performance</span>
+                    <span className="text-sm text-muted-foreground">On-time Performance</span>
                     <div className="flex items-center gap-2">
                       <Progress value={waitTime.distribution?.onTime ? (waitTime.distribution.onTime / Object.values(waitTime.distribution).reduce((a, b) => a + b, 0)) * 100 : 0} className="w-20 h-2" />
                       <span className="text-sm font-semibold">
@@ -314,16 +314,16 @@ export default function PatientExperience({ data }) {
                 {/* Quick Stats */}
                 <div className="grid grid-cols-2 gap-3 pt-4 border-t border-border">
                   <div className="text-center">
-                    <div className="text-lg font-bold text-slate-800 dark:text-slate-200">
+                    <div className="text-lg font-bold text-foreground">
                       {retention.totalPatients}
                     </div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400">Total Patients</div>
+                    <div className="text-xs text-muted-foreground">Total Patients</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-lg font-bold text-slate-800 dark:text-slate-200">
+                    <div className="text-lg font-bold text-foreground">
                       {completionRates.total}
                     </div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400">Total Appointments</div>
+                    <div className="text-xs text-muted-foreground">Total Appointments</div>
                   </div>
                 </div>
               </div>

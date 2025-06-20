@@ -144,7 +144,7 @@ export default function RevenueAnalytics({ data }) {
           <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <PieChartIcon className="h-5 w-5 text-green-500" />
+                <PieChartIcon className="h-5 w-5 text-success" />
                 Payment Status
               </CardTitle>
             </CardHeader>
@@ -186,7 +186,7 @@ export default function RevenueAnalytics({ data }) {
           <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-blue-500" />
+                <TrendingUp className="h-5 w-5 text-primary" />
                 Revenue Trends
               </CardTitle>
             </CardHeader>
@@ -233,7 +233,7 @@ export default function RevenueAnalytics({ data }) {
           <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5 text-purple-500" />
+                <CreditCard className="h-5 w-5 text-secondary" />
                 Payment Methods
               </CardTitle>
             </CardHeader>
@@ -283,7 +283,7 @@ export default function RevenueAnalytics({ data }) {
           <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-orange-500" />
+                <BarChart3 className="h-5 w-5 text-chart-2" />
                 Financial Summary
               </CardTitle>
             </CardHeader>

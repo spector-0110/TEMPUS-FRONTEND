@@ -51,7 +51,7 @@ export function MobileNavigation({ className = "", position = "absolute", varian
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem 
-            className="cursor-pointer text-red-600 hover:text-red-700 focus:text-red-700"
+            className="cursor-pointer text-destructive hover:text-destructive/80 focus:text-destructive/80"
           >
             <LogOut className="mr-2 h-4 w-4" />
             <LogoutButton showIcon={false} />

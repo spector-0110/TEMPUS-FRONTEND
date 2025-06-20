@@ -78,14 +78,14 @@ const ConfirmationDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-background dark:bg-background border-border dark:border-border transition-colors duration-300">
         <DialogHeader>
           <div className="flex items-center gap-3">
-            <Icon className={`h-6 w-6 ${getIconColorClass()}`} />
-            <DialogTitle>{title}</DialogTitle>
+            <Icon className={`h-6 w-6 ${getIconColorClass()} transition-colors duration-300`} />
+            <DialogTitle className="text-foreground dark:text-foreground transition-colors duration-300">{title}</DialogTitle>
           </div>
           {description && (
-            <DialogDescription className="mt-2">
+            <DialogDescription className="mt-2 text-muted-foreground dark:text-muted-foreground transition-colors duration-300">
               {description}
             </DialogDescription>
           )}
@@ -96,6 +96,7 @@ const ConfirmationDialog = ({
             variant="outline" 
             onClick={onClose}
             disabled={isLoading}
+            className="border-border dark:border-border hover:bg-accent dark:hover:bg-accent hover:text-accent-foreground dark:hover:text-accent-foreground transition-all duration-300"
           >
             {cancelText}
           </Button>
@@ -103,8 +104,16 @@ const ConfirmationDialog = ({
             variant={getConfirmButtonVariant()}
             onClick={handleConfirm}
             disabled={isLoading}
+            className="transition-all duration-300 hover:shadow-md disabled:opacity-50"
           >
-            {isLoading ? 'Processing...' : confirmText}
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                Processing...
+              </div>
+            ) : (
+              confirmText
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

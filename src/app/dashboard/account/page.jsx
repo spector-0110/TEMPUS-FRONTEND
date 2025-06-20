@@ -27,8 +27,8 @@ export default function AccountPage() {
   if (error) {
     return (
       <div className="min-h-screen p-6 flex items-center justify-center">
-        <Card className="max-w-2xl w-full border-red-200 shadow-lg">
-          <CardHeader className="bg-red-50 border-b border-red-100">
+        <Card className="max-w-2xl w-full border-destructive/30 shadow-lg">
+          <CardHeader className="bg-destructive/10 border-b border-destructive/20">
             <CardTitle className="flex items-center text-destructive gap-2">
               <AlertCircle className="h-5 w-5" />
               Error Loading Hospital Details
@@ -62,7 +62,7 @@ export default function AccountPage() {
             {!isEditing && (
               <Button 
                 onClick={handleEdit} 
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 size="sm"
               >
                 Edit Profile

@@ -37,7 +37,7 @@ export default function Logo() {
           </Button>
         </div>
         
-        <Card className="p-16 flex items-center justify-center bg-gray-800/50 border-gray-700 min-h-[300px]">
+        <Card className="p-16 flex items-center justify-center bg-muted/50 border-border min-h-[300px]">
           <motion.div
             key={size}
             initial={{ opacity: 0 }}

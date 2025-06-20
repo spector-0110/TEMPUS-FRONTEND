@@ -120,7 +120,7 @@ const ErrorDialog = ({
               </Button>
               
               {showRawData && (
-                <pre className="mt-2 p-2 dark:bg-gray-800 rounded text-xs overflow-auto max-h-40 font-mono">
+                <pre className="mt-2 p-2 bg-muted rounded text-xs overflow-auto max-h-40 font-mono">
                   {JSON.stringify(errorData, null, 2)}
                 </pre>
               )}

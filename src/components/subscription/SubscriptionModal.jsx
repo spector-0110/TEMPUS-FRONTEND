@@ -198,8 +198,8 @@ export function SubscriptionModal({
                       </div>
                       {validationError && (
                         <Alert className="border-destructive bg-destructive/10">
-                          <AlertCircle className="h-4 w-4 text-red-400" />
-                          <AlertDescription className="text-red-400">
+                          <AlertCircle className="h-4 w-4 text-destructive" />
+                          <AlertDescription className="text-destructive">
                             {validationError}
                           </AlertDescription>
                         </Alert>
@@ -244,7 +244,7 @@ export function SubscriptionModal({
                     <Card className="bg-muted border-border">
                       <CardHeader>
                         <CardTitle className="text-lg flex items-center space-x-2">
-                          <Shield className="h-5 w-5 text-green-400" />
+                          <Shield className="h-5 w-5 text-success" />
                           <span>What's Included</span>
                         </CardTitle>
                       </CardHeader>
@@ -258,7 +258,7 @@ export function SubscriptionModal({
                           '24/7 customer support'
                         ].map((feature, index) => (
                           <div key={index} className="flex items-center space-x-3">
-                            <Check className="h-4 w-4 text-green-400 flex-shrink-0" />
+                            <Check className="h-4 w-4 text-success flex-shrink-0" />
                             <span className="text-muted-foreground">{feature}</span>
                           </div>
                         ))}
@@ -283,7 +283,7 @@ export function SubscriptionModal({
 
                         {/* Discounts */}
                         {pricing.discountDetails.map((discount, index) => (
-                          <div key={index} className="flex justify-between items-center text-green-400">
+                          <div key={index} className="flex justify-between items-center text-success">
                             <span>
                               {discount.label} (-{discount.percentage}%)
                             </span>
@@ -296,7 +296,7 @@ export function SubscriptionModal({
                         {/* Final Price */}
                         <div className="flex justify-between items-center text-xl font-bold">
                           <span>Total</span>
-                          <span className="text-green-400">{formatPrice(pricing.finalPrice)}</span>
+                          <span className="text-success">{formatPrice(pricing.finalPrice)}</span>
                         </div>
 
                         {/* Price per doctor */}
@@ -307,8 +307,8 @@ export function SubscriptionModal({
                         {/* Savings highlight */}
                         {pricing.savings > 0 && (
                           <Alert className="border-success bg-success/10">
-                            <Zap className="h-4 w-4 text-green-400" />
-                            <AlertDescription className="text-green-400">
+                            <Zap className="h-4 w-4 text-success" />
+                            <AlertDescription className="text-success">
                               You save {formatPrice(pricing.savings)} with this plan!
                             </AlertDescription>
                           </Alert>
@@ -374,7 +374,7 @@ export function SubscriptionModal({
                   This usually takes a few seconds.
                 </p>
                 {isVerifyingPayment && (
-                  <div className="flex items-center justify-center space-x-2 text-blue-400">
+                  <div className="flex items-center justify-center space-x-2 text-info">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     <span>Verifying payment...</span>
                   </div>

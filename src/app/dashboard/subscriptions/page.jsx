@@ -42,12 +42,12 @@ const SubscriptionPage = () => {
   const getTrendInfo = (trend) => {
     switch(trend?.toUpperCase()) {
       case 'GROWING':
-        return { icon: '↑', color: 'text-green-500' };
+        return { icon: '↑', color: 'text-success' };
       case 'DECLINING':
-        return { icon: '↓', color: 'text-red-500' };
+        return { icon: '↓', color: 'text-destructive' };
       case 'STABLE':
       default:
-        return { icon: '→', color: 'text-yellow-500' };
+        return { icon: '→', color: 'text-warning' };
     }
   };
 
@@ -55,11 +55,11 @@ const SubscriptionPage = () => {
   const getStatusBadge = (status) => {
     switch(status?.toUpperCase()) {
       case 'ACTIVE':
-        return <Badge className="bg-green-500">Active</Badge>;
+        return <Badge className="bg-success text-success-foreground">Active</Badge>;
       case 'EXPIRED':
-        return <Badge className="bg-red-500">Expired</Badge>;
+        return <Badge className="bg-destructive text-destructive-foreground">Expired</Badge>;
       case 'PENDING':
-        return <Badge className="bg-yellow-500">Pending</Badge>;
+        return <Badge className="bg-warning text-warning-foreground">Pending</Badge>;
       default:
         return <Badge>Unknown</Badge>;
     }
@@ -69,11 +69,11 @@ const SubscriptionPage = () => {
   const getPaymentStatusBadge = (status) => {
     switch(status?.toUpperCase()) {
       case 'SUCCESS':
-        return <Badge className="bg-green-500">Paid</Badge>;
+        return <Badge className="bg-success text-success-foreground">Paid</Badge>;
       case 'PENDING':
-        return <Badge className="bg-yellow-500">Pending</Badge>;
+        return <Badge className="bg-warning text-warning-foreground">Pending</Badge>;
       case 'FAILED':
-        return <Badge className="bg-red-500">Failed</Badge>;
+        return <Badge className="bg-destructive text-destructive-foreground">Failed</Badge>;
       default:
         return <Badge>Unknown</Badge>;
     }
@@ -143,31 +143,31 @@ const SubscriptionPage = () => {
       {/* Quick Usage Summary */}
       {subscriptionUsage && (
         <div className={`${isMobile ? 'mb-4' : 'mb-6'}`}>
-          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+          <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
             <CardContent className="p-4">
               <div className={`grid ${isMobile ? 'grid-cols-2 gap-4' : 'grid-cols-4 gap-4'}`}>
                 <div className="text-center">
-                  <p className="text-sm font-medium text-blue-600">Days Used</p>
-                  <p className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-blue-800`}>
+                  <p className="text-sm font-medium text-primary">Days Used</p>
+                  <p className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-primary`}>
                     {subscriptionUsage.usageMetrics?.daysUsed || 0}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-sm font-medium text-green-600">Days Left</p>
-                  <p className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-green-800`}>
+                  <p className="text-sm font-medium text-success">Days Left</p>
+                  <p className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-success`}>
                     {subscriptionUsage.remainingDays}
                   </p>
                 </div>
                 <div className={`text-center ${isMobile ? 'col-span-2' : ''}`}>
-                  <p className="text-sm font-medium text-purple-600">Remaining Value</p>
-                  <p className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-purple-800`}>
+                  <p className="text-sm font-medium text-secondary">Remaining Value</p>
+                  <p className={`${isMobile ? 'text-lg' : 'text-xl'} font-bold text-secondary`}>
                     ₹{subscriptionUsage.remainingAmount?.toFixed(2)}
                   </p>
                 </div>
                 {!isMobile && (
                   <div className="text-center">
-                    <p className="text-sm font-medium text-orange-600">Usage</p>
-                    <p className="text-xl font-bold text-orange-800">
+                    <p className="text-sm font-medium text-chart-2">Usage</p>
+                    <p className="text-xl font-bold text-chart-2">
                       {subscriptionUsage.usageMetrics?.percentageUsed}%
                     </p>
                   </div>
@@ -180,9 +180,9 @@ const SubscriptionPage = () => {
 
       {/* Status Alert */}
       {needsRenewal() && (
-        <Alert className="mb-6 border-orange-200 bg-orange-50">
+        <Alert className="mb-6 border-warning/50 bg-warning/10">
           <AlertTriangle className="h-4 w-4" />
-          <AlertDescription className="font-medium text-orange-800">
+          <AlertDescription className="font-medium text-warning-foreground">
             {subscription?.currentStatus?.status === 'EXPIRED' 
               ? '⚠️ Your subscription has expired. Please renew to continue using all features.'
               : '⚠️ Your subscription needs attention. Please complete your payment to activate all features.'
@@ -219,14 +219,14 @@ const SubscriptionPage = () => {
                 <div className="space-y-6">
                   {/* Usage Overview - if subscriptionUsage exists */}
                   {subscriptionUsage && (
-                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-medium mb-4 text-blue-800`}>
+                    <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
+                      <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-medium mb-4 text-primary`}>
                         Subscription Usage
                       </h3>
                       <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-2 md:grid-cols-4 gap-4'}`}>
                         <div className="text-center">
-                          <p className="text-sm text-blue-600">Days Used</p>
-                          <p className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-blue-800`}>
+                          <p className="text-sm text-primary/70">Days Used</p>
+                          <p className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-primary`}>
                             {subscriptionUsage.usageMetrics?.daysUsed || 0}
                           </p>
                           <p className="text-xs text-blue-600">
@@ -262,13 +262,13 @@ const SubscriptionPage = () => {
                       
                       {/* Progress Bar */}
                       <div className="mt-4">
-                        <div className="flex justify-between text-sm text-gray-600 mb-2">
+                        <div className="flex justify-between text-sm text-muted-foreground mb-2">
                           <span>Usage Progress</span>
                           <span>{subscriptionUsage.usageMetrics?.percentageUsed}%</span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="w-full bg-muted rounded-full h-2">
                           <div 
-                            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                            className="bg-primary h-2 rounded-full transition-all duration-300"
                             style={{ width: `${subscriptionUsage.usageMetrics?.percentageUsed || 0}%` }}
                           ></div>
                         </div>
@@ -337,11 +337,11 @@ const SubscriptionPage = () => {
                 <div className="text-center py-8">
                   <p className="text-muted-foreground mb-4">No active subscription found.</p>
                   {subscriptionUsage && (
-                    <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                      <p className="text-sm text-yellow-800 mb-2">
+                    <div className="mt-4 p-4 bg-warning/10 border border-warning/20 rounded-lg">
+                      <p className="text-sm text-warning-foreground mb-2">
                         ⚠️ Usage data detected but no active subscription found.
                       </p>
-                      <p className="text-xs text-yellow-600">
+                      <p className="text-xs text-warning-foreground/70">
                         Please contact support if you believe this is an error.
                       </p>
                     </div>
@@ -518,17 +518,17 @@ const SubscriptionPage = () => {
                               </div>
                               <div className="flex items-center justify-between">
                                 <p className="text-sm text-muted-foreground">Days Used</p>
-                                <p className="font-medium text-blue-600">
+                                <p className="font-medium text-primary">
                                   {subscriptionUsage.usageMetrics?.daysUsed || 0} days
                                 </p>
                               </div>
                               <div className="flex items-center justify-between">
                                 <p className="text-sm text-muted-foreground">Days Remaining</p>
-                                <p className="font-medium text-green-600">{subscriptionUsage.remainingDays} days</p>
+                                <p className="font-medium text-success">{subscriptionUsage.remainingDays} days</p>
                               </div>
-                              <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                              <div className="w-full bg-muted rounded-full h-2 mt-2">
                                 <div 
-                                  className="bg-blue-600 h-2 rounded-full"
+                                  className="bg-primary h-2 rounded-full"
                                   style={{ width: `${subscriptionUsage.usageMetrics?.percentageUsed || 0}%` }}
                                 ></div>
                               </div>
@@ -555,17 +555,17 @@ const SubscriptionPage = () => {
                               </div>
                               <div className="flex items-center justify-between">
                                 <p className="text-sm text-muted-foreground">Amount Used</p>
-                                <p className="font-medium text-purple-600">
+                                <p className="font-medium text-secondary">
                                   ₹{(parseFloat(subscriptionUsage.subscriptionDetails?.totalPrice || 0) - subscriptionUsage.remainingAmount).toFixed(2)}
                                 </p>
                               </div>
                               <div className="flex items-center justify-between">
                                 <p className="text-sm text-muted-foreground">Remaining</p>
-                                <p className="font-medium text-green-600">₹{subscriptionUsage.remainingAmount?.toFixed(2)}</p>
+                                <p className="font-medium text-success">₹{subscriptionUsage.remainingAmount?.toFixed(2)}</p>
                               </div>
-                              <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                              <div className="w-full bg-muted rounded-full h-2 mt-2">
                                 <div 
-                                  className="bg-purple-600 h-2 rounded-full"
+                                  className="bg-secondary h-2 rounded-full"
                                   style={{ width: `${subscriptionUsage.usageMetrics?.percentageUsed || 0}%` }}
                                 ></div>
                               </div>

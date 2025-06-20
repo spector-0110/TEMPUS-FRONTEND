@@ -85,10 +85,10 @@ export default function AppointmentAnalytics({ data }) {
         transition={{ duration: 0.6 }}
         className="text-center"
       >
-        <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-200 mb-2">
+        <h2 className="text-3xl font-bold text-foreground mb-2">
           Appointment Analytics
         </h2>
-        <p className="text-slate-600 dark:text-slate-400">
+        <p className="text-muted-foreground dark:text-muted-foreground">
           Comprehensive analysis of appointment patterns and trends
         </p>
       </motion.div>
@@ -105,13 +105,13 @@ export default function AppointmentAnalytics({ data }) {
             <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-300">
               <div className={`absolute inset-0 bg-gradient-to-br ${metric.color} opacity-5 group-hover:opacity-10 transition-opacity`} />
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                <CardTitle className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">
                   {metric.title}
                 </CardTitle>
                 <metric.icon className={`h-5 w-5 bg-gradient-to-br ${metric.color} text-white rounded p-1`} />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-1">
+                <div className="text-2xl font-bold text-foreground mb-1">
                   {metric.value}
                 </div>
                 <div className="flex items-center gap-1">
@@ -139,7 +139,7 @@ export default function AppointmentAnalytics({ data }) {
           <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5 text-blue-500" />
+                <Activity className="h-5 w-5 text-primary" />
                 Daily Appointment Volume
               </CardTitle>
             </CardHeader>
@@ -185,7 +185,7 @@ export default function AppointmentAnalytics({ data }) {
           <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-green-500" />
+                <Calendar className="h-5 w-5 text-success" />
                 Appointment Status
               </CardTitle>
             </CardHeader>
@@ -222,7 +222,7 @@ export default function AppointmentAnalytics({ data }) {
           <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-purple-500" />
+                <Users className="h-5 w-5 text-secondary" />
                 Doctor Performance
               </CardTitle>
             </CardHeader>
@@ -258,7 +258,7 @@ export default function AppointmentAnalytics({ data }) {
           <Card className="bg-card-elevated/60 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-orange-500" />
+                <TrendingUp className="h-5 w-5 text-chart-2" />
                 Patient Flow Analysis
               </CardTitle>
             </CardHeader>
@@ -281,13 +281,13 @@ export default function AppointmentAnalytics({ data }) {
                 
                 <div className="pt-4 border-t border-border">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600 dark:text-slate-400">Total Patients</span>
-                    <span className="text-lg font-semibold text-slate-800 dark:text-slate-200">
+                    <span className="text-sm text-muted-foreground dark:text-muted-foreground">Total Patients</span>
+                    <span className="text-lg font-semibold text-foreground">
                       {patientFlow.totalPatients}
                     </span>
                   </div>
                   <div className="flex justify-between items-center mt-2">
-                    <span className="text-sm text-slate-600 dark:text-slate-400">Return Rate</span>
+                    <span className="text-sm text-muted-foreground dark:text-muted-foreground">Return Rate</span>
                     <Badge variant="outline">
                       {Math.round((patientFlow.returning / patientFlow.totalPatients) * 100)}%
                     </Badge>

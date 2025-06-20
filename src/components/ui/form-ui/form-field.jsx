@@ -25,7 +25,7 @@ function FormField({
         type={type}
         value={value}
         onChange={(e) => onChange(id, e.target.value, sectionName)}
-        className={error ? 'border-red-500' : ''}
+        className={error ? 'border-destructive' : ''}
         readOnly={readOnly}
         max={max}
       />

@@ -236,12 +236,12 @@ export default function AppointmentsPage() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'booked': return 'bg-blue-100 text-blue-800';
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'missed': return 'bg-red-100 text-red-800';
-      case 'cancelled': return 'bg-gray-100 text-gray-800';
-      case 'confirmed': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'booked': return 'bg-muted dark:bg-muted text-muted-foreground dark:text-muted-foreground border-border dark:border-border';
+      case 'completed': return 'bg-success/10 dark:bg-success/20 text-success dark:text-success border-success/30 dark:border-success/40';
+      case 'missed': return 'bg-destructive/10 dark:bg-destructive/20 text-destructive dark:text-destructive border-destructive/30 dark:border-destructive/40';
+      case 'cancelled': return 'bg-muted dark:bg-muted text-muted-foreground dark:text-muted-foreground border-border dark:border-border';
+      case 'confirmed': return 'bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary border-primary/30 dark:border-primary/40';
+      default: return 'bg-muted dark:bg-muted text-muted-foreground dark:text-muted-foreground border-border dark:border-border';
     }
   };
 
@@ -258,9 +258,9 @@ export default function AppointmentsPage() {
 
   const getPaymentStatusColor = (paymentStatus) => {
     switch (paymentStatus) {
-      case 'paid': return 'bg-emerald-100 text-emerald-800';
-      case 'unpaid': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'paid': return 'bg-success/10 dark:bg-success/20 text-success dark:text-success border-success/30 dark:border-success/40';
+      case 'unpaid': return 'bg-warning/10 dark:bg-warning/20 text-warning dark:text-warning border-warning/30 dark:border-warning/40';
+      default: return 'bg-muted dark:bg-muted text-muted-foreground dark:text-muted-foreground border-border dark:border-border';
     }
   };
 
@@ -422,7 +422,7 @@ export default function AppointmentsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Appointments</h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground dark:text-muted-foreground">
             Manage your hospital's appointment system and create new appointments
           </p>
         </div>
@@ -450,10 +450,10 @@ export default function AppointmentsPage() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <Calendar className="h-8 w-8 text-blue-600" />
+              <Calendar className="h-8 w-8 text-primary" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Today's Appointments</p>
-                <p className="text-2xl font-bold">
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Today's Appointments</p>
+                <p className="text-2xl font-bold text-foreground">
                   {Array.isArray(appointments) ? 
                     appointments.filter(apt => {
                       const today = new Date().toISOString().split('T')[0];
@@ -469,10 +469,10 @@ export default function AppointmentsPage() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <Users className="h-8 w-8 text-green-600" />
+              <Users className="h-8 w-8 text-success" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Total Patients</p>
-                <p className="text-2xl font-bold">{Array.isArray(appointments) ? appointments.length : 0}</p>
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Total Patients</p>
+                <p className="text-2xl font-bold text-foreground">{Array.isArray(appointments) ? appointments.length : 0}</p>
               </div>
             </div>
           </CardContent>
@@ -481,10 +481,10 @@ export default function AppointmentsPage() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <CheckCircle className="h-8 w-8 text-emerald-600" />
+              <CheckCircle className="h-8 w-8 text-success" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Completed</p>
-                <p className="text-2xl font-bold">
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Completed</p>
+                <p className="text-2xl font-bold text-foreground">
                   {Array.isArray(appointments) ? appointments.filter(apt => apt.status === 'completed').length : 0}
                 </p>
               </div>
@@ -495,10 +495,10 @@ export default function AppointmentsPage() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <Clock className="h-8 w-8 text-orange-600" />
+              <Clock className="h-8 w-8 text-warning" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Pending</p>
-                <p className="text-2xl font-bold">
+                <p className="text-sm font-medium text-muted-foreground dark:text-muted-foreground">Pending</p>
+                <p className="text-2xl font-bold text-foreground">
                   {Array.isArray(appointments) ? appointments.filter(apt => apt.status === 'booked').length : 0}
                 </p>
               </div>
@@ -521,7 +521,7 @@ export default function AppointmentsPage() {
             <div className="flex-1">
               <label className="text-sm font-medium mb-2 block">Search</label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-muted-foreground" />
                 <Input
                   placeholder="Search by patient name or mobile number..."
                   value={searchQuery}
@@ -531,7 +531,7 @@ export default function AppointmentsPage() {
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-muted-foreground hover:text-foreground transition-colors"
                     type="button"
                   >
                     <X className="h-4 w-4" />
@@ -613,8 +613,8 @@ export default function AppointmentsPage() {
             </div>
           ) : filteredAppointments.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full p-6">
-              <Calendar className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-500 mb-4">No appointments found</h3>
+              <Calendar className="mx-auto h-12 w-12 text-muted-foreground dark:text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium text-muted-foreground dark:text-muted-foreground mb-4">No appointments found</h3>
               <Button onClick={() => setShowCreateDialog(true)} className="gap-2">
                 <Plus className="h-4 w-4" />
                 Create First Appointment
@@ -626,7 +626,7 @@ export default function AppointmentsPage() {
                 {filteredAppointments.map((appointment) => (
                   <div
                     key={appointment.id}
-                    className="border rounded-xl p-5 transition-all hover:bg-neutral-900 hover:shadow-md cursor-pointer"
+                    className="border border-border rounded-xl p-5 transition-all hover:bg-card-hover hover:shadow-md cursor-pointer bg-card"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                       <div className="flex-1">
@@ -661,7 +661,7 @@ export default function AppointmentsPage() {
                             {appointment.documents && appointment.documents.length > 0 && (
                               <div className="text-sm">
                                 <span className="font-medium flex items-center gap-1">
-                                  <FileText className="h-3.5 w-3.5 text-purple-600" />
+                                  <FileText className="h-3.5 w-3.5 text-accent" />
                                   Documents:
                                 </span> {appointment.documents.length} file{appointment.documents.length !== 1 ? 's' : ''}
                               </div>
