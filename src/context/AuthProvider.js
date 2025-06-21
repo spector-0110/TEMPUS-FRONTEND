@@ -87,31 +87,3 @@ export function useAuth() {
   
   return context;
 }
-
-// Hook for protecting routes
-export function useRequireAuth(redirectTo = '/auth/login') {
-  const { user, loading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push(redirectTo);
-    }
-  }, [user, loading, router, redirectTo]);
-
-  return { user, loading };
-}
-
-// Hook for redirecting authenticated users
-export function useRedirectIfAuthenticated(redirectTo = '/protected') {
-  const { user, loading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!loading && user) {
-      router.push(redirectTo);
-    }
-  }, [user, loading, router, redirectTo]);
-
-  return { user, loading };
-}

@@ -116,6 +116,9 @@ export class AuthService {
       const { error } = await this.supabase.auth.signOut();
       
       if (error) throw error;
+
+      // Remove hospital form data from localStorage
+      localStorage.removeItem('hospitalFormData');
       
       return { error: null };
     } catch (error) {
