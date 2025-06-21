@@ -119,6 +119,7 @@ export class AuthService {
 
       // Remove hospital form data from localStorage
       localStorage.removeItem('hospitalFormData');
+      localStorage.removeItem('tiqora_server_status');
       
       return { error: null };
     } catch (error) {
