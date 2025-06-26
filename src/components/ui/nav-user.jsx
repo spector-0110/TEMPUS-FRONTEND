@@ -100,13 +100,6 @@ export function NavUser({
                 <UserCircleIcon />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => {
-                handleNavItemClick();
-                router.push("/dashboard/subscriptions");
-              }}>
-                <CreditCardIcon />
-                Billing
-              </DropdownMenuItem>
               <DropdownMenuItem onClick={handleNavItemClick}>
                 <BellIcon />
                 Notifications
