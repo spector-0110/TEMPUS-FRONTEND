@@ -1,0 +1,472 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Enhanced Theme System with Extended Color Palette */
+@layer base {
+  :root {
+    /* === LIGHT THEME === */
+    
+    /* Core Foundation Colors */
+    --background: 0 0% 100%;
+    --foreground: 215 27% 17%;
+    --surface: 0 0% 98%;
+    --surface-variant: 215 15% 96%;
+    --surface-elevated: 0 0% 100%;
+    
+    /* Card & Container System */
+    --card: 0 0% 100%;
+    --card-foreground: 215 27% 17%;
+    --card-hover: 215 20% 96%;
+    --card-border: 215 20% 90%;
+    --card-elevated: 0 0% 100%;
+    --card-pressed: 215 25% 94%;
+    
+    /* Interactive Elements - Primary */
+    --primary: 221 39% 11%;
+    --primary-foreground: 0 0% 98%;
+    --primary-hover: 221 39% 15%;
+    --primary-active: 221 39% 19%;
+    --primary-subtle: 221 39% 96%;
+    
+    /* Interactive Elements - Secondary */
+    --secondary: 215 16% 93%;
+    --secondary-foreground: 215 27% 17%;
+    --secondary-hover: 215 16% 87%;
+    --secondary-active: 215 16% 81%;
+    --secondary-subtle: 215 30% 97%;
+    
+    /* Accent Colors */
+    --accent: 142 76% 36%;
+    --accent-foreground: 0 0% 98%;
+    --accent-hover: 142 76% 32%;
+    --accent-active: 142 76% 28%;
+    --accent-subtle: 142 76% 96%;
+    
+    /* Status Colors - Success */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 98%;
+    --success-hover: 142 71% 40%;
+    --success-active: 142 71% 35%;
+    --success-muted: 142 50% 95%;
+    --success-subtle: 142 60% 96%;
+    
+    /* Status Colors - Warning */
+    --warning: 48 96% 53%;
+    --warning-foreground: 215 27% 17%;
+    --warning-hover: 48 96% 48%;
+    --warning-active: 48 96% 43%;
+    --warning-muted: 48 100% 96%;
+    --warning-subtle: 48 100% 97%;
+    
+    /* Status Colors - Error/Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --destructive-hover: 0 84% 55%;
+    --destructive-active: 0 84% 50%;
+    --destructive-muted: 0 93% 94%;
+    --destructive-subtle: 0 86% 96%;
+    
+    /* Status Colors - Info */
+    --info: 200 100% 50%;
+    --info-foreground: 0 0% 98%;
+    --info-hover: 200 100% 45%;
+    --info-active: 200 100% 40%;
+    --info-muted: 200 100% 95%;
+    --info-subtle: 200 100% 97%;
+    
+    /* Neutral Gray Scales */
+    --muted: 215 20% 96%;
+    --muted-foreground: 215 16% 47%;
+    --muted-hover: 215 20% 94%;
+    --subtle: 215 20% 92%;
+    --subtle-foreground: 215 20% 37%;
+    --subtle-hover: 215 20% 90%;
+    
+    /* Text Hierarchy */
+    --text-primary: 215 27% 17%;
+    --text-secondary: 215 16% 47%;
+    --text-tertiary: 215 16% 65%;
+    --text-disabled: 215 16% 75%;
+    --text-placeholder: 215 16% 55%;
+    
+    /* Navigation & Sidebar */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 215 27% 17%;
+    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 215 20% 96%;
+    --sidebar-accent-foreground: 215 27% 17%;
+    --sidebar-border: 215 20% 90%;
+    --sidebar-ring: 221 83% 53%;
+    --sidebar-hover: 215 20% 94%;
+    
+    /* Borders & Inputs */
+    --border: 215 20% 89%;
+    --border-strong: 215 20% 80%;
+    --border-subtle: 215 20% 95%;
+    --input: 215 20% 89%;
+    --input-background: 0 0% 100%;
+    --input-focus: 221 83% 53%;
+    --input-hover: 215 20% 85%;
+    --ring: 221 83% 53%;
+    
+    /* Overlays & Modals */
+    --overlay: 215 27% 17% / 0.8;
+    --overlay-foreground: 0 0% 98%;
+    --backdrop: 215 27% 17% / 0.5;
+    
+    /* Popover & Tooltips */
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 27% 17%;
+    --popover-border: 215 20% 90%;
+    --tooltip: 215 27% 17%;
+    --tooltip-foreground: 0 0% 98%;
+    
+    /* Chart & Data Visualization */
+    --chart-1: 221 83% 53%;
+    --chart-2: 142 71% 45%;
+    --chart-3: 262 83% 58%;
+    --chart-4: 48 96% 53%;
+    --chart-5: 0 84% 60%;
+    --chart-6: 290 100% 50%;
+    --chart-7: 180 100% 40%;
+    --chart-8: 30 100% 50%;
+    
+    /* Utility Variables */
+    --radius: 0.5rem;
+    --radius-sm: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    
+    /* Shadow Variables */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  }
+  
+  .dark {
+    /* === DARK THEME === */
+    
+    /* Core Foundation Colors */
+    --background: 220 27% 8%;
+    --foreground: 220 9% 95%;
+    --surface: 220 20% 10%;
+    --surface-variant: 220 16% 12%;
+    --surface-elevated: 220 20% 12%;
+    
+    /* Card & Container System */
+    --card: 220 20% 10%;
+    --card-foreground: 220 9% 95%;
+    --card-hover: 220 20% 12%;
+    --card-border: 220 14% 22%;
+    --card-elevated: 220 20% 12%;
+    --card-pressed: 220 20% 8%;
+    
+    /* Interactive Elements - Primary */
+    --primary: 221 83% 63%;
+    --primary-foreground: 220 27% 8%;
+    --primary-hover: 221 83% 68%;
+    --primary-active: 221 83% 73%;
+    --primary-subtle: 221 50% 15%;
+    
+    /* Interactive Elements - Secondary */
+    --secondary: 220 14% 22%;
+    --secondary-foreground: 220 9% 95%;
+    --secondary-hover: 220 14% 25%;
+    --secondary-active: 220 14% 28%;
+    --secondary-subtle: 220 20% 15%;
+    
+    /* Accent Colors */
+    --accent: 262 72% 68%;
+    --accent-foreground: 220 27% 8%;
+    --accent-hover: 262 72% 73%;
+    --accent-active: 262 72% 78%;
+    --accent-subtle: 262 50% 15%;
+    
+    /* Status Colors - Success */
+    --success: 142 71% 55%;
+    --success-foreground: 220 27% 8%;
+    --success-hover: 142 71% 60%;
+    --success-active: 142 71% 65%;
+    --success-muted: 142 30% 15%;
+    --success-subtle: 142 40% 12%;
+    
+    /* Status Colors - Warning */
+    --warning: 48 96% 63%;
+    --warning-foreground: 220 27% 8%;
+    --warning-hover: 48 96% 68%;
+    --warning-active: 48 96% 73%;
+    --warning-muted: 48 60% 15%;
+    --warning-subtle: 48 70% 12%;
+    
+    /* Status Colors - Error/Destructive */
+    --destructive: 0 72% 70%;
+    --destructive-foreground: 220 27% 8%;
+    --destructive-hover: 0 72% 75%;
+    --destructive-active: 0 72% 80%;
+    --destructive-muted: 0 50% 15%;
+    --destructive-subtle: 0 60% 12%;
+    
+    /* Status Colors - Info */
+    --info: 200 100% 60%;
+    --info-foreground: 220 27% 8%;
+    --info-hover: 200 100% 65%;
+    --info-active: 200 100% 70%;
+    --info-muted: 200 60% 15%;
+    --info-subtle: 200 70% 12%;
+    
+    /* Neutral Gray Scales */
+    --muted: 220 14% 22%;
+    --muted-foreground: 220 9% 70%;
+    --muted-hover: 220 14% 25%;
+    --subtle: 220 14% 18%;
+    --subtle-foreground: 220 9% 80%;
+    --subtle-hover: 220 14% 20%;
+    
+    /* Text Hierarchy */
+    --text-primary: 220 9% 95%;
+    --text-secondary: 220 9% 70%;
+    --text-tertiary: 220 9% 55%;
+    --text-disabled: 220 9% 40%;
+    --text-placeholder: 220 9% 60%;
+    
+    /* Navigation & Sidebar */
+    --sidebar-background: 220 32% 6%;
+    --sidebar-foreground: 220 9% 80%;
+    --sidebar-primary: 221 83% 63%;
+    --sidebar-primary-foreground: 220 27% 8%;
+    --sidebar-accent: 220 20% 12%;
+    --sidebar-accent-foreground: 220 9% 85%;
+    --sidebar-border: 220 14% 18%;
+    --sidebar-ring: 221 83% 63%;
+    --sidebar-hover: 220 20% 14%;
+    
+    /* Borders & Inputs */
+    --border: 220 14% 22%;
+    --border-strong: 220 14% 30%;
+    --border-subtle: 220 14% 18%;
+    --input: 220 14% 22%;
+    --input-background: 220 20% 10%;
+    --input-focus: 221 83% 63%;
+    --input-hover: 220 14% 25%;
+    --ring: 221 83% 63%;
+    
+    /* Overlays & Modals */
+    --overlay: 220 27% 8% / 0.8;
+    --overlay-foreground: 220 9% 95%;
+    --backdrop: 220 27% 8% / 0.6;
+    
+    /* Popover & Tooltips */
+    --popover: 220 20% 10%;
+    --popover-foreground: 220 9% 95%;
+    --popover-border: 220 14% 22%;
+    --tooltip: 220 20% 10%;
+    --tooltip-foreground: 220 9% 95%;
+    
+    /* Chart & Data Visualization - Enhanced for dark mode */
+    --chart-1: 221 83% 63%;
+    --chart-2: 142 71% 55%;
+    --chart-3: 262 72% 68%;
+    --chart-4: 48 96% 63%;
+    --chart-5: 0 72% 70%;
+    --chart-6: 290 100% 60%;
+    --chart-7: 180 100% 50%;
+    --chart-8: 30 100% 60%;
+    
+    /* Shadow Variables - Adjusted for dark mode */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+  }
+}
+
+/* Base element styles */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-background text-foreground transition-colors duration-200;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    /* Ensure cursor remains active during theme transitions */
+    cursor: auto !important;
+    pointer-events: auto !important;
+  }
+  
+  /* Enhanced scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-md;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+  
+  /* Focus styles */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+}
+
+/* Component patterns */
+@layer components {
+  /* Glass morphism effect */
+  .glass {
+    @apply bg-card/80 backdrop-blur-md border border-card-border/50;
+  }
+  
+  .glass-strong {
+    @apply bg-card/90 backdrop-blur-xl border border-card-border;
+  }
+  
+  /* Gradient backgrounds */
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+  }
+  
+  .gradient-surface {
+    background: linear-gradient(135deg, hsl(var(--surface)) 0%, hsl(var(--surface-variant)) 100%);
+  }
+  
+  /* Enhanced theme-aware shadows */
+  .shadow-theme-sm {
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .shadow-theme {
+    box-shadow: var(--shadow);
+  }
+  
+  .shadow-theme-md {
+    box-shadow: var(--shadow-md);
+  }
+  
+  .shadow-theme-lg {
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .shadow-theme-xl {
+    box-shadow: var(--shadow-xl);
+  }
+  
+  /* Animation classes */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+  
+  /* Grid patterns */
+  .bg-grid {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='hsl(var(--border))' stroke-opacity='0.1'%3e%3cpath d='m0 .5h32m-32 32v-32'/%3e%3c/svg%3e");
+  }
+  
+  .bg-dots {
+    background-image: radial-gradient(circle, hsl(var(--border)) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes gradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Cursor preservation utilities */
+@layer utilities {
+  .preserve-cursor * {
+    cursor: auto !important;
+    pointer-events: auto !important;
+  }
+  
+  .cursor-safe {
+    cursor: auto !important;
+    pointer-events: auto !important;
+  }
+  
+  /* Theme transition safe */
+  .theme-transitioning {
+    cursor: auto !important;
+    pointer-events: auto !important;
+  }
+}
+
+/* Global cursor preservation during theme changes */
+html[style*="color-scheme"] {
+  cursor: auto !important;
+}
+
+html[style*="color-scheme"] * {
+  cursor: inherit !important;
+}
+
+/* Ensure all interactive elements maintain cursor */
+button, a, [role="button"], [role="link"], input, textarea, select {
+  cursor: pointer !important;
+}
+
+input[type="text"], input[type="email"], input[type="password"], textarea {
+  cursor: text !important;
+}
