@@ -7,7 +7,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { History, CheckCircle, XCircle, Clock, ExternalLink, FileText } from 'lucide-react';
-import { fetchPatientHistoryUsingMobileNumber } from '@/lib/api';
+import { fetchPatientHistoryUsingMobileNumber } from '@/lib/api/api';
 
 export default function PatientHistoryModal({ 
   isOpen, 

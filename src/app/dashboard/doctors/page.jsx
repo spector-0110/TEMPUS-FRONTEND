@@ -10,7 +10,7 @@ import DoctorCard from '@/components/doctors/DoctorCard';
 import DoctorDetailsEditor from '@/components/doctors/DoctorDetailsEditor';
 import { ErrorDialog } from '@/components/ui/error-dialog';
 import { SuccessDialog } from '@/components/ui/success-dialog';
-import { updateDoctorDetails, updateDoctorSchedule, createDoctor } from '@/lib/api'; 
+import { updateDoctorDetails, updateDoctorSchedule, createDoctor } from '@/lib/api/api'; 
 import { validateUpdateDoctorData, validateAllSchedulesData, validateCreateDoctorData } from '@/lib/validation/doctor-validation';
 
 /**

@@ -18,7 +18,7 @@ import { SuccessDialog } from '@/components/ui/success-dialog';
 import AppointmentCreationFlow from '@/components/appointments/AppointmentCreationFlow';
 import AppointmentDetailsModal from '@/components/appointments/AppointmentDetailsModal';
 import PatientHistoryModal from '@/components/appointments/PatientHistoryModal';
-import {getTodayAndTomorrowandPastWeekAppointments, updateAppointmentStatus, updateAppointmentPaymentStatus, fetchPatientHistoryUsingMobileNumber}  from "@/lib/api"
+import {getTodayAndTomorrowandPastWeekAppointments, updateAppointmentStatus, updateAppointmentPaymentStatus, fetchPatientHistoryUsingMobileNumber}  from "@/lib/api/api"
 import AppointmentDetailsProvider from '@/context/AppointmentDetailsProvider';
 import { DateTime } from 'luxon';
 

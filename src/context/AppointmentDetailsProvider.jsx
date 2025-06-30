@@ -1,7 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getDetails } from '../lib/patientAPI';
+import { getDetails } from '../lib/api/patientAPI';
 
 const DetailsContext = createContext();
 

@@ -1,5 +1,5 @@
 import CryptoJS from 'crypto-js';
-import { ServerConnectionError } from './errors';
+import { ServerConnectionError } from '../errors';
 import { createClient } from "@/utils/supabase/client";
 
 

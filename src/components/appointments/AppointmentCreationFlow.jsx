@@ -8,7 +8,7 @@ import { CheckCircle, ArrowLeft, ArrowRight, RefreshCw, User, Calendar } from 'l
 import PatientForm from './PatientForm';
 import DoctorSelector from './DoctorSelector';
 import SlotPicker from './SlotPicker';
-import { createAppointment } from '@/lib/patientAPI';
+import { createAppointment } from '@/lib/api/patientAPI';
 import { validateAppointmentData } from '@/lib/validation/appointment-validation';
 import { useDetails } from '@/context/AppointmentDetailsProvider';
 

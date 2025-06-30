@@ -2,7 +2,7 @@
 
 import { createContext, useState, useContext, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from './AuthProvider';
-import { fetchHospitalDetails, updateHospitalDetailsAPI,getHospitalDashboard } from '@/lib/api';
+import { fetchHospitalDetails, updateHospitalDetailsAPI,getHospitalDashboard } from '@/lib/api/api';
 
 const HospitalContext = createContext({
   hospitalDetails: null,

@@ -16,6 +16,7 @@ import {
   SearchIcon,
   SettingsIcon,
   UsersIcon,
+  UserCheck,
 } from "lucide-react"
 import {useHospital} from "@/context/HospitalProvider"
 import { NavDocuments } from "@/components/ui/nav-documents"
@@ -60,6 +61,11 @@ export function AppSidebar({
       title: "Doctors",
       url: "/dashboard/doctors",
       icon: UsersIcon,
+    },
+    {
+      title: "Staff",
+      url: "/dashboard/staff",
+      icon: UserCheck,
     },
     {
       title: "Analytics",

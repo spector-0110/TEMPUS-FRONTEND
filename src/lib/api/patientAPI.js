@@ -1,4 +1,4 @@
-import { ServerConnectionError } from './errors';
+import { ServerConnectionError } from '../errors';
 import CryptoJS from 'crypto-js';
 
 const API_TIMEOUT = 10000; // 10 seconds timeout

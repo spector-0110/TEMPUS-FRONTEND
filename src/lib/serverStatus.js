@@ -1,6 +1,6 @@
 'use client';
 
-import { checkServerStatus } from './api';
+import { checkServerStatus } from './api/api';
 
 // Cache management for server status to prevent excessive checks
 const SERVER_STATUS_CACHE_KEY = 'tiqora_server_status';
