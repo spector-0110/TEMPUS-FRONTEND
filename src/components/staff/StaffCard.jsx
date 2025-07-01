@@ -293,7 +293,7 @@ export function StaffCard({ staff, onEdit, onDelete, onMarkAttendance, viewMode 
               </div>
             </div>
               
-              <DropdownMenu>
+              {/* <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button 
                     variant="ghost" 
@@ -324,7 +324,7 @@ export function StaffCard({ staff, onEdit, onDelete, onMarkAttendance, viewMode 
                     Delete Staff
                   </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu>
+              </DropdownMenu> */}
             </div>
           </div>
         </CardContent>

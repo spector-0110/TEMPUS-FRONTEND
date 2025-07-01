@@ -20,10 +20,22 @@ export function useStaff() {
   // Computed properties for better UX
   const computedStats = useMemo(() => {
     const { staffList = [] } = context;
+
+    // Only compute if staffList is not empty
+    if (staffList.length === 0) return {
+      total: 0,
+      active: 0,
+      inactive: 0,
+      roleCount: 0,
+      roleDistribution: {},
+      totalMonthlySalary: 0,
+      averageSalary: 0,
+      roles: []
+    };
     
     const activeStaff = staffList.filter(staff => staff.isActive);
     const inactiveStaff = staffList.filter(staff => !staff.isActive);
-    const roles = [...new Set(staffList.map(staff => staff.staffRole))];
+    const roles = [...new Set(staffList.map(staff => staff.staffRole))].filter(Boolean);
     
     // Role distribution
     const roleDistribution = roles.reduce((acc, role) => {
@@ -34,12 +46,12 @@ export function useStaff() {
     // Salary analytics
     const totalMonthlySalary = staffList
       .filter(staff => staff.salaryType === 'monthly' && staff.isActive)
-      .reduce((sum, staff) => sum + (parseInt(staff.salaryAmount || 0)), 0);
+      .reduce((sum, staff) => sum + (parseFloat(staff.salaryAmount || 0)), 0);
     
     const averageSalary = activeStaff.length > 0 
-      ? activeStaff.reduce((sum, staff) => sum + (parseInt(staff.salaryAmount || 0)), 0) / activeStaff.length 
+      ? activeStaff.reduce((sum, staff) => sum + (parseFloat(staff.salaryAmount || 0)), 0) / activeStaff.length 
       : 0;
-    
+
     return {
       total: staffList.length,
       active: activeStaff.length,
@@ -51,7 +63,7 @@ export function useStaff() {
       roles
     };
   }, [context.staffList]);
-  
+
   // Staff management helpers
   const staffHelpers = useMemo(() => ({
     activateStaff: async (staffId) => {
@@ -89,8 +101,7 @@ export function useStaff() {
 
   return {
     ...context,
-    ...computedStats,
-    ...staffHelpers,
+    computedStats,
     isEmpty: context.staffList.length === 0,
     hasError: !!context.staffError,
     isLoading: context.staffLoading,

@@ -60,6 +60,8 @@ import { STAFF_CONSTANTS, getDisplayName } from '@/lib/api/staffAPI';
 import { useStaff } from '@/context/StaffContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { validateCreateStaffData, validateUpdateStaffData } from '@/lib/validation/staff-validation';
+import { uploadStaffImage, deleteStaffImage } from '@/lib/uploadStaffImage';
+import { useHospital } from '@/context/HospitalProvider';
 
 export function StaffForm({ 
   isOpen, 
@@ -74,7 +76,14 @@ export function StaffForm({
   const [validationErrors, setValidationErrors] = useState({});
   const [showResultDialog, setShowResultDialog] = useState(false);
   const [resultMessage, setResultMessage] = useState({ title: '', description: '', isSuccess: true });
+  const [isUploading, setIsUploading] = useState(false);
+  const {hospitalDetails} = useHospital();
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isProcessingImage, setIsProcessingImage] = useState(false);
+  const isEditMode = staff && staff.id;
+  const hospitalName= hospitalDetails?.name || 'default-hospital';
   
+
   const {
     register,
     handleSubmit,
@@ -99,6 +108,15 @@ export function StaffForm({
   
   const watchedValues = watch();
   
+  // Cleanup preview URL when component unmounts
+  useEffect(() => {
+    return () => {
+      if (photoPreview && selectedFile) {
+        URL.revokeObjectURL(photoPreview);
+      }
+    };
+  }, [photoPreview, selectedFile]);
+  
   // Reset form when staff or mode changes
   useEffect(() => {
     if (staff && mode === 'edit') {
@@ -115,6 +133,7 @@ export function StaffForm({
         isActive: staff.isActive !== undefined ? staff.isActive : true
       });
       setPhotoPreview(staff.photoUrl);
+      setSelectedFile(null);
     } else {
       reset({
         name: '',
@@ -129,6 +148,7 @@ export function StaffForm({
         isActive: true
       });
       setPhotoPreview(null);
+      setSelectedFile(null);
     }
   }, [staff, mode, reset]);
   
@@ -144,9 +164,45 @@ export function StaffForm({
     setValidationErrors({});
     
     try {
+      let photoUrl = data.photoUrl;
+
+      // Upload image if a new file is selected
+      if (selectedFile) {
+        try {
+          setIsProcessingImage(true);
+          
+          // Delete previous image if in edit mode and the staff has a custom photo
+          if (mode === 'edit' && staff?.photoUrl && !staff.photoUrl.includes('/doctor.png')) {
+            try {
+              await deleteStaffImage(staff.photoUrl);
+            } catch (deleteError) {
+              console.error('Failed to delete previous image:', deleteError);
+            }
+          }
+          
+          photoUrl = await uploadStaffImage(
+            selectedFile,
+            hospitalName,
+            data.name || 'unnamed-staff'
+          );
+        } catch (error) {
+          console.error('Image upload failed:', error);
+          setResultMessage({
+            title: 'Image Upload Failed',
+            description: `Image upload failed: ${error.message}`,
+            isSuccess: false
+          });
+          setShowResultDialog(true);
+          return;
+        } finally {
+          setIsProcessingImage(false);
+        }
+      }
+
       // Prepare data for validation and API submission
       const formData = {
         ...data,
+        photoUrl, // Use the uploaded URL or existing photo
         age: data.age ? parseInt(data.age) : undefined,
         salaryAmount: data.salaryAmount ? parseFloat(data.salaryAmount) : undefined,
         salaryCreditCycle: data.salaryCreditCycle ? parseInt(data.salaryCreditCycle) : undefined
@@ -224,6 +280,14 @@ export function StaffForm({
           isSuccess: true
         });
         setShowResultDialog(true);
+        
+        // Clear selected file after successful submission
+        if (selectedFile) {
+          setSelectedFile(null);
+          if (photoPreview && selectedFile) {
+            URL.revokeObjectURL(photoPreview);
+          }
+        }
       } else {
         // Create mode - use all form data
         const validationResult = validateCreateStaffData(formData);
@@ -251,6 +315,14 @@ export function StaffForm({
           isSuccess: true
         });
         setShowResultDialog(true);
+        
+        // Clear selected file after successful submission
+        if (selectedFile) {
+          setSelectedFile(null);
+          if (photoPreview && selectedFile) {
+            URL.revokeObjectURL(photoPreview);
+          }
+        }
       }
       
       onClose();
@@ -270,7 +342,22 @@ export function StaffForm({
   
   const handlePhotoUrlClear = () => {
     setValue('photoUrl', '');
+    
+    // Clean up file selection and preview
+    if (selectedFile) {
+      setSelectedFile(null);
+      if (photoPreview) {
+        URL.revokeObjectURL(photoPreview);
+      }
+    }
+    
     setPhotoPreview(null);
+    
+    // Reset file input
+    const fileInput = document.getElementById('photo-file');
+    if (fileInput) {
+      fileInput.value = '';
+    }
   };
   
   const getInitials = (name) => {
@@ -372,6 +459,60 @@ export function StaffForm({
     );
   };
   
+  // Image handling functions
+  const validateImageFile = (file) => {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (!allowedTypes.includes(file.type)) {
+      throw new Error('Only JPEG, JPG, PNG, and WebP images are allowed');
+    }
+
+    if (file.size > maxSize) {
+      throw new Error('File size must be less than 5MB');
+    }
+
+    return true;
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) {
+      setSelectedFile(null);
+      if (photoPreview && selectedFile) {
+        URL.revokeObjectURL(photoPreview);
+      }
+      setPhotoPreview(watchedValues.photoUrl || null);
+      return;
+    }
+
+    try {
+      validateImageFile(file);
+      setSelectedFile(file);
+      
+      // Clean up previous preview if it was from a file
+      if (photoPreview && selectedFile) {
+        URL.revokeObjectURL(photoPreview);
+      }
+      
+      // Create preview URL
+      const preview = URL.createObjectURL(file);
+      setPhotoPreview(preview);
+
+      // Reset the input value to allow re-uploading the same file
+      e.target.value = '';
+    } catch (error) {
+      console.error('Error selecting image:', error);
+      setResultMessage({
+        title: 'Invalid Image',
+        description: error.message,
+        isSuccess: false
+      });
+      setShowResultDialog(true);
+      e.target.value = '';
+    }
+  };
+  
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
@@ -401,33 +542,62 @@ export function StaffForm({
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <Avatar className="w-16 h-16">
-                      <AvatarImage src={photoPreview} alt="Staff photo" />
+                  <div className="flex items-start gap-4">
+                    <Avatar className="w-20 h-20">
+                      <AvatarImage 
+                        src={photoPreview} 
+                        alt="Staff photo" 
+                        onError={(e) => {
+                          e.target.src = '/doctor.png';
+                        }}
+                      />
                       <AvatarFallback className="text-lg">
                         {watchedValues.name ? getInitials(watchedValues.name) : <User className="w-6 h-6" />}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex-1 space-y-2">
-                      <Label htmlFor="photoUrl" className="text-sm">Photo URL</Label>
-                      <div className="flex gap-2">
+                    <div className="flex-1 space-y-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="photo-file" className="text-sm">Upload Photo</Label>
                         <Input
-                          id="photoUrl"
-                          placeholder="Enter photo URL"
-                          {...register('photoUrl')}
-                          className="flex-1"
+                          id="photo-file"
+                          type="file"
+                          accept="image/jpeg,image/jpg,image/png,image/webp"
+                          onChange={handleFileChange}
+                          className="cursor-pointer"
                         />
-                        {photoPreview && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={handlePhotoUrlClear}
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
+                        {isProcessingImage && (
+                          <div className="text-sm text-primary flex items-center gap-2">
+                            <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                            Processing image...
+                          </div>
                         )}
+                        <p className="text-xs text-muted-foreground">
+                          Max file size: 5MB. Supported formats: JPEG, PNG, WebP
+                        </p>
                       </div>
+                      
+                      {/* <div className="space-y-2">
+                        <Label htmlFor="photoUrl" className="text-sm">Or enter photo URL</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            id="photoUrl"
+                            placeholder="Enter photo URL"
+                            {...register('photoUrl')}
+                            className="flex-1"
+                            disabled={!!selectedFile}
+                          />
+                          {(photoPreview || selectedFile) && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={handlePhotoUrlClear}
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </div> */}
                     </div>
                   </div>
                 </CardContent>
@@ -701,19 +871,19 @@ export function StaffForm({
                   type="button"
                   variant="outline"
                   onClick={onClose}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isProcessingImage}
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isProcessingImage}
                   className="min-w-[100px]"
                 >
-                  {isSubmitting ? (
+                  {(isSubmitting || isProcessingImage) ? (
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                      {mode === 'edit' ? 'Updating...' : 'Creating...'}
+                      {isProcessingImage ? 'Processing...' : (mode === 'edit' ? 'Updating...' : 'Creating...')}
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">

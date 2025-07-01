@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useStaff } from '@/hooks/useStaff';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,7 +12,7 @@ export function StaffListHeader() {
   const isMobile = useIsMobile();
   const {
     refreshStaffList,
-    computedStats = {},
+    computedStats,
     isLoading
   } = useStaff();
 
@@ -23,7 +24,7 @@ export function StaffListHeader() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Staff</p>
-                <p className="text-2xl font-bold">{isLoading ? '-' : computedStats.total || 0}</p>
+                <p className="text-2xl font-bold">{isLoading ? '-' : computedStats?.total || 0}</p>
               </div>
               <Users className="w-8 h-8 text-blue-500" />
             </div>
@@ -35,9 +36,9 @@ export function StaffListHeader() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Active</p>
-                <p className="text-2xl font-bold text-green-600">{isLoading ? '-' : computedStats.active || 0}</p>
+                <p className="text-2xl font-bold text-green-600">{isLoading ? '-' : computedStats?.active || 0}</p>
                 <p className="text-xs text-muted-foreground">
-                  {isLoading ? '-' : computedStats.total > 0 ? Math.round((computedStats.active / computedStats.total) * 100) : 0}%
+                  {isLoading ? '-' : computedStats?.total > 0 ? `${Math.round((computedStats.active / computedStats.total) * 100)}%` : '0%'}
                 </p>
               </div>
               <UserCheck className="w-8 h-8 text-green-500" />
@@ -50,9 +51,9 @@ export function StaffListHeader() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Inactive</p>
-                <p className="text-2xl font-bold text-red-600">{computedStats.inactive}</p>
+                <p className="text-2xl font-bold text-red-600">{isLoading ? '-' : computedStats?.inactive || 0}</p>
                 <p className="text-xs text-muted-foreground">
-                  {computedStats.total > 0 ? Math.round((computedStats.inactive / computedStats.total) * 100) : 0}%
+                  {isLoading ? '-' : computedStats?.total > 0 ? `${Math.round((computedStats.inactive / computedStats.total) * 100)}%` : '0%'}
                 </p>
               </div>
               <UserX className="w-8 h-8 text-red-500" />
@@ -65,7 +66,9 @@ export function StaffListHeader() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Avg Salary</p>
-                <p className="text-2xl font-bold">₹{Math.round(computedStats.averageSalary).toLocaleString()}</p>
+                <p className="text-2xl font-bold">
+                  {isLoading ? '-' : `₹${Math.round(computedStats?.averageSalary || 0).toLocaleString()}`}
+                </p>
                 <p className="text-xs text-muted-foreground">Per month</p>
               </div>
               <IndianRupee className="w-8 h-8 text-purple-500" />
@@ -74,7 +77,7 @@ export function StaffListHeader() {
         </Card>
       </div>
       
-      <Card>
+      {/* <Card>
         <CardContent className="p-4">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold">Staff Management</h2>
@@ -112,7 +115,7 @@ export function StaffListHeader() {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 }
