@@ -327,7 +327,7 @@ export function StaffPaymentsManager({ staffId, staffName }) {
                 <p className="text-lg font-bold">
                   ₹{payments
                     .filter(p => new Date(p.paymentDate).getMonth() === new Date().getMonth())
-                    .reduce((sum, p) => sum + p.amount, 0)
+                    .reduce((sum, p) => sum + parseInt(p.amount), 0)
                     .toLocaleString()
                   }
                 </p>

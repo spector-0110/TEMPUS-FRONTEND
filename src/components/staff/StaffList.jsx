@@ -6,8 +6,22 @@ import { Card, CardContent } from '@/components/ui/card';
 import { 
   Plus,
   User,
-  Loader2
+  Loader2,
+  Calendar as CalendarIcon,
+  CheckCircle,
+  XCircle,
+  Coffee,
+  Clock,
+  RefreshCw
 } from 'lucide-react';
+import { format } from 'date-fns';
+import { Calendar } from '@/components/ui/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 import { StaffCard } from './StaffCard';
 import { StaffForm } from './StaffForm';
 import { useStaff } from '@/hooks/useStaff';
@@ -22,18 +36,50 @@ export function StaffList() {
     isEmpty,
     staffError,
     refreshStaffList,
-    deleteStaffMember
+    deleteStaffMember,
+    markStaffAttendance
   } = useStaff();
-  
+
   const [showForm, setShowForm] = useState(false);
   const [editingStaff, setEditingStaff] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, staff: null });
-  const [viewMode, setViewMode] = useState('card'); // 'card' | 'list' | 'grid'
+  const [viewMode, setViewMode] = useState('card');
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const today = new Date();
+    // Ensure we have a valid date object
+    return isNaN(today.getTime()) ? new Date() : today;
+  });
+  const [attendanceDialog, setAttendanceDialog] = useState({ isOpen: false, staff: null, status: null });
   
   const observerRef = useRef();
   const loadMoreRef = useRef();
   
-  
+  // Helper function to format date consistently
+  const formatDate = useCallback((date) => {
+    if (!date) return '';
+    return date.getFullYear() + '-' + 
+      String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+      String(date.getDate()).padStart(2, '0');
+  }, []);
+
+  // Refresh staff list with date
+  const refreshStaffWithDate = useCallback(() => {
+    if (!selectedDate) return;
+    try {
+      const formattedDate = formatDate(selectedDate);
+      refreshStaffList({ date: formattedDate });
+    } catch (error) {
+      console.error('Error refreshing staff list:', error);
+      toast.error('Failed to refresh staff list');
+    }
+  }, [selectedDate, refreshStaffList, formatDate]);
+
+  // Fetch staff list when date changes and on mount
+  useEffect(() => {
+    if (!selectedDate) return;
+    refreshStaffWithDate();
+  }, [selectedDate, refreshStaffWithDate]);
+
   const handleEdit = (staff) => {
     setEditingStaff(staff);
     setShowForm(true);
@@ -57,6 +103,33 @@ export function StaffList() {
     setEditingStaff(null);
   };
   
+  const handleAttendanceClick = (staff) => {
+    setAttendanceDialog({ isOpen: true, staff, status: staff.attendanceStatus });
+  };
+  
+  const handleAttendance = (staff, status) => {
+    setAttendanceDialog({ isOpen: true, staff, status });
+  };
+
+  const confirmAttendance = async () => {
+    if (attendanceDialog.staff && attendanceDialog.status && selectedDate) {
+      try {
+        const formattedDate = formatDate(selectedDate);
+        await markStaffAttendance({
+          staffId: attendanceDialog.staff,
+          attendanceDate: formattedDate,
+          status: attendanceDialog.status
+        });
+        // Refresh the staff list with current date after marking attendance
+        refreshStaffWithDate();
+        setAttendanceDialog({ isOpen: false, staff: null, status: null });
+      } catch (error) {
+        console.error('Error marking attendance:', error);
+        toast.error('Failed to mark attendance. Please try again.');
+      }
+    }
+  };
+
   // Error state
   if (hasError) {
     return (
@@ -69,7 +142,12 @@ export function StaffList() {
           </div>
           <Button 
             variant="outline" 
-            onClick={refreshStaffList}
+            onClick={() => {
+              const formattedDate = selectedDate.getFullYear() + '-' + 
+                String(selectedDate.getMonth() + 1).padStart(2, '0') + '-' + 
+                String(selectedDate.getDate()).padStart(2, '0');
+              refreshStaffList({ date: formattedDate });
+            }}
             className="mt-4"
           >
             Try Again
@@ -104,17 +182,50 @@ export function StaffList() {
     <>
       {/* Staff List Container */}
       <div className="space-y-4">
-        {/* View Mode Selector - Desktop Only */}
-        {!isMobile && (
-          <div className="flex justify-between items-center">
-            <p className="text-sm text-muted-foreground">
-              Showing {staffList.length} staff members
-            </p>
-            <div className="flex gap-2">
-              {/* View mode buttons could go here */}
-            </div>
+        {/* Date Picker and View Mode Selector */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "justify-start text-left font-normal w-[240px]",
+                  !selectedDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={refreshStaffWithDate}
+              disabled={isLoading}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              {!isMobile && "Refresh"}
+            </Button>
+
+            {!isMobile && (
+              <p className="text-sm text-muted-foreground">
+                Showing {staffList.length} staff members
+              </p>
+            )}
           </div>
-        )}
+        </div>
         
         {/* Staff Cards */}
         <div className={`space-y-4 ${viewMode === 'grid' ? 'sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-4 sm:space-y-0' : ''}`}>
@@ -127,6 +238,7 @@ export function StaffList() {
                 staff={staff}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onMarkAttendance={handleAttendance}
                 viewMode={viewMode}
               />
             </div>
@@ -173,6 +285,41 @@ export function StaffList() {
                   onClick={confirmDelete}
                 >
                   Delete
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+      
+      {/* Attendance Confirmation Modal */}
+      {attendanceDialog.isOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold mb-2">Mark Attendance</h3>
+              <p className="text-muted-foreground mb-4">
+                Mark <strong>{attendanceDialog.staff?.name}</strong> as{' '}
+                <strong>{attendanceDialog.status}</strong> for{' '}
+                {format(selectedDate, "PPP")}?
+              </p>
+              <div className="flex gap-2 justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => setAttendanceDialog({ isOpen: false, staff: null, status: null })}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={confirmAttendance}
+                  className={cn(
+                    attendanceDialog.status === 'present' && 'bg-green-600 hover:bg-green-700',
+                    attendanceDialog.status === 'absent' && 'bg-red-600 hover:bg-red-700',
+                    attendanceDialog.status === 'half_day' && 'bg-orange-600 hover:bg-orange-700',
+                    attendanceDialog.status === 'leave' && 'bg-blue-600 hover:bg-blue-700'
+                  )}
+                >
+                  Confirm
                 </Button>
               </div>
             </CardContent>

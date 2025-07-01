@@ -59,7 +59,6 @@ export default function RootLayout({
               <main className="min-h-[calc(100vh-64px)]">
                 {children}
               </main>
-              <Toaster />
               {/* <LogoutButton/> */}
             </HospitalProvider>
           </AuthProvider>

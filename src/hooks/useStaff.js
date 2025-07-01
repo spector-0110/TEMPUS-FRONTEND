@@ -195,9 +195,9 @@ export function useStaffPayments(staffId) {
   
   // Computed analytics
   const paymentStats = useMemo(() => {
-    const total = staffPayments.reduce((sum, payment) => sum + payment.amount, 0);
+    const total = staffPayments.reduce((sum, payment) => sum + parseInt(payment.amount), 0);
     const byType = staffPayments.reduce((acc, payment) => {
-      acc[payment.paymentType] = (acc[payment.paymentType] || 0) + payment.amount;
+      acc[payment.paymentType] = (acc[payment.paymentType] || 0) + parseInt(payment.amount);
       return acc;
     }, {});
     

@@ -250,9 +250,43 @@ export function StaffProvider({ children }) {
   
 
   // Refresh staff list
-  const refreshStaffList = useCallback(() => {
-    fetchStaffList(1, true);
-  }, [fetchStaffList]);
+  const refreshStaffList = useCallback(async (params = {}) => {
+    if (!isReady) return;
+    
+    // Cancel previous request if any
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    abortControllerRef.current = new AbortController();
+    
+    try {
+      setStaffLoading(true);
+      setStaffError(null);
+      
+      const response = await getAllStaff({
+        date: params.date || DateTime.now().setZone('Asia/Kolkata').toFormat('yyyy-MM-dd')
+      }, {
+        signal: abortControllerRef.current.signal
+      });
+      
+      if (response.success) {
+        const newStaff = response.data.staff || [];
+        setStaffList(newStaff);
+        setStaffError(null);
+      } else {
+        throw new Error(response.message || 'Failed to fetch staff');
+      }
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        console.error('Error fetching staff list:', error);
+        setStaffError(error.message || 'Failed to load staff');
+        toast.error('Failed to load staff list');
+      }
+    } finally {
+      setStaffLoading(false);
+    }
+  }, [isReady]);
   
   // Payments functions
   const fetchStaffPayments = useCallback(async (staffId, queryParams = {}) => {
