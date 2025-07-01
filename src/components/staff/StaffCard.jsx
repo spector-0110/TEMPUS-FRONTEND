@@ -20,6 +20,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   MoreVertical,
@@ -45,12 +55,32 @@ import { useStaff } from '@/context/StaffContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { StaffPaymentsManager } from './StaffPaymentsManager';
 import { StaffAttendanceCalendar } from './StaffAttendanceCalendar';
+import { StaffForm } from './StaffForm';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 
-export function StaffCard({ staff, onEdit, onDelete, onMarkAttendance, viewMode }) {
+export function StaffCard({ 
+  staff, 
+  viewMode, 
+  selectedDate,
+  refreshStaffList
+}) {
   const isMobile = useIsMobile();
   const [showDetails, setShowDetails] = useState(false);
-  const { fetchStaffPayments, fetchStaffAttendance } = useStaff();
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showAttendanceDialog, setShowAttendanceDialog] = useState({ 
+    isOpen: false, 
+    status: null 
+  });
+  
+  const { 
+    fetchStaffPayments, 
+    fetchStaffAttendance, 
+    deleteStaffMember,
+    markStaffAttendance 
+  } = useStaff();
   
   const getAttendanceStatus = (attendance) => {
     if (!attendance) return { color: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200', label: 'Not Marked' };
@@ -103,6 +133,63 @@ export function StaffCard({ staff, onEdit, onDelete, onMarkAttendance, viewMode 
     setShowDetails(true);
     fetchStaffPayments(staff.id);
     fetchStaffAttendance(staff.id);
+  };
+
+  const handleEdit = () => {
+    setShowEditForm(true);
+  };
+
+  const handleDelete = () => {
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDelete = async () => {
+    const success = await deleteStaffMember(staff.id);
+    if (success) {
+      setShowDeleteDialog(false);
+      // Optionally refresh the list if needed
+      if (refreshStaffList) {
+        refreshStaffList();
+      }
+    }
+  };
+
+  const handleMarkAttendance = (status) => {
+    setShowAttendanceDialog({ isOpen: true, status });
+  };
+
+  const confirmAttendance = async () => {
+    if (showAttendanceDialog.status && selectedDate) {
+      try {
+        const formattedDate = selectedDate.getFullYear() + '-' + 
+          String(selectedDate.getMonth() + 1).padStart(2, '0') + '-' + 
+          String(selectedDate.getDate()).padStart(2, '0');
+        
+        await markStaffAttendance({
+          staffId: staff.id,
+          attendanceDate: formattedDate,
+          status: showAttendanceDialog.status
+        });
+        
+        // Refresh the staff list after marking attendance
+        if (refreshStaffList) {
+          refreshStaffList();
+        }
+        
+        setShowAttendanceDialog({ isOpen: false, status: null });
+      } catch (error) {
+        console.error('Error marking attendance:', error);
+        // You might want to show a toast error here
+      }
+    }
+  };
+
+  const handleFormClose = () => {
+    setShowEditForm(false);
+    // Optionally refresh the list after editing
+    if (refreshStaffList) {
+      refreshStaffList();
+    }
   };
   
   const ImageComponent = ({ size = 'sm', priority = false }) => {
@@ -243,7 +330,7 @@ export function StaffCard({ staff, onEdit, onDelete, onMarkAttendance, viewMode 
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onMarkAttendance?.(staff.id, 'present');
+                    handleMarkAttendance('present');
                   }}
                   className="w-6 h-6 rounded flex items-center justify-center text-xs font-medium hover:bg-green-100 hover:text-green-800 dark:hover:bg-green-900 dark:hover:text-green-200 transition-colors"
                   title="Mark Present"
@@ -253,7 +340,7 @@ export function StaffCard({ staff, onEdit, onDelete, onMarkAttendance, viewMode 
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onMarkAttendance?.(staff.id, 'absent');
+                    handleMarkAttendance('absent');
                   }}
                   className="w-6 h-6 rounded flex items-center justify-center text-xs font-medium hover:bg-red-100 hover:text-red-800 dark:hover:bg-red-900 dark:hover:text-red-200 transition-colors"
                   title="Mark Absent"
@@ -263,7 +350,7 @@ export function StaffCard({ staff, onEdit, onDelete, onMarkAttendance, viewMode 
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onMarkAttendance?.(staff.id, 'half_day');
+                    handleMarkAttendance('half_day');
                   }}
                   className="w-6 h-6 rounded flex items-center justify-center text-xs font-medium hover:bg-yellow-100 hover:text-yellow-800 dark:hover:bg-yellow-900 dark:hover:text-yellow-200 transition-colors"
                   title="Mark Half Day"
@@ -273,7 +360,7 @@ export function StaffCard({ staff, onEdit, onDelete, onMarkAttendance, viewMode 
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onMarkAttendance?.(staff.id, 'paid_leave');
+                    handleMarkAttendance('paid_leave');
                   }}
                   className="w-6 h-6 rounded flex items-center justify-center text-xs font-medium hover:bg-blue-100 hover:text-blue-800 dark:hover:bg-blue-900 dark:hover:text-blue-200 transition-colors"
                   title="Mark as Paid Leave"
@@ -283,7 +370,7 @@ export function StaffCard({ staff, onEdit, onDelete, onMarkAttendance, viewMode 
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onMarkAttendance?.(staff.id, 'week_holiday');
+                    handleMarkAttendance('week_holiday');
                   }}
                   className="w-6 h-6 rounded flex items-center justify-center text-xs font-medium hover:bg-purple-100 hover:text-purple-800 dark:hover:bg-purple-900 dark:hover:text-purple-200 transition-colors"
                   title="Mark as Holiday"
@@ -358,8 +445,8 @@ export function StaffCard({ staff, onEdit, onDelete, onMarkAttendance, viewMode 
                   variant="ghost"
                   size="sm"
                   onClick={() => {
-                    setShowDetails(false);
-                    onEdit(staff);
+                    // setShowDetails(false);
+                    setTimeout(() => handleEdit(), 0);
                   }}
                 >
                   <Edit className="w-4 h-4 mr-2" />
@@ -370,8 +457,8 @@ export function StaffCard({ staff, onEdit, onDelete, onMarkAttendance, viewMode 
                   size="sm"
                   className="text-destructive hover:text-destructive"
                   onClick={() => {
-                    setShowDetails(false);
-                    onDelete(staff);
+                    // setShowDetails(false);
+                    setTimeout(() => handleDelete(), 0);
                   }}
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
@@ -519,6 +606,68 @@ export function StaffCard({ staff, onEdit, onDelete, onMarkAttendance, viewMode 
           </Tabs>
         </DialogContent>
       </Dialog>
+
+      {/* Staff Edit Form Modal */}
+      <StaffForm
+        isOpen={showEditForm}
+        onClose={handleFormClose}
+        staff={staff}
+        mode="edit"
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Staff Member</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete <strong>{staff.name}</strong>? 
+              This action cannot be undone and will remove all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Attendance Confirmation Dialog */}
+      <AlertDialog 
+        open={showAttendanceDialog.isOpen} 
+        onOpenChange={(open) => setShowAttendanceDialog({ isOpen: open, status: null })}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Mark Attendance</AlertDialogTitle>
+            <AlertDialogDescription>
+              Mark <strong>{staff.name}</strong> as{' '}
+              <strong>{showAttendanceDialog.status}</strong> for{' '}
+              {selectedDate ? format(selectedDate, "PPP") : 'today'}?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmAttendance}
+              className={cn(
+                showAttendanceDialog.status === 'present' && 'bg-green-600 hover:bg-green-700',
+                showAttendanceDialog.status === 'absent' && 'bg-red-600 hover:bg-red-700',
+                showAttendanceDialog.status === 'half_day' && 'bg-orange-600 hover:bg-orange-700',
+                showAttendanceDialog.status === 'paid_leave' && 'bg-blue-600 hover:bg-blue-700',
+                showAttendanceDialog.status === 'week_holiday' && 'bg-purple-600 hover:bg-purple-700'
+              )}
+            >
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

@@ -50,7 +50,7 @@ export default function RootLayout({
       <body className={`${geistSans.className} antialiased cursor-safe`}>
         <EnhancedThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange={false}
         >

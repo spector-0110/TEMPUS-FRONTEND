@@ -8,10 +8,6 @@ import {
   User,
   Loader2,
   Calendar as CalendarIcon,
-  CheckCircle,
-  XCircle,
-  Coffee,
-  Clock,
   RefreshCw
 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -36,20 +32,16 @@ export function StaffList() {
     isEmpty,
     staffError,
     refreshStaffList,
-    deleteStaffMember,
     markStaffAttendance
   } = useStaff();
 
   const [showForm, setShowForm] = useState(false);
-  const [editingStaff, setEditingStaff] = useState(null);
-  const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, staff: null });
   const [viewMode, setViewMode] = useState('card');
   const [selectedDate, setSelectedDate] = useState(() => {
     const today = new Date();
     // Ensure we have a valid date object
     return isNaN(today.getTime()) ? new Date() : today;
   });
-  const [attendanceDialog, setAttendanceDialog] = useState({ isOpen: false, staff: null, status: null });
   
   const observerRef = useRef();
   const loadMoreRef = useRef();
@@ -80,54 +72,10 @@ export function StaffList() {
     refreshStaffWithDate();
   }, [selectedDate, refreshStaffWithDate]);
 
-  const handleEdit = (staff) => {
-    setEditingStaff(staff);
-    setShowForm(true);
-  };
-  
-  const handleDelete = (staff) => {
-    setDeleteConfirm({ isOpen: true, staff });
-  };
-  
-  const confirmDelete = async () => {
-    if (deleteConfirm.staff) {
-      const success = await deleteStaffMember(deleteConfirm.staff.id);
-      if (success) {
-        setDeleteConfirm({ isOpen: false, staff: null });
-      }
-    }
-  };
-  
   const handleFormClose = () => {
     setShowForm(false);
-    setEditingStaff(null);
-  };
-  
-  const handleAttendanceClick = (staff) => {
-    setAttendanceDialog({ isOpen: true, staff, status: staff.attendanceStatus });
-  };
-  
-  const handleAttendance = (staff, status) => {
-    setAttendanceDialog({ isOpen: true, staff, status });
-  };
-
-  const confirmAttendance = async () => {
-    if (attendanceDialog.staff && attendanceDialog.status && selectedDate) {
-      try {
-        const formattedDate = formatDate(selectedDate);
-        await markStaffAttendance({
-          staffId: attendanceDialog.staff,
-          attendanceDate: formattedDate,
-          status: attendanceDialog.status
-        });
-        // Refresh the staff list with current date after marking attendance
-        refreshStaffWithDate();
-        setAttendanceDialog({ isOpen: false, staff: null, status: null });
-      } catch (error) {
-        console.error('Error marking attendance:', error);
-        toast.error('Failed to mark attendance. Please try again.');
-      }
-    }
+    // Refresh staff list after form closes
+    refreshStaffWithDate();
   };
 
   // Error state
@@ -236,10 +184,9 @@ export function StaffList() {
             >
               <StaffCard
                 staff={staff}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onMarkAttendance={handleAttendance}
                 viewMode={viewMode}
+                selectedDate={selectedDate}
+                refreshStaffList={refreshStaffWithDate}
               />
             </div>
           ))}
@@ -259,73 +206,9 @@ export function StaffList() {
       <StaffForm
         isOpen={showForm}
         onClose={handleFormClose}
-        staff={editingStaff}
-        mode={editingStaff ? 'edit' : 'create'}
+        staff={null}
+        mode="create"
       />
-      
-      {/* Delete Confirmation Modal */}
-      {deleteConfirm.isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <Card className="w-full max-w-md">
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold mb-2">Delete Staff Member</h3>
-              <p className="text-muted-foreground mb-4">
-                Are you sure you want to delete <strong>{deleteConfirm.staff?.name}</strong>? 
-                This action cannot be undone and will remove all associated data.
-              </p>
-              <div className="flex gap-2 justify-end">
-                <Button
-                  variant="outline"
-                  onClick={() => setDeleteConfirm({ isOpen: false, staff: null })}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={confirmDelete}
-                >
-                  Delete
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-      
-      {/* Attendance Confirmation Modal */}
-      {attendanceDialog.isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <Card className="w-full max-w-md">
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold mb-2">Mark Attendance</h3>
-              <p className="text-muted-foreground mb-4">
-                Mark <strong>{attendanceDialog.staff?.name}</strong> as{' '}
-                <strong>{attendanceDialog.status}</strong> for{' '}
-                {format(selectedDate, "PPP")}?
-              </p>
-              <div className="flex gap-2 justify-end">
-                <Button
-                  variant="outline"
-                  onClick={() => setAttendanceDialog({ isOpen: false, staff: null, status: null })}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={confirmAttendance}
-                  className={cn(
-                    attendanceDialog.status === 'present' && 'bg-green-600 hover:bg-green-700',
-                    attendanceDialog.status === 'absent' && 'bg-red-600 hover:bg-red-700',
-                    attendanceDialog.status === 'half_day' && 'bg-orange-600 hover:bg-orange-700',
-                    attendanceDialog.status === 'leave' && 'bg-blue-600 hover:bg-blue-700'
-                  )}
-                >
-                  Confirm
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
     </>
   );
 }
