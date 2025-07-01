@@ -10,7 +10,7 @@ import defaultHospitalFormConfig from '@/lib/config/hospitalFormConfig';
 import { ApiErrorAlert } from '@/components/ui/api-error-alert';
 import { FormSection } from '@/components/ui/form-ui/form-section';
 import { HospitalOtpDialog } from '@/components/ui/form-ui/hospital-otp-dialog';
-import { getOTPforHospitalDetailsUpdate } from '@/lib/api';
+import { getOTPforHospitalDetailsUpdate } from '@/lib/api/api';
 
 // Constants for allowed fields updates
 const ALLOWED_UPDATE_FIELDS = [

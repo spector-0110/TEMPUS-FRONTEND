@@ -3,7 +3,8 @@ import { Geist } from "next/font/google";
 import { EnhancedThemeProvider } from '@/context/ThemeProvider';
 import { AuthProvider } from '@/context/AuthProvider';
 import { HospitalProvider } from '@/context/HospitalProvider';
-import {LogoutButton} from '@/components/ui/logout-button';
+import { LogoutButton } from '@/components/ui/logout-button';
+import { Toaster } from "@/components/ui/Toaster";
 import "@/styles/globals.css";
 
 const defaultUrl = process.env.NEXT_PUBLIC_SITE_URL
@@ -58,6 +59,7 @@ export default function RootLayout({
               <main className="min-h-[calc(100vh-64px)]">
                 {children}
               </main>
+              <Toaster />
               {/* <LogoutButton/> */}
             </HospitalProvider>
           </AuthProvider>

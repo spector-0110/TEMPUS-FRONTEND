@@ -8,6 +8,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { useAuth } from "@/context/AuthProvider";
 import { Spinner } from "@/components/ui/spinner";
 import { useHospital } from '@/context/HospitalProvider';
+import { StaffProvider } from '@/context/StaffContext';
 import { checkServerStatusWithCache } from '@/lib/serverStatus';
 
 export default function DashBoardLayout({ children }) {
@@ -72,7 +73,9 @@ export default function DashBoardLayout({ children }) {
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+              <StaffProvider>
                 {children}
+              </StaffProvider>
             </div>
           </div>
         </div>
