@@ -51,7 +51,7 @@ export default function RootLayout({
         <EnhancedThemeProvider
           attribute="class"
           defaultTheme="light"
-          enableSystem
+          enableSystem={false}
           disableTransitionOnChange={false}
         >
            <AuthProvider>
