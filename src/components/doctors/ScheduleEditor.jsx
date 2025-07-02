@@ -80,7 +80,7 @@ const ScheduleEditor = ({ doctorId, initialSchedules, onSave, onCancel }) => {
     const processed = schedules.map(s => ({
       ...s,
       dayOfWeek: Number(s.dayOfWeek),
-      avgConsultationTime: parseInt(s.avgConsultationTime, 5),
+      avgConsultationTime: parseInt(s.avgConsultationTime, 10),
       timeRanges: s.timeRanges.map(({ start, end }) => ({ start, end })),
     }));
 

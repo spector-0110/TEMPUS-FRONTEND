@@ -111,7 +111,6 @@ const DoctorsPage = () => {
       await updateDoctorSchedule(scheduleData);
       
       // Refresh data from server
-      await backgroundRefresh();
       
       // Show success dialog
       setSuccessDialog({
@@ -120,6 +119,8 @@ const DoctorsPage = () => {
         message: 'Doctor schedule has been successfully updated.',
         details: []
       });
+      setErrorDialog({ isOpen: false }); // Close any existing error dialog
+      await backgroundRefresh();
     } catch (error) {
       console.error('Error updating schedule:', {
         error: error instanceof Error ? {
