@@ -303,6 +303,19 @@ export default function AppointmentsPage() {
 
   const handleStatusChange = async (appointmentId, newStatus) => {
     try {
+      // Check if trying to mark as completed without payment
+      if (newStatus === 'completed') {
+        const appointment = appointments.find(apt => apt.id === appointmentId);
+        if (appointment && appointment.paymentStatus !== 'paid') {
+          setErrorDialog({
+            isOpen: true,
+            title: 'Payment Required',
+            message: 'Payment must be completed before marking the appointment as completed.',
+          });
+          return;
+        }
+      }
+
       // Update appointment status in local state immediately for better UX
       setAppointments(prevAppointments => 
         prevAppointments.map(apt => 

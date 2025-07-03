@@ -131,3 +131,39 @@ export const APPOINTMENT_FILTERS = {
     CANCELLED: 'cancelled'
   }
 };
+
+/**
+ * Validates appointment status update
+ */
+export const validateAppointmentStatusUpdate = (currentStatus, newStatus, paymentStatus) => {
+  const errors = [];
+
+  // Business rule: Cannot mark as completed if payment is not done
+  if (newStatus === 'completed' && paymentStatus !== 'paid') {
+    errors.push({
+      field: 'status',
+      message: 'Payment must be completed before marking the appointment as completed'
+    });
+  }
+
+  // Validate status transition rules
+  const allowedTransitions = {
+    booked: ['completed', 'cancelled', 'missed'],
+    completed: [],
+    cancelled: [],
+    missed: ['completed', 'cancelled'],
+  };
+
+  const allowed = allowedTransitions[currentStatus] || [];
+  if (!allowed.includes(newStatus)) {
+    errors.push({
+      field: 'status',
+      message: `Cannot change status from ${currentStatus} to ${newStatus}`
+    });
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};

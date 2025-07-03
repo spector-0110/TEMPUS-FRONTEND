@@ -7,9 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { ErrorDialog } from "@/components/ui/error-dialog";
 import { Calendar, Clock, User, Phone, Mail, MapPin, Stethoscope, AlertCircle, CheckCircle, XCircle, CreditCard, Smartphone, IndianRupee, FileText, Download } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
+import { validateAppointmentStatusUpdate } from "@/lib/validation/appointment-validation";
 
 const statusConfig = {
   booked: { 
@@ -85,6 +87,13 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
     description: ''
   });
   const [downloadingFiles, setDownloadingFiles] = useState({});
+  const [errorDialog, setErrorDialog] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    details: [],
+    errorType: 'general'
+  });
 
   if (!appointment) return null;
 
@@ -168,6 +177,18 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
 
   const handleStatusUpdate = async (newStatus) => {
     if (!onStatusChange) return;
+    
+    // Additional validation: Prevent completion if payment is not done
+    if (newStatus === 'completed' && appointment?.paymentStatus !== 'paid') {
+      setErrorDialog({
+        isOpen: true,
+        title: 'Payment Required',
+        message: 'Cannot mark appointment as completed without payment',
+        details: ['Please complete the payment first before marking the appointment as completed.'],
+        errorType: 'validation'
+      });
+      return;
+    }
     
     const statusInfo = statusConfig[newStatus];
     setConfirmationDialog({
@@ -309,7 +330,15 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
       cancelled: [],
       missed: ['completed', 'cancelled'],
     };
-    return allowedTransitions[currentStatus] || [];
+    
+    let allowedStatuses = allowedTransitions[currentStatus] || [];
+    
+    // Prevent marking as completed if payment is not done
+    if (allowedStatuses.includes('completed') && appointment?.paymentStatus !== 'paid') {
+      allowedStatuses = allowedStatuses.filter(status => status !== 'completed');
+    }
+    
+    return allowedStatuses;
   };
 
   const canUpdatePaymentStatus = (currentPaymentStatus, appointmentStatus) => {
@@ -550,9 +579,40 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
                         </Button>
                       );
                     })}
+                    
+                    {/* Show disabled complete button if payment is not done */}
+                    {!allowedStatuses.includes('completed') && 
+                     (appointment.status === 'booked' || appointment.status === 'missed') && 
+                     appointment.paymentStatus !== 'paid' && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={true}
+                        className="flex items-center gap-2 opacity-50 cursor-not-allowed"
+                        title="Payment required before marking as completed"
+                      >
+                        <CheckCircle className="h-4 w-4" />
+                        Mark as Completed
+                      </Button>
+                    )}
                   </div>
                   {isUpdatingStatus && (
                     <p className="text-sm text-muted-foreground mt-2">Updating appointment status...</p>
+                  )}
+                  {/* Payment requirement notice for completion */}
+                  {(appointment.status === 'booked' || appointment.status === 'missed') && 
+                   appointment.paymentStatus !== 'paid' && (
+                    <div className="flex items-start gap-3 mt-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md">
+                      <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-amber-800 dark:text-amber-200 mb-1">
+                          Payment Required
+                        </p>
+                        <p className="text-sm text-amber-700 dark:text-amber-300">
+                          Payment must be completed before marking the appointment as completed. Please update the payment status first.
+                        </p>
+                      </div>
+                    </div>
                   )}
                 </CardContent>
               </Card>
@@ -678,6 +738,16 @@ export default function AppointmentDetailsModal({ appointment, isOpen, onClose, 
           </Button>
         </div>
       </DialogContent>
+
+      {/* Error Dialog */}
+      <ErrorDialog
+        isOpen={errorDialog.isOpen}
+        onClose={() => setErrorDialog(prev => ({ ...prev, isOpen: false }))}
+        title={errorDialog.title}
+        message={errorDialog.message}
+        details={errorDialog.details}
+        errorType={errorDialog.errorType}
+      />
 
       {/* Confirmation Dialog */}
       <ConfirmationDialog
