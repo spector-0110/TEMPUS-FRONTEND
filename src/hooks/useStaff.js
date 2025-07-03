@@ -97,7 +97,6 @@ export function useStaff() {
     }
   }), [context]);
 
-  // console.log('useStaff - Computed Stats:', computedStats);
 
   return {
     ...context,

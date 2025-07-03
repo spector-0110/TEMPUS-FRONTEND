@@ -82,18 +82,35 @@ export default function AnalyticsDashboard({ data }) {
     setTimeout(() => setIsRefreshing(false), 1500);
   };
 
-  const appointmentTrends = Object.entries(appointment.volumeTrends.daily).map(([date, value]) => ({
-    label: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    value
-  }));
+  // Filter data based on selected time range
+  const getFilteredData = (data, timeRange) => {
+    if (!data || !appointment.volumeTrends?.daily) return [];
+    
+    const today = new Date();
+    const days = {
+      '7d': 7,
+      '30d': 30,
+      '90d': 90
+    };
+    
+    const cutoffDate = new Date(today);
+    cutoffDate.setDate(today.getDate() - days[timeRange]);
+    
+    return Object.entries(appointment.volumeTrends.daily)
+      .filter(([date]) => new Date(date) >= cutoffDate)
+      .map(([date, value]) => ({
+        label: new Date(date).toLocaleDateString('en-In', { month: 'short', day: 'numeric' }),
+        value
+      }));
+  };
+
+  const appointmentTrends = getFilteredData(appointment.volumeTrends?.daily, activeTimeRange);
 
   // KPI Summary Cards (Overview)
   const kpiMetrics = [
     {
       title: 'Total Appointments',
-      value: appointment.statusDistribution 
-        ? Object.values(appointment.statusDistribution).reduce((sum, count) => sum + count, 0) 
-        : 0,
+      value: appointmentTrends.reduce((sum, item) => sum + item.value, 0),
       icon: Calendar,
       color: 'from-primary to-primary-hover',
       change: '+12%',
@@ -110,8 +127,8 @@ export default function AnalyticsDashboard({ data }) {
     {
       title: 'Patient Satisfaction',
       value: patientExperience && patientExperience.overallSatisfaction !== undefined ? 
-        `${patientExperience.overallSatisfaction}%` : 
-        `${patientExperience?.retention?.returnRate || 0}%`,
+        `${patientExperience.overallSatisfaction.toFixed(2)}%` : 
+        `${patientExperience?.retention?.returnRate.toFixed(2) || 0}%`,
       icon: Award,
       color: 'from-yellow-400 to-yellow-500',
       change: '+2.4%',
@@ -120,7 +137,7 @@ export default function AnalyticsDashboard({ data }) {
     {
       title: 'Monthly Revenue',
       value: revenue?.paymentStatus?.paid ? 
-        `$${(revenue.paymentStatus.paid.amount || 0).toLocaleString()}` : '$0',
+        `₹${(revenue.paymentStatus.paid.amount || 0).toLocaleString()}` : '$0',
       icon: TrendingUp,
       color: 'from-green-500 to-green-600',
       change: '+8.1%',
@@ -130,9 +147,9 @@ export default function AnalyticsDashboard({ data }) {
 
   // Format appointment volume data for area chart
   const appointmentVolumeData = appointment.volumeTrends?.daily 
-    ? Object.entries(appointment.volumeTrends.daily).map(([date, count]) => ({
-        date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        appointments: count
+    ? getFilteredData(appointment.volumeTrends.daily, activeTimeRange).map(({ label, value }) => ({
+        date: label,
+        appointments: value
       }))
     : [];
 
@@ -177,6 +194,9 @@ export default function AnalyticsDashboard({ data }) {
           </h1>
           <p className="text-muted-foreground mt-1">
             Comprehensive insights for {hospitalInfo.name || 'Your Hospital'}
+            <span className="ml-2 text-sm bg-primary/10 text-primary px-2 py-1 rounded-full">
+              {activeTimeRange.replace('d', ' Days')}
+            </span>
           </p>
         </motion.div>
         
@@ -260,7 +280,7 @@ export default function AnalyticsDashboard({ data }) {
                 <div className="lg:col-span-2">
                     <LineChartCustom
                     data={appointmentTrends}
-                    title="Appointment Volume Trends"
+                    title={`Appointment Volume Trends (${activeTimeRange.replace('d', ' Days')})`}
                     color="#3B82F6"
                     showArea={true}
                     />
@@ -378,17 +398,17 @@ export default function AnalyticsDashboard({ data }) {
           {/* Other tabs would be implemented similarly but with different chart types and data */}
           <TabsContent value="appointments" className="mt-0">
             {/* Appointment specific visualizations */}
-            <AppointmentAnalytics data={appointment} />
+            <AppointmentAnalytics data={appointment} timeRange={activeTimeRange} />
           </TabsContent>
 
           <TabsContent value="doctors" className="mt-0">
             {/* Doctor specific visualizations */}
-            <DoctorPerformance doctors={doctors} appointmentData={appointment} operationalData={operational} />
+            <DoctorPerformance doctors={doctors} appointmentData={appointment} operationalData={operational} timeRange={activeTimeRange} />
           </TabsContent>
 
           <TabsContent value="revenue" className="mt-0">
             {/* Revenue specific visualizations */}
-            <RevenueAnalytics data={revenue} />
+            <RevenueAnalytics data={revenue} timeRange={activeTimeRange} />
               <BarChartIcon className="h-16 w-16 mx-auto text-success opacity-50 mb-4" />
               <h3 className="text-xl font-medium text-muted-foreground">Revenue Analytics</h3>
               <p className="text-muted-foreground mt-2 max-w-md mx-auto">

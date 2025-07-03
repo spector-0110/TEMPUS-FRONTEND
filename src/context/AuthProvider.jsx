@@ -38,7 +38,6 @@ export function AuthProvider({ children }) {
     const { data: { subscription } } = authService.onAuthStateChange(
       async (event, session) => {
         if (mounted) {
-          console.log('Auth state changed:', event, session?.user?.id);
           setSession(session);
           setUser(session?.user || null);
           setLoading(false);

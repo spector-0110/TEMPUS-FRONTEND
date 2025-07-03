@@ -142,8 +142,6 @@ export async function getAllStaff(queryParams = {}, options = {}) {
         'Content-Type': 'application/json'
       },
     });
-
-    console.log('getAllStaff - Response status--------------->>>>>>>:', response.status);
     
     return handleApiResponse(response, 'Failed to fetch staff list');
   } catch (error) {
